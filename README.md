@@ -1,5 +1,6 @@
 # 2021fa-420-nullptr
-Clonning Directions: 
+##Clonning Directions:
+
 clone project 
 ```
 git clone https://github.com/mucsci-students/2021fa-420-nullptr.git
