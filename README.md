@@ -1,5 +1,5 @@
 # 2021fa-420-nullptr
-##Clonning Directions:
+## Clone Directions:
 
 clone project 
 ```
