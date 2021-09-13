@@ -15,55 +15,96 @@
 
 class UMLData
 {
+    private:
+        //params: std::string name
+        //finds class by name and returns index within member classes vector
+        int findClass(std::string name);
+
+        //params: UMLClass sourceClassIn, UMLClass destClassIn
+        //finds relationship using two UML classes and returns index within member classes vector
+        int findRelationship(const UMLClass& sourceClassIn, const UMLClass& destClassIn);
+
+        //params: std::string name
+        //gets class reference for the given name
+        UMLClass& getClass(std::string name);
+
+        //params: std::string name
+        //gets relationship reference for the given string class names
+        UMLRelationship& getRelationship(std::string srcName, std::string destName);
+
+        //params: UMLRelationship relationshipIn
+        //takes in relationship object and adds it to relationship vector
+        void addRelationship(const UMLRelationship& relationshipIn);
+
+        //params: UMLClass source, UMLClass destClass
+        //creates relationship from two classes and adds to relationshp vector
+        void addRelationship(const UMLClass& sourceClass, const UMLClass& destClass);
+
+        std::vector<UMLClass> classes;
+        std::vector<UMLRelationship> relationships;
+
     public: 
         
+        //Empty constructor
         UMLData() {};
 
-        //constructor takes in vector of classes
+        //Constructor that takes in vector of classes 
         UMLData(const std::vector<UMLClass>& vclass)
         {
             classes = vclass;
         }
 
+        //returns vector of all classes
         std::vector<UMLClass> getClasses() const { return classes; }
+   
+        //returns vector of all relationships
         std::vector<UMLRelationship> getRelationships() const { return relationships; }
 
+        //params: classIn
+        //takes in class and adds it to vector
         void addClass(const UMLClass& classIn);
+
+        //params: std::string name
+        //takes in string name and creates class and adds to classes vector
         void addClass(std::string name);
+
+        //params: std::string name, vector<UMLAttributes> attributes
+        //takes in name and vector of attributes and creates class and adds to vector of classes
         void addClass(std::string name, std::vector<UMLAttribute> attributes);
 
-     
+        //params: std::string srcName, destName
+        //takes in src string and dest string, creates relationship and adds to relationships vector
         void addRelationship(std::string srcName, std::string destName);
-
+        
+        //params: std:string className
+        //takes in className string and returns a vector of all the relationshps associated with that class
         std::vector<UMLRelationship> getRelationshipsByClass(std::string className);
 
+        //params: std::string srcName, std::string destName
+        //deletes relationshp based on two strings
         void deleteRelationship(std::string srcName, std::string destName);
+
+        //params: std::string name
+        //deletes a class by string in the classes vector
         void deleteClass(std::string name);
 
+        //params: std::string oldName, std::string newName
+        //changes class name from old name and new name
         void changeClassName(std::string oldName, std::string newName);
 
+        //params std::string className
+        //gets class attributes for a className class and returns them in a vector
         std::vector<UMLAttribute> getClassAttributes(std::string className);
+
+        //params std::string className, UMLAttribute attribute
+        //adds class attribute to specified className
         void addClassAttribute(std::string className, UMLAttribute attribute);
+
+        //params: std::string className, std::string attribute name
+        //removes className class attribute by the name
         void removeClassAttriubte(std::string className, std::string attributeName);
-
-        
-
-    private:
-
-        int findClass(std::string name);
-        int findRelationship(const UMLClass& sourceClassIn, const UMLClass& destClassIn);
-
-        UMLClass& getClass(std::string name);
-        UMLRelationship& getRelationship(std::string srcName, std::string destName);
-
-        void addRelationship(const UMLRelationship& relationshipIn);
-        void addRelationship(const UMLClass& sourceClass, const UMLClass& destClass);
-
-        std::vector<UMLClass> classes;
-        std::vector<UMLRelationship> relationships;
 };
 
-//takes in a class name and then returns the index within classes vector
 int UMLData::findClass(std::string name)
 {
     for (int i = 0; i < classes.size(); ++i)
@@ -75,7 +116,7 @@ int UMLData::findClass(std::string name)
     }
     return -1;
 }
-//takes in source and dest class and returns index within relationship vector
+
 int UMLData::findRelationship(const UMLClass& sourceClassIn, const UMLClass& destClassIn)
 {
     for (int i = 0; i < relationships.size(); ++i)
@@ -91,7 +132,7 @@ int UMLData::findRelationship(const UMLClass& sourceClassIn, const UMLClass& des
     }
     return -1;
 }
-//takes in name string and returns class object
+
 UMLClass& UMLData::getClass(std::string name)
 {
     int loc = findClass(name);
@@ -99,7 +140,7 @@ UMLClass& UMLData::getClass(std::string name)
         throw "name not found";
     return classes[loc];
 }
-//takes in src string and dest string and returns relationship object
+
 UMLRelationship& UMLData::getRelationship(std::string srcName, std::string destName)
 {
     int loc = findRelationship(getClass(srcName), getClass(destName));
@@ -108,7 +149,6 @@ UMLRelationship& UMLData::getRelationship(std::string srcName, std::string destN
     return relationships[loc];
 }
 
-//takes in class and adds it to classes vector
 void UMLData::addClass(const UMLClass& classIn)
 {
     //check if already exists
@@ -119,19 +159,16 @@ void UMLData::addClass(const UMLClass& classIn)
     classes.push_back(classIn);
 }
 
-//takes in string name and creates class and adds to classes vector
 void UMLData::addClass(std::string name)
 {
     addClass(UMLClass(name));
 }
 
-//takes in string name and vector attributes creates umlclass and adds to vector
 void UMLData::addClass(std::string name, std::vector<UMLAttribute> attributes)
 {
     addClass(UMLClass(name, attributes));
 }
 
-//adds relationship to relationships vector
 void UMLData::addRelationship(const UMLRelationship& relIn)
 {
     int loc = findRelationship(relIn.getSource(), relIn.getDestination());
@@ -140,17 +177,17 @@ void UMLData::addRelationship(const UMLRelationship& relIn)
     
     relationships.push_back(relIn); 
 }
-//creates relationship from two classes and adds to relationshp vector
+
 void UMLData::addRelationship(const UMLClass& sourceClass, const UMLClass& destClass)
 {
     addRelationship(UMLRelationship(sourceClass, destClass));
 }
-//adds relationshp to vector via strings
+
 void UMLData::addRelationship(std::string srcName, std::string destName)
 {
     addRelationship(getClass(srcName), getClass(destName));
 }
-//deletes class by name
+
 void UMLData::deleteClass(std::string name)
 {
     int loc = findClass(name);
@@ -168,7 +205,7 @@ void UMLData::deleteClass(std::string name)
     //remove class
     classes.erase(classes.begin() + loc);
 }
-//deletes class by relationship
+
 void UMLData::deleteRelationship(std::string srcName, std::string destName)
 {
     int loc = findRelationship(getClass(srcName), getClass(destName));
@@ -177,7 +214,6 @@ void UMLData::deleteRelationship(std::string srcName, std::string destName)
     relationships.erase(relationships.begin() + loc);
 }
 
-//takes in a class name and finds all relationshps associated with that class
 std::vector<UMLRelationship> UMLData::getRelationshipsByClass(std::string classNameIn)
 {
     std::vector<UMLRelationship> relationshipsContainingClass;
@@ -198,7 +234,7 @@ std::vector<UMLRelationship> UMLData::getRelationshipsByClass(std::string classN
     return relationshipsContainingClass;
 
 }
-//change name of class
+
 void UMLData::changeClassName(std::string oldName, std::string newName)
 {
     if (findClass(newName) >= 0)
@@ -206,7 +242,6 @@ void UMLData::changeClassName(std::string oldName, std::string newName)
     getClass(oldName).changeName(newName);
 }
 
-//add class attribute
 void UMLData::addClassAttribute(std::string className, UMLAttribute attribute)
 {
     getClass(className).addAttribute(attribute);

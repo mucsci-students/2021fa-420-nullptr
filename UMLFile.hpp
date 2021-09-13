@@ -23,35 +23,40 @@
 using json = nlohmann::json;
 //--------------------------------------------------------------------
 
-
 class UMLFile
 {
+      private:
+        //takes in vector of classes and adds a json string to the jsonFile
+        void addUMLClassVec(const std::vector<UMLClass>& umlclasses);
+
+        //takes in vector of relationships and adds them to the jsonFile
+        void addUMLRelationshipVec(const std::vector<UMLRelationship>& relationships);
+
+        //gets the classes from the json file and returns classes vector
+        std::vector<UMLClass> getUMLClassVec();
+        
+        //takes in UML Data object
+        //gets the relationships from the json file and adds them to the UMLData object
+        void getUMLRelationshipVec(UMLData& data);
+
+        json jsonFile;
+        std::string path;
     public:
+        //constructor: takes in the name of the file to save
         UMLFile(const std::string&);
 
         //saving file
         void save(const UMLData& data);
 
-        //loading file
-        UMLData load();
-
-    private:
-        void addUMLClassVec(const std::vector<UMLClass>& umlclasses);
-        void addUMLRelationshipVec(const std::vector<UMLRelationship>& relationships);
-        std::vector<UMLClass> getUMLClassVec();
-        void getUMLRelationshipVec(UMLData& data);
-
-        json jsonFile;
-        std::string path;
+        //loads a system file and returns a UML data object
+        UMLData load();  
 };
 
-//constructor: takes in the name of the file to save
 UMLFile::UMLFile(const std::string& path) 
 {
     this->path = path;
 }
 
-//takes in vector of classes and adds a json string to the jsonFile
 void UMLFile::addUMLClassVec(const std::vector<UMLClass>& classes)
 {
     for (UMLClass umlclass : classes)
@@ -66,7 +71,6 @@ void UMLFile::addUMLClassVec(const std::vector<UMLClass>& classes)
     }    
 }
 
-//takes in vector of relationships and adds them to the jsonFile
 void UMLFile::addUMLRelationshipVec(const std::vector<UMLRelationship>& relationships)
 {
     for (UMLRelationship relationship : relationships)
@@ -75,7 +79,6 @@ void UMLFile::addUMLRelationshipVec(const std::vector<UMLRelationship>& relation
     }    
 }
 
-//saves the jsonFile to an actual system file
 void UMLFile::save(const UMLData& data)
 {
     addUMLClassVec(data.getClasses());
@@ -87,7 +90,6 @@ void UMLFile::save(const UMLData& data)
     file.close();
 }
 
-//loads a system file and returns a UML data object
 UMLData UMLFile::load() 
 {
     std::ifstream file; 
@@ -101,7 +103,6 @@ UMLData UMLFile::load()
     return data;
 }
 
-//gets the classes from the json file and returns their vector
 std::vector<UMLClass> UMLFile::getUMLClassVec()
 {
     std::vector<UMLClass> classVec;
@@ -118,8 +119,6 @@ std::vector<UMLClass> UMLFile::getUMLClassVec()
     return classVec;
 }
 
-//takes in UML Data object
-//gets the relationships from the json file and adds them to the UMLData object
 void UMLFile::getUMLRelationshipVec(UMLData& data)
 {
     for (auto rel : jsonFile["Relationship"])
