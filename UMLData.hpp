@@ -28,9 +28,6 @@ class UMLData
         std::vector<UMLClass> getClasses() const { return classes; }
         std::vector<UMLRelationship> getRelationships() const { return relationships; }
 
-        UMLClass getClass(std::string name);
-        UMLRelationship getRelationship(std::string srcName, std::string destName);
-
         void addClass(const UMLClass& classIn);
         void addClass(std::string name);
         void addClass(std::string name, std::vector<UMLAttribute> attributes);
@@ -43,12 +40,19 @@ class UMLData
         void deleteRelationship(std::string srcName, std::string destName);
         void deleteClass(std::string name);
 
+        void changeClassName(std::string oldName, std::string newName);
+        void addClassAttribute(std::string className, UMLAttribute attribute);
+        void removeClassAttriubte(std::string className, std::string attributeName);
+
         
 
     private:
 
         int findClass(std::string name);
         int findRelationship(const UMLClass& sourceClassIn, const UMLClass& destClassIn);
+
+        UMLClass& getClass(std::string name);
+        UMLRelationship& getRelationship(std::string srcName, std::string destName);
 
         void addRelationship(const UMLRelationship& relationshipIn);
         void addRelationship(const UMLClass& sourceClass, const UMLClass& destClass);
@@ -86,7 +90,7 @@ int UMLData::findRelationship(const UMLClass& sourceClassIn, const UMLClass& des
     return -1;
 }
 //takes in name string and returns class object
-UMLClass UMLData::getClass(std::string name)
+UMLClass& UMLData::getClass(std::string name)
 {
     int loc = findClass(name);
     if (loc < 0)
@@ -94,7 +98,7 @@ UMLClass UMLData::getClass(std::string name)
     return classes[loc];
 }
 //takes in src string and dest string and returns relationship object
-UMLRelationship UMLData::getRelationship(std::string srcName, std::string destName)
+UMLRelationship& UMLData::getRelationship(std::string srcName, std::string destName)
 {
     int loc = findRelationship(getClass(srcName), getClass(destName));
     if (loc < 0)
@@ -191,4 +195,8 @@ std::vector<UMLRelationship> UMLData::getRelationshipsByClass(std::string classN
     }
     return relationshipsContainingClass;
 
+}
+void UMLData::changeClassName(std::string oldName, std::string newName)
+{
+    getClass(oldName).changeName(newName);
 }

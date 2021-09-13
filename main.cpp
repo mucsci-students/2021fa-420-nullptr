@@ -54,6 +54,10 @@ int main()
 
     data.deleteClass("tree");
 
+    data.changeClassName("cat", "cat123");
+
+    std::cout << "after changes" << std::endl;
+
     for (UMLRelationship r : data.getRelationships())
     {
         std::cout << "source: " << r.getSource().getName() << " dest: " << r.getDestination().getName() << std::endl;
