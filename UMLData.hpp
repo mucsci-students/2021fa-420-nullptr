@@ -41,6 +41,8 @@ class UMLData
         void deleteClass(std::string name);
 
         void changeClassName(std::string oldName, std::string newName);
+
+        std::vector<UMLAttribute> getClassAttributes(std::string className);
         void addClassAttribute(std::string className, UMLAttribute attribute);
         void removeClassAttriubte(std::string className, std::string attributeName);
 
@@ -196,16 +198,26 @@ std::vector<UMLRelationship> UMLData::getRelationshipsByClass(std::string classN
     return relationshipsContainingClass;
 
 }
+//change name of class
 void UMLData::changeClassName(std::string oldName, std::string newName)
 {
+    if (findClass(newName) >= 0)
+        throw "new name already exists";
     getClass(oldName).changeName(newName);
 }
 
+//add class attribute
 void UMLData::addClassAttribute(std::string className, UMLAttribute attribute)
 {
     getClass(className).addAttribute(attribute);
 }
+
 void UMLData::removeClassAttriubte(std::string className, std::string attributeName)
 {
     getClass(className).deleteAttribute(attributeName);
+}
+
+std::vector<UMLAttribute> UMLData::getClassAttributes(std::string className)
+{
+    return getClass(className).getAttributes();
 }

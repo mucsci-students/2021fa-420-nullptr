@@ -43,6 +43,8 @@ int main()
     data.addRelationship("tree", "cat");
     data.addRelationship("rat", "cat");
 
+    //data.changeClassName("woof", "test");
+
     
 
     std::vector<UMLRelationship> fromClass = data.getRelationshipsByClass("tree");
@@ -63,9 +65,22 @@ int main()
         std::cout << "source: " << r.getSource().getName() << " dest: " << r.getDestination().getName() << std::endl;
     }
 
-     for (UMLClass uClass : data.getClasses())
+    for (UMLClass uClass : data.getClasses())
     {
         std::cout << uClass.getName() << std::endl;
+    }
+
+    std::cout << "class attributes" << std::endl;
+    for (UMLAttribute attr : data.getClassAttributes("rat"))
+    {
+        std::cout << attr.getAttributeName() << std::endl;
+    }
+
+    data.removeClassAttriubte("rat", "red");
+
+     for (UMLAttribute attr : data.getClassAttributes("rat"))
+    {
+        std::cout << attr.getAttributeName() << std::endl;
     }
 
     UMLFile file("save.json");
