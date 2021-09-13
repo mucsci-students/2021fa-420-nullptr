@@ -200,3 +200,12 @@ void UMLData::changeClassName(std::string oldName, std::string newName)
 {
     getClass(oldName).changeName(newName);
 }
+
+void UMLData::addClassAttribute(std::string className, UMLAttribute attribute)
+{
+    getClass(className).addAttribute(attribute);
+}
+void UMLData::removeClassAttriubte(std::string className, std::string attributeName)
+{
+    getClass(className).deleteAttribute(attributeName);
+}
