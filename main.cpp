@@ -8,22 +8,12 @@
 // System includes
 #include <string>
 #include <iostream>
+#include "UMLFile.hpp"
 #include <vector>
-#include <stdexcept>
 #include "UMLClass.hpp"
-#include "UMLAttribute.hpp"
-#include "UMLRelationship.hpp"
-//--------------------------------------------------------------------
+#include "UMLData.hpp"
 
-int main ()
+int main()
 {
-    std::cout << "Hello world." << std::endl;
-
-    UMLClass newClass("test");
-    newClass.addAttribute(UMLAttribute("swag"));
-    std::cout << "Attribute name: " << newClass.findAttribute("swag")->getAttributeName() << std::endl;
-    std::cout << "Vector size before deleting swag: " << newClass.getAttributes().size() << std::endl;
-    newClass.deleteAttribute("swag");
-    std::cout << "Vector size after deleting swag: " << newClass.getAttributes().size() << std::endl;
     return 0;
-}
+};
