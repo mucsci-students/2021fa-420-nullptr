@@ -4,7 +4,7 @@ project(project C CXX)
 
 add_subdirectory(include/json)
 
-add_executable(project main.cpp UMLFile.cpp)
+add_executable(project main.cpp)
 
 target_link_libraries(project PUBLIC json)
 

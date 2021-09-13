@@ -17,13 +17,17 @@ int main()
 {
 
     //testing UMLDATA 
-    
+
     UMLData data;
     UMLClass test("test");
     UMLClass woof("woof");
     UMLClass bird("bird");
     UMLClass cat("cat");
     UMLClass rat("rat");
+    UMLAttribute ratEyes("2 eyes");
+    UMLAttribute ratColor("red");
+    rat.addAttribute(ratEyes);
+    rat.addAttribute(ratColor);
     data.addClass(test);
     data.addClass(woof);
     data.addClass(bird);
@@ -36,20 +40,17 @@ int main()
         std::cout << uClass.getName() << std::endl;
     }
 
-    data.addRelationship("cat", "rat");
-
-    data.addRelationship("bird", "cat");
+    data.addRelationship("tree", "cat");
+    data.addRelationship("rat", "cat");
 
     for (UMLRelationship r : data.getRelationships())
     {
         std::cout << "source: " << r.getSource().getName() << " dest: " << r.getDestination().getName() << std::endl;
     }
-    data.deleteRelationship("bird", "cat");
 
-   for (UMLRelationship r : data.getRelationships())
-    {
-        std::cout << "source: " << r.getSource().getName() << " dest: " << r.getDestination().getName() << std::endl;
-    }
+    UMLFile file("save.json");
+    file.save(data);
+    
 
     return 0;
 };

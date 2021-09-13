@@ -1,9 +1,17 @@
 #pragma once
+/*
+  Filename   : UMLData.cpp
+  Description: Stores the Relationship and Class information of the current state 
+*/
+//--------------------------------------------------------------------
+// System includes
 #include "UMLClass.hpp"
 #include "UMLAttribute.hpp"
 #include "UMLRelationship.hpp"
 #include <vector>
 #include <iostream>
+//--------------------------------------------------------------------
+
 
 class UMLData
 {
@@ -11,8 +19,14 @@ class UMLData
         
         UMLData() {};
 
-        std::vector<UMLClass> getClasses() { return classes; }
-        std::vector<UMLRelationship> getRelationships() { return relationships; }
+        //constructor takes in vector of classes
+        UMLData(const std::vector<UMLClass>& vclass)
+        {
+            classes = vclass;
+        }
+
+        std::vector<UMLClass> getClasses() const { return classes; }
+        std::vector<UMLRelationship> getRelationships() const { return relationships; }
 
         UMLClass getClass(std::string name);
         UMLRelationship getRelationship(std::string srcName, std::string destName);
@@ -39,6 +53,7 @@ class UMLData
         std::vector<UMLRelationship> relationships;
 };
 
+//takes in a class name and then returns the index within classes vector
 int UMLData::findClass(std::string name)
 {
     for (int i = 0; i < classes.size(); ++i)
@@ -50,6 +65,7 @@ int UMLData::findClass(std::string name)
     }
     return -1;
 }
+//takes in source and dest class and returns index within relationship vector
 int UMLData::findRelationship(const UMLClass& sourceClassIn, const UMLClass& destClassIn)
 {
     for (int i = 0; i < relationships.size(); ++i)
@@ -65,7 +81,7 @@ int UMLData::findRelationship(const UMLClass& sourceClassIn, const UMLClass& des
     }
     return -1;
 }
-
+//takes in name string and returns class object
 UMLClass UMLData::getClass(std::string name)
 {
     int loc = findClass(name);
@@ -73,7 +89,7 @@ UMLClass UMLData::getClass(std::string name)
         throw "name not found";
     return classes[loc];
 }
-
+//takes in src string and dest string and returns relationship object
 UMLRelationship UMLData::getRelationship(std::string srcName, std::string destName)
 {
     int loc = findRelationship(getClass(srcName), getClass(destName));
@@ -82,7 +98,7 @@ UMLRelationship UMLData::getRelationship(std::string srcName, std::string destNa
     return relationships[loc];
 }
 
-
+//takes in class and adds it to classes vector
 void UMLData::addClass(const UMLClass& classIn)
 {
     //check if already exists
@@ -93,16 +109,19 @@ void UMLData::addClass(const UMLClass& classIn)
     classes.push_back(classIn);
 }
 
+//takes in string name and creates class and adds to classes vector
 void UMLData::addClass(std::string name)
 {
     addClass(UMLClass(name));
 }
 
+//takes in string name and vector attributes creates umlclass and adds to vector
 void UMLData::addClass(std::string name, std::vector<UMLAttribute> attributes)
 {
     addClass(UMLClass(name, attributes));
 }
 
+//adds relationship to relationships vector
 void UMLData::addRelationship(const UMLRelationship& relIn)
 {
     int loc = findRelationship(relIn.getSource(), relIn.getDestination());
@@ -111,17 +130,17 @@ void UMLData::addRelationship(const UMLRelationship& relIn)
     
     relationships.push_back(relIn); 
 }
-
+//creates relationship from two classes and adds to relationshp vector
 void UMLData::addRelationship(const UMLClass& sourceClass, const UMLClass& destClass)
 {
     addRelationship(UMLRelationship(sourceClass, destClass));
 }
-
+//adds relationshp to vector via strings
 void UMLData::addRelationship(std::string srcName, std::string destName)
 {
     addRelationship(getClass(srcName), getClass(destName));
 }
-
+//deletes class by name
 void UMLData::deleteClass(std::string name)
 {
     int loc = findClass(name);
@@ -129,7 +148,7 @@ void UMLData::deleteClass(std::string name)
         throw "class not found";
     classes.erase(classes.begin() + loc);
 }
-
+//deletes class by relationship
 void UMLData::deleteRelationship(std::string srcName, std::string destName)
 {
     int loc = findRelationship(getClass(srcName), getClass(destName));
