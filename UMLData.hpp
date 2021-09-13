@@ -38,8 +38,12 @@ class UMLData
      
         void addRelationship(std::string srcName, std::string destName);
 
+        std::vector<UMLRelationship> getRelationshipsByClass(std::string className);
+
         void deleteRelationship(std::string srcName, std::string destName);
         void deleteClass(std::string name);
+
+        
 
     private:
 
@@ -146,6 +150,16 @@ void UMLData::deleteClass(std::string name)
     int loc = findClass(name);
     if (loc < 0)
         throw "class not found";
+    
+    //delete relationships associated with class
+    std::vector<UMLRelationship> relationshipsFromClass = getRelationshipsByClass(name);
+
+    for (UMLRelationship rel : relationshipsFromClass)
+    {
+        deleteRelationship(rel.getSource().getName(), rel.getDestination().getName());
+    }
+
+    //remove class
     classes.erase(classes.begin() + loc);
 }
 //deletes class by relationship
@@ -155,4 +169,26 @@ void UMLData::deleteRelationship(std::string srcName, std::string destName)
     if (loc < 0)
         throw "relationship not found";
     relationships.erase(relationships.begin() + loc);
+}
+
+//takes in a class name and finds all relationshps associated with that class
+std::vector<UMLRelationship> UMLData::getRelationshipsByClass(std::string classNameIn)
+{
+    std::vector<UMLRelationship> relationshipsContainingClass;
+
+    std::string className = getClass(classNameIn).getName();
+
+    for (int i = 0; i < relationships.size(); ++i)
+    {
+        //pull src and destination classes from vector location
+        std::string src = relationships[i].getSource().getName();
+        std::string dest = relationships[i].getDestination().getName();
+        //compare
+        if ((src == className) or (dest == className))
+        {
+            relationshipsContainingClass.push_back(relationships[i]);
+        }
+    }
+    return relationshipsContainingClass;
+
 }
