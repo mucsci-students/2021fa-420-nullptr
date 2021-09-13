@@ -1,3 +1,4 @@
+#pragma once
 /*
   Filename   : UMLClass.cpp
   Description: Serves as an object for which information about a class
@@ -27,13 +28,22 @@ class UMLClass
 
 	public:
 		// Constructor for class objects
+
+		UMLClass() {}
+
 		UMLClass (string newClass) : 
 			className (newClass)
 		{
 		}
 
+		UMLClass(string newClass, const std::vector<UMLAttribute>& attributes)
+		{
+			className = newClass;
+			classAttributes = attributes;
+		}
+
 		// Grab name from given class object
-		string getName ()
+		string getName () const
 		{
 			return className;
 		}

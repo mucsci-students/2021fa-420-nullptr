@@ -2,36 +2,26 @@
 #include <string>
 #include <json.hpp>
 #include <fstream>
+#include "UMLData.hpp"
 
-using json = nlohmann::json;
+// using json = nlohmann::json;
 
-struct UMLAttribute
-{
-    std::string name;
-};
+// class UMLFile
+// {
+//     public:
+//         UMLFile(const std::string&);
 
-struct UMLClass
-{
-    std::string name;
-    std::vector<UMLAttribute> attributes;
-};
+//         //saving file
+//         void addUMLClassVec(const std::vector<UMLClass>&);
+//         void addUMLRelationshipVec();
+//         void save();
 
-class UMLFile
-{
-    public:
-        UMLFile(const std::string&);
+//         //loading file
+//         void load();
+//         std::vector<UMLClass> getUMLClassVec();
+//         void getUMLRelationshipVec();
 
-        //saving file
-        void addUMLClassVec(const std::vector<UMLClass>&);
-        void addUMLRelationshipVec();
-        void save();
-
-        //loading file
-        void load();
-        std::vector<UMLClass> getUMLClassVec();
-        void getUMLRelationshipVec();
-
-    private:
-        json data;
-        std::string path;
-};
+//     private:
+//         json data;
+//         std::string path;
+// };

@@ -8,37 +8,48 @@
 // System includes
 #include <string>
 #include <iostream>
-<<<<<<< HEAD
-#include <string>
 #include "UMLFile.hpp"
 #include <vector>
+#include "UMLClass.hpp"
+#include "UMLData.hpp"
 
 int main()
 {
-    std::cout << "Hello world." << std::endl;
 
-    UMLFile file("save.json");
-    file.load();  
-    std::vector<UMLClass> gg = file.getUMLClassVec();
+    //testing UMLDATA 
+    
+    UMLData data;
+    UMLClass test("test");
+    UMLClass woof("woof");
+    UMLClass bird("bird");
+    UMLClass cat("cat");
+    UMLClass rat("rat");
+    data.addClass(test);
+    data.addClass(woof);
+    data.addClass(bird);
+    data.addClass(cat);
+    data.addClass(rat);
+    data.addClass("tree");
 
-=======
-#include <vector>
-#include <stdexcept>
-#include "UMLClass.hpp"
-#include "UMLAttribute.hpp"
-#include "UMLRelationship.hpp"
-//--------------------------------------------------------------------
+    for (UMLClass uClass : data.getClasses())
+    {
+        std::cout << uClass.getName() << std::endl;
+    }
 
-int main ()
-{
-    std::cout << "Hello world." << std::endl;
+    data.addRelationship("cat", "rat");
 
-    UMLClass newClass("test");
-    newClass.addAttribute(UMLAttribute("swag"));
-    std::cout << "Attribute name: " << newClass.findAttribute("swag")->getAttributeName() << std::endl;
-    std::cout << "Vector size before deleting swag: " << newClass.getAttributes().size() << std::endl;
-    newClass.deleteAttribute("swag");
-    std::cout << "Vector size after deleting swag: " << newClass.getAttributes().size() << std::endl;
->>>>>>> develop
+    data.addRelationship("bird", "cat");
+
+    for (UMLRelationship r : data.getRelationships())
+    {
+        std::cout << "source: " << r.getSource().getName() << " dest: " << r.getDestination().getName() << std::endl;
+    }
+    data.deleteRelationship("bird", "cat");
+
+   for (UMLRelationship r : data.getRelationships())
+    {
+        std::cout << "source: " << r.getSource().getName() << " dest: " << r.getDestination().getName() << std::endl;
+    }
+
     return 0;
 };

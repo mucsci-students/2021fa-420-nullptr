@@ -14,6 +14,7 @@
 //--------------------------------------------------------------------
 // System includes
 #include <string>
+#include "UMLClass.hpp"
 //--------------------------------------------------------------------
 
 //--------------------------------------------------------------------
@@ -25,25 +26,24 @@ class UMLRelationship
 {
 	private:
 		// Name of class that owns attribute and name of attribute
-		string source;
-		string destination;
+		UMLClass source, destination;
 
 	public:
 		// Constructor for class objects
-		UMLRelationship (string newSource, string newDestination) : 
-			source (newSource),
-			destination (newDestination)
+		UMLRelationship (UMLClass src, UMLClass dest)
 		{
+			source = src;
+			destination = dest;
 		}
 
 		// Grab name of the source class
-		string getSource ()
+		UMLClass getSource () const
 		{
 			return source;
 		}
 
 		// Grab name of the destination class
-		string getDestination ()
+		UMLClass getDestination () const
 		{
 			return destination;
 		}
