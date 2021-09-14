@@ -38,18 +38,22 @@ class UMLRelationship
 		}
 
 		// Grab name of the source class
-		const UMLClass& getSource () const
-		{
-			return *source;
-		}
+		const UMLClass& getSource () const;
 
 		// Grab name of the destination classs
-		const UMLClass& getDestination () const
-		{
-			return *destination;
-		}
+		const UMLClass& getDestination () const;
 };
 
 /************************************************************/
 #endif
 /************************************************************/
+
+const UMLClass& UMLRelationship::getSource () const
+{
+	return *source;
+}
+
+const UMLClass& UMLRelationship::getDestination () const
+{
+	return *destination;
+}

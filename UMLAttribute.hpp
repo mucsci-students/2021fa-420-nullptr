@@ -42,13 +42,11 @@ class UMLAttribute
 
 };
 
-// Grab name of the given attribute
 string UMLAttribute::getAttributeName ()
 {
 	return attributeName;
 }
 
-// Change name of the given attribute
 void UMLAttribute::changeName (string newAttributeName)
 {
 	attributeName = newAttributeName;
