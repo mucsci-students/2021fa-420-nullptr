@@ -16,6 +16,10 @@
 class UMLData
 {
     private:
+
+        std::vector<UMLClass> classes;
+        std::vector<UMLRelationship> relationships;
+
         //params: std::string name
         //finds class by name and returns index within member classes vector
         int findClass(std::string name);
@@ -40,25 +44,19 @@ class UMLData
         //creates relationship from two classes and adds to relationshp vector
         void addRelationship(const UMLClass& sourceClass, const UMLClass& destClass);
 
-        std::vector<UMLClass> classes;
-        std::vector<UMLRelationship> relationships;
-
     public: 
         
         //Empty constructor
-        UMLData() {};
+        UMLData();
 
         //Constructor that takes in vector of classes 
-        UMLData(const std::vector<UMLClass>& vclass)
-        {
-            classes = vclass;
-        }
+        UMLData(const std::vector<UMLClass>& vclass);
 
         //returns vector of all classes
-        std::vector<UMLClass> getClasses() const { return classes; }
+        std::vector<UMLClass> getClasses() const;
    
         //returns vector of all relationships
-        std::vector<UMLRelationship> getRelationships() const { return relationships; }
+        std::vector<UMLRelationship> getRelationships() const;
 
         //params: classIn
         //takes in class and adds it to vector
@@ -149,6 +147,39 @@ UMLRelationship& UMLData::getRelationship(std::string srcName, std::string destN
     return relationships[loc];
 }
 
+void UMLData::addRelationship(const UMLRelationship& relIn)
+{
+    int loc = findRelationship(relIn.getSource(), relIn.getDestination());
+    if (loc > 0)
+        throw "relationship already exists";
+    
+    relationships.push_back(relIn); 
+}
+
+void UMLData::addRelationship(const UMLClass& sourceClass, const UMLClass& destClass)
+{
+    addRelationship(UMLRelationship(sourceClass, destClass));
+}
+
+UMLData::UMLData()
+{
+}
+
+UMLData::UMLData(const std::vector<UMLClass>& vclass)
+:classes(vclass)
+{
+}
+
+std::vector<UMLClass> UMLData::getClasses() const
+{
+    return classes;
+}
+
+std::vector<UMLRelationship> UMLData::getRelationships() const
+{
+    return relationships;
+}
+
 void UMLData::addClass(const UMLClass& classIn)
 {
     //check if already exists
@@ -169,49 +200,9 @@ void UMLData::addClass(std::string name, std::vector<UMLAttribute> attributes)
     addClass(UMLClass(name, attributes));
 }
 
-void UMLData::addRelationship(const UMLRelationship& relIn)
-{
-    int loc = findRelationship(relIn.getSource(), relIn.getDestination());
-    if (loc > 0)
-        throw "relationship already exists";
-    
-    relationships.push_back(relIn); 
-}
-
-void UMLData::addRelationship(const UMLClass& sourceClass, const UMLClass& destClass)
-{
-    addRelationship(UMLRelationship(sourceClass, destClass));
-}
-
 void UMLData::addRelationship(std::string srcName, std::string destName)
 {
     addRelationship(getClass(srcName), getClass(destName));
-}
-
-void UMLData::deleteClass(std::string name)
-{
-    int loc = findClass(name);
-    if (loc < 0)
-        throw "class not found";
-    
-    //delete relationships associated with class
-    std::vector<UMLRelationship> relationshipsFromClass = getRelationshipsByClass(name);
-
-    for (UMLRelationship rel : relationshipsFromClass)
-    {
-        deleteRelationship(rel.getSource().getName(), rel.getDestination().getName());
-    }
-
-    //remove class
-    classes.erase(classes.begin() + loc);
-}
-
-void UMLData::deleteRelationship(std::string srcName, std::string destName)
-{
-    int loc = findRelationship(getClass(srcName), getClass(destName));
-    if (loc < 0)
-        throw "relationship not found";
-    relationships.erase(relationships.begin() + loc);
 }
 
 std::vector<UMLRelationship> UMLData::getRelationshipsByClass(std::string classNameIn)
@@ -235,11 +226,42 @@ std::vector<UMLRelationship> UMLData::getRelationshipsByClass(std::string classN
 
 }
 
+void UMLData::deleteRelationship(std::string srcName, std::string destName)
+{
+    int loc = findRelationship(getClass(srcName), getClass(destName));
+    if (loc < 0)
+        throw "relationship not found";
+    relationships.erase(relationships.begin() + loc);
+}
+
+void UMLData::deleteClass(std::string name)
+{
+    int loc = findClass(name);
+    if (loc < 0)
+        throw "class not found";
+    
+    //delete relationships associated with class
+    std::vector<UMLRelationship> relationshipsFromClass = getRelationshipsByClass(name);
+
+    for (UMLRelationship rel : relationshipsFromClass)
+    {
+        deleteRelationship(rel.getSource().getName(), rel.getDestination().getName());
+    }
+
+    //remove class
+    classes.erase(classes.begin() + loc);
+}
+
 void UMLData::changeClassName(std::string oldName, std::string newName)
 {
     if (findClass(newName) >= 0)
         throw "new name already exists";
     getClass(oldName).changeName(newName);
+}
+
+std::vector<UMLAttribute> UMLData::getClassAttributes(std::string className)
+{
+    return getClass(className).getAttributes();
 }
 
 void UMLData::addClassAttribute(std::string className, UMLAttribute attribute)
@@ -250,9 +272,4 @@ void UMLData::addClassAttribute(std::string className, UMLAttribute attribute)
 void UMLData::removeClassAttriubte(std::string className, std::string attributeName)
 {
     getClass(className).deleteAttribute(attributeName);
-}
-
-std::vector<UMLAttribute> UMLData::getClassAttributes(std::string className)
-{
-    return getClass(className).getAttributes();
 }

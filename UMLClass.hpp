@@ -16,7 +16,8 @@
 
 //--------------------------------------------------------------------
 // Using declarations
-using namespace std;
+using std::string;
+using std::vector;
 //--------------------------------------------------------------------
 
 class UMLClass
@@ -29,16 +30,11 @@ class UMLClass
 	public:
 		// Params: newClass (name of class)
 		// Constructor for class object without attributes
-		UMLClass (string newClass) {
-			className = newClass;
-		}
+		UMLClass (string newClass);
 
 		// Params: newClass (name of class), attributes (vector of attributes)
 		// Constructor for class object with attributes
-		UMLClass(string newClass, const std::vector<UMLAttribute>& attributes) {
-			className = newClass;
-			classAttributes = attributes;
-		}
+		UMLClass(string newClass, const std::vector<UMLAttribute>& attributes);
 
 		// Grab name from given class object
 		string getName () const;
@@ -62,6 +58,17 @@ class UMLClass
 		// Returns vector of attributes 
 		vector<UMLAttribute> getAttributes ();
 };
+
+UMLClass::UMLClass (string newClass) 
+:className(newClass)
+{
+}
+
+UMLClass::UMLClass(string newClass, const std::vector<UMLAttribute>& attributes) 
+:className(newClass)
+,classAttributes(attributes)
+{
+}
 
 string UMLClass::getName () const
 {

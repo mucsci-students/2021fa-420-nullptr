@@ -18,7 +18,7 @@
 
 //--------------------------------------------------------------------
 // Using declarations
-using namespace std;
+using std::string;
 //--------------------------------------------------------------------
 
 class UMLAttribute
@@ -30,9 +30,7 @@ class UMLAttribute
 	public:
 		// Params: string newAttribute (name of attribute)
 		// Constructor for attribute objects
-		UMLAttribute (string newAttribute) {
-			attributeName = newAttribute;
-		}
+		UMLAttribute (string newAttribute);
 
 		// Grab name of the given attribute
 		string getAttributeName ();
@@ -41,6 +39,11 @@ class UMLAttribute
 		void changeName (string newAttributeName);
 
 };
+
+UMLAttribute::UMLAttribute (string newAttribute) 
+:attributeName(newAttribute)
+{
+}
 
 string UMLAttribute::getAttributeName ()
 {
