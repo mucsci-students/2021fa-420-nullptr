@@ -26,30 +26,32 @@ class UMLRelationship
 {
 	private:
 		// Name of class that owns attribute and name of attribute
-		const UMLClass* source = nullptr;
-		const UMLClass* destination = nullptr;
+		const UMLClass* source;
+		const UMLClass* destination;
 
 	public:
 		// Constructor for class objects
-		UMLRelationship (const UMLClass& src, const UMLClass& dest)
-		{
-			source = &src;
-			destination = &dest;
-		}
+		UMLRelationship(const UMLClass& src, const UMLClass& dest);
 
 		// Grab name of the source class
-		const UMLClass& getSource () const;
+		const UMLClass& getSource() const;
 
 		// Grab name of the destination classs
-		const UMLClass& getDestination () const;
+		const UMLClass& getDestination() const;
 };
 
-const UMLClass& UMLRelationship::getSource () const
+UMLRelationship::UMLRelationship(const UMLClass& src, const UMLClass& dest)
+:source(&src)
+,destination(&dest)
+{
+}
+
+const UMLClass& UMLRelationship::getSource() const
 {
 	return *source;
 }
 
-const UMLClass& UMLRelationship::getDestination () const
+const UMLClass& UMLRelationship::getDestination() const
 {
 	return *destination;
 }
