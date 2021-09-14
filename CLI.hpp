@@ -47,13 +47,14 @@ class CLI
 
 void CLI::displayCLI ()
 {
+    // stores choice input by user
     int userChoice;
-    bool loopCondition = true;
-    bool classLoop = false;
-    bool attributeLoop = false;
-    bool relationshipLoop = false;
+    // loop boolean that maintains CLI routine
+    bool mainLoop = true;
+    // loop boolean that maintains CLI subrountines
+    bool subLoop = false;
 
-    while(loopCondition){
+    while(mainLoop) {
         // Main prompt: prompts user for options.
         cout << "Choose an option:"<< endl;
         cout << "Class [0]" << endl;
@@ -68,10 +69,10 @@ void CLI::displayCLI ()
         // store user option
         cin >> userChoice;
 
-        // Lists operations for modifying classes
-        if(userChoice == 0) {
-            classLoop = true;
-            while(classLoop) {
+        subLoop = true;
+        while(subLoop) { 
+            // Lists operations for modifying classes
+            if(userChoice == 0) {
                 cout << "Choose an option:"<< endl;
                 cout << "Add [0]" << endl;
                 cout << "Remove [1]" << endl;
@@ -80,65 +81,98 @@ void CLI::displayCLI ()
 
                 // store user option
                 cin >> userChoice;
-               
+                
                 // Add class
                 if (userChoice == 0) {
                     // prompt name of class then add class
-                    classLoop = false;
+                    mainLoop = false;
                 }
                 // Remove class
                 else if (userChoice == 1) {
                     // prompt name of class then remove class
-                    classLoop = false;
+                    mainLoop = false;
                 } 
                 // Rename class
                 else if (userChoice == 2) {
                     // prompt name of class then rename class
-                    classLoop = false;
+                    mainLoop = false;
                 }
                 // Go Back
                 else if (userChoice == 3) {
                     // exits loop, goes back
-                    classLoop = false;
+                    mainLoop = false;
                 }
                 // Invalid choice
                 else {
                     // show error
                 }
             }
-        }
-        // Lists operations for modifying attributes
-        if(userChoice == 1){
+            // Lists operations for modifying attributes
+            if(userChoice == 1) {
+                cout << "Choose an option:"<< endl;
+                cout << "Add [0]" << endl;
+                cout << "Remove [1]" << endl;
+                cout << "Rename [2]" << endl;
+                cout << "Back [3]" << endl;
 
-        }
-        //  Lists operations for modifying relationships
-        if(userChoice == 2){
+                // store user option
+                cin >> userChoice;
 
-        }
-        //  Lists operations for viewing information within the diagram
-        if(userChoice == 3){
+                // Add attribute
+                if (userChoice == 0) {
+                    // prompt name of class and attribute then add attribute
+                    mainLoop = false;
+                }
+                // Remove class
+                else if (userChoice == 1) {
+                    // prompt name of class and attribute then remove attribute
+                    mainLoop = false;
+                } 
+                // Rename class
+                else if (userChoice == 2) {
+                    // prompt name of class and attribute then rename attribute
+                    mainLoop = false;
+                }
+                // Go Back
+                else if (userChoice == 3) {
+                    // exits loop, goes back
+                    mainLoop = false;
+                }
+                // Invalid choice
+                else {
+                    // show error
+                }
+            }
+            // Lists operations for modifying relationships
+            if(userChoice == 2) {
 
-        }
-        // Saves UML diagram to a JSON file in the same directory as the executable
-        if(userChoice == 4){
+            }
+            // Lists operations for viewing information within the diagram
+            if(userChoice == 3) {
 
-        }
-        // Prompts for a directory. If the directory exists, a UML diagram
-        if(userChoice == 5){
+            }
+            // Saves UML diagram to a JSON file in the same directory as the executable
+            if(userChoice == 4) {
 
-        }
-        // Loads this help file into the console
-        if(userChoice == 6){
+            }
+            // Prompts for a directory. If the directory exists, a UML diagram
+            if(userChoice == 5) {
 
-        }
-        // Exits the program
-        if(userChoice == 7){
+            }
+            // Loads this help file into the console
+            if(userChoice == 6) {
 
-        }
-        // Throw error, userChoice is not an option
-        else{
+            }
+            // Exits the program
+            if(userChoice == 7) {
 
-        }
+            }
+            // Throw error, userChoice is not an option
+            else {
+
+            }
+
+        }  
     } 
 }
 
