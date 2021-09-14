@@ -29,17 +29,15 @@ class UMLClass
 	public:
 		// Params: newClass (name of class)
 		// Constructor for class object without attributes
-		UMLClass (string newClass) : 
-			className (newClass)
-		{
+		UMLClass (string newClass) {
+			className = newClass;
 		}
 
 		// Params: newClass (name of class), attributes (vector of attributes)
 		// Constructor for class object with attributes
-		UMLClass(string newClass, const std::vector<UMLAttribute>& attributes) :
-			className (newClass),
-			classAttributes (attributes)
-		{
+		UMLClass(string newClass, const std::vector<UMLAttribute>& attributes) {
+			className = newClass;
+			classAttributes = attributes;
 		}
 
 		// Grab name from given class object

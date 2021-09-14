@@ -30,9 +30,8 @@ class UMLAttribute
 	public:
 		// Params: string newAttribute (name of attribute)
 		// Constructor for attribute objects
-		UMLAttribute (string newAttribute) : 
-			attributeName (newAttribute)
-		{
+		UMLAttribute (string newAttribute) {
+			attributeName = newAttribute;
 		}
 
 		// Grab name of the given attribute
