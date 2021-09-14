@@ -31,7 +31,6 @@
  using std::endl;
  using std::string;
  using std::vector;
- using std::list;
  using std::invalid_argument;
 //--------------------------------------------------------------------
 
@@ -44,96 +43,69 @@ class CLI
 
 
     public:
+};
 
-void CLI::displayCLI()
+void CLI::displayCLI ()
 {
-   
-    
-
-    // Main prompt user for option.
-    cout << "Choose an option:"<< endl;
-    cout << "Class [0]: Lists operations for modifying classes." << endl;
-    cout << "Attribute [1]: Lists operations for modifying attributes." << endl;
-    cout << "Relationship [2]: Lists operations for modifying relationships." << endl;
-    cout << "List [3]: Lists operations for viewing information within the diagram. " << endl;
-    cout << "Save [4]: Saves your UML diagram to a JSON file in the same directory as the executable." << endl;
-    cout << "Load [5]: Prompts for a directory. If the directory exists, a UML diagram 
-            made previously by this program will be loaded for modification." << endl;
-    cout << "Help [6]: Loads this help file into the console. " << endl;
-    cout << "Exit [7]: Exits the program. If the UML class diagram is not saved 
-            beforehand, data will be lost." << endl;
-
-    // store user option
     int userChoice;
-    cin >> userChoice;
-        
+    bool loopCondition = true;
+    bool classLoop = false;
+    bool attributeLoop = false;
+    bool relationshipLoop = false;
+
+    while(loopCondition){
+        // Main prompt: prompts user for options.
+        cout << "Choose an option:"<< endl;
+        cout << "Class [0]" << endl;
+        cout << "Attribute [1]" << endl;
+        cout << "Relationship [2]" << endl;
+        cout << "List [3]" << endl;
+        cout << "Save [4]" << endl;
+        cout << "Load [5]" << endl;
+        cout << "Help [6]" << endl;
+        cout << "Exit [7]" << endl;
+
+        // store user option
+        cin >> userChoice;
+
         // Lists operations for modifying classes
         if(userChoice == 0 ){
 
         }
-        
         // Lists operations for modifying attributes
         if(userChoice == 1){
 
         }
-
         //  Lists operations for modifying relationships
         if(userChoice == 2){
 
         }
-         
         //  Lists operations for viewing information within the diagram
         if(userChoice == 3){
 
         }
-
         // Saves UML diagram to a JSON file in the same directory as the executable
         if(userChoice == 4){
 
         }
-
         // Prompts for a directory. If the directory exists, a UML diagram
         if(userChoice == 5){
 
         }
-
         // Loads this help file into the console
         if(userChoice == 6){
 
         }
-
         // Exits the program
         if(userChoice == 7){
 
         }
-
         // Throw error, userChoice is not an option
         else{
-        
 
         }
-
-    
-
+    } 
 }
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /************************************************************/
 #endif
