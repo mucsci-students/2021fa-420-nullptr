@@ -66,7 +66,9 @@ void CLI::displayCLI ()
         cout << "Exit [7]" << endl;
 
         // store user option
+        cout << endl << "Choice: ";
         cin >> userChoice;
+        cout << endl;
 
         subLoop = true;
         while (subLoop) { 
@@ -221,16 +223,19 @@ void CLI::displayCLI ()
             // Save UML
             else if(userChoice == 4) {
                 // Saves UML diagram to a JSON file in the same directory as the executable
+                subLoop = false;
             }
 
             // Load UML
             else if(userChoice == 5) {
                 // Prompts for a directory. If the directory exists, UML diagram info is displayed
+                subLoop = false;
             }
 
             // Help
             else if(userChoice == 6) {
                 // Loads this help file into the console
+                subLoop = false;
             }
 
             // Exits the program
