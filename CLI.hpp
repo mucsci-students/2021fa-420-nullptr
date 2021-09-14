@@ -2,8 +2,6 @@
   Filename   : CLI.hpp
   Description: File which generates the command line interface
   for the user to create UML diagrams
-  Author: Tyler York
-  Date: 9/14/2021
 */
 
 /************************************************************/
@@ -37,16 +35,15 @@
 class CLI
 {
     private:
-        // displays command line interface
-        void displayCLI();
-
-    public:
         // stores choice input by user
         int userChoice;
         // loop boolean that maintains CLI routine
         bool mainLoop;
         // loop boolean that maintains CLI subrountines
         bool subLoop;
+    public:
+        // displays command line interface
+        void displayCLI();
 };
 
 void CLI::displayCLI ()
@@ -83,8 +80,10 @@ void CLI::displayCLI ()
                 cout << "Back [3]" << endl;
 
                 // store user option
+                cout << endl << "Choice: ";
                 cin >> userChoice;
-                
+                cout << endl;
+
                 // Add class
                 if (userChoice == 0) {
                     // prompt name of class then add class
@@ -112,7 +111,7 @@ void CLI::displayCLI ()
             }
 
             // Attribute
-            if(userChoice == 1) {
+            else if(userChoice == 1) {
                 // Lists operations for modifying attributes
                 cout << "Choose an option:"<< endl;
                 cout << "Add [0]" << endl;
@@ -121,7 +120,9 @@ void CLI::displayCLI ()
                 cout << "Back [3]" << endl;
 
                 // store user option
+                cout << endl << "Choice: ";
                 cin >> userChoice;
+                cout << endl;
 
                 // Add attribute
                 if (userChoice == 0) {
@@ -150,7 +151,7 @@ void CLI::displayCLI ()
             }
 
             // Relationship
-            if(userChoice == 2) {
+            else if(userChoice == 2) {
                 // Lists operations for modifying relationships
                 cout << "Choose an option:"<< endl;
                 cout << "Add [0]" << endl;
@@ -158,7 +159,9 @@ void CLI::displayCLI ()
                 cout << "Back [2]" << endl;
 
                 // store user option
+                cout << endl << "Choice: ";
                 cin >> userChoice;
+                cout << endl;
 
                 // Add relationship
                 if (userChoice == 0) {
@@ -182,7 +185,7 @@ void CLI::displayCLI ()
             }
 
             // Diagram
-            if(userChoice == 3) {
+            else if(userChoice == 3) {
                 // Lists operations for viewing information within the diagram
                 cout << "Choose an option:"<< endl;
                 cout << "Class [0]" << endl;
@@ -190,7 +193,9 @@ void CLI::displayCLI ()
                 cout << "Back [2]" << endl;
 
                 // store user option
+                cout << endl << "Choice: ";
                 cin >> userChoice;
+                cout << endl;
 
                 // Display single class
                 if (userChoice == 0) {
@@ -214,25 +219,26 @@ void CLI::displayCLI ()
             }
 
             // Save UML
-            if(userChoice == 4) {
+            else if(userChoice == 4) {
                 // Saves UML diagram to a JSON file in the same directory as the executable
             }
 
             // Load UML
-            if(userChoice == 5) {
+            else if(userChoice == 5) {
                 // Prompts for a directory. If the directory exists, UML diagram info is displayed
             }
 
             // Help
-            if(userChoice == 6) {
+            else if(userChoice == 6) {
                 // Loads this help file into the console
             }
 
             // Exits the program
-            if(userChoice == 7) {
+            else if(userChoice == 7) {
+                subLoop = false;
                 mainLoop = false;
             }
-            
+
             // Throw error, userChoice is not an option
             else {
                 // throw error
