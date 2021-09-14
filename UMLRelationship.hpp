@@ -44,10 +44,6 @@ class UMLRelationship
 		const UMLClass& getDestination () const;
 };
 
-/************************************************************/
-#endif
-/************************************************************/
-
 const UMLClass& UMLRelationship::getSource () const
 {
 	return *source;
@@ -57,3 +53,7 @@ const UMLClass& UMLRelationship::getDestination () const
 {
 	return *destination;
 }
+
+/************************************************************/
+#endif
+/************************************************************/

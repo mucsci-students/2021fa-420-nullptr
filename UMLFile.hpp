@@ -10,8 +10,8 @@
 // System includes
 #include <vector>
 #include <string>
-#include <json.hpp>
 #include <fstream>
+#include "include/json/json.hpp"
 #include "UMLClass.hpp"
 #include "UMLData.hpp"
 #include "UMLAttribute.hpp"
