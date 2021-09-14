@@ -110,6 +110,7 @@ void CLI::displayCLI ()
                 }
                 // Invalid choice
                 else {
+                    // show error, reset user choice
                     cout << "Invalid choice!" << endl << endl;
                     userChoice = "0";
                 }
@@ -151,7 +152,7 @@ void CLI::displayCLI ()
                 }
                 // Invalid choice
                 else {
-                    // show error
+                    // show error, reset user choice
                     cout << "Invalid choice!" << endl << endl;
                     userChoice = "1";
                 }
@@ -187,7 +188,7 @@ void CLI::displayCLI ()
                 }
                 // Invalid choice
                 else {
-                    // show error
+                    // show error, reset user choice
                     cout << "Invalid choice!" << endl << endl;
                     userChoice = "2";
                 }
@@ -223,7 +224,7 @@ void CLI::displayCLI ()
                 }
                 // Invalid choice
                 else {
-                    // show error
+                    // show error, reset user choice
                     cout << "Invalid choice!" << endl << endl;
                     userChoice = "3";
                 }
@@ -255,7 +256,7 @@ void CLI::displayCLI ()
 
             // Invalid choice
             else {
-                // show error
+                // show error, reset user choice and break loop
                 cout << "Invalid choice!" << endl << endl;
                 userChoice = "";
                 subLoop = false;
