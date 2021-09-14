@@ -69,8 +69,43 @@ void CLI::displayCLI ()
         cin >> userChoice;
 
         // Lists operations for modifying classes
-        if(userChoice == 0 ){
+        if(userChoice == 0) {
+            classLoop = true;
+            while(classLoop) {
+                cout << "Choose an option:"<< endl;
+                cout << "Add [0]" << endl;
+                cout << "Remove [1]" << endl;
+                cout << "Rename [2]" << endl;
+                cout << "Back [3]" << endl;
 
+                // store user option
+                cin >> userChoice;
+               
+                // Add class
+                if (userChoice == 0) {
+                    // prompt name of class then add class
+                    classLoop = false;
+                }
+                // Remove class
+                else if (userChoice == 1) {
+                    // prompt name of class then remove class
+                    classLoop = false;
+                } 
+                // Rename class
+                else if (userChoice == 2) {
+                    // prompt name of class then rename class
+                    classLoop = false;
+                }
+                // Go Back
+                else if (userChoice == 3) {
+                    // exits loop, goes back
+                    classLoop = false;
+                }
+                // Invalid choice
+                else {
+                    // show error
+                }
+            }
         }
         // Lists operations for modifying attributes
         if(userChoice == 1){
