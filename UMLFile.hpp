@@ -59,9 +59,9 @@ class UMLFile
         void getUMLRelationshipVec(UMLData& data);
 };
 
-UMLFile::UMLFile(const string& path) 
+UMLFile::UMLFile(const string& newpath)
+:path(newpath)
 {
-    this->path = path;
 }
 
 void UMLFile::save(const UMLData& data)
