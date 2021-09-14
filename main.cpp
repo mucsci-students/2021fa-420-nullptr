@@ -12,9 +12,12 @@
 #include "UMLClass.hpp"
 #include "UMLFile.hpp"
 #include "UMLData.hpp"
+#include "CLI.hpp"
 //--------------------------------------------------------------------
 
 int main()
 {
+    CLI newInterface;
+    newInterface.displayCLI();
     return 0;
 };
