@@ -30,27 +30,27 @@ class UMLAttribute
 	public:
 		// Params: string newAttribute (name of attribute)
 		// Constructor for attribute objects
-		UMLAttribute (string newAttribute);
+		UMLAttribute(string newAttribute);
 
 		// Grab name of the given attribute
-		string getAttributeName ();
+		string getAttributeName();
 
 		// Change name of the given attribute
-		void changeName (string newAttributeName);
+		void changeName(string newAttributeName);
 
 };
 
-UMLAttribute::UMLAttribute (string newAttribute) 
+UMLAttribute::UMLAttribute(string newAttribute) 
 :attributeName(newAttribute)
 {
 }
 
-string UMLAttribute::getAttributeName ()
+string UMLAttribute::getAttributeName()
 {
 	return attributeName;
 }
 
-void UMLAttribute::changeName (string newAttributeName)
+void UMLAttribute::changeName(string newAttributeName)
 {
 	attributeName = newAttributeName;
 }
