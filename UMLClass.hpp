@@ -27,63 +27,79 @@ class UMLClass
 		vector<UMLAttribute> classAttributes;
 
 	public:
-		// Constructor for class objects
-
-		UMLClass() {}
-
+		// Params: newClass (name of class)
+		// Constructor for class object without attributes
 		UMLClass (string newClass) : 
 			className (newClass)
 		{
 		}
 
-		UMLClass(string newClass, const std::vector<UMLAttribute>& attributes)
+		// Params: newClass (name of class), attributes (vector of attributes)
+		// Constructor for class object with attributes
+		UMLClass(string newClass, const std::vector<UMLAttribute>& attributes) :
+			className (newClass),
+			classAttributes (attributes)
 		{
-			className = newClass;
-			classAttributes = attributes;
 		}
 
 		// Grab name from given class object
-		string getName () const
-		{
-			return className;
-		}
+		string getName () const;
 
+		// Params: string newClassName (name of class to be changed)
 		// Change name of given class object
-		void changeName (string newClassName)
-		{
-			className = newClassName;
-		}
+		void changeName (string newClassName);
 
+		// Params: UMLAttribute newAttribute (attribute object to be added)
 		// Adds attribute to attribute vector
-		void addAttribute (UMLAttribute newAttribute) {
-			classAttributes.push_back(newAttribute);
-		}
+		void addAttribute (UMLAttribute newAttribute);
 
+		// Params: string attributeName (name of attribute to be deleted)
 		// Removes attribute from attribute vector
-		vector<UMLAttribute>::iterator deleteAttribute (string attributeName) {
-			auto attribute = findAttribute(attributeName);
-			// attribute not found 
-			if (attribute == classAttributes.end()) {
-				// 
-				return classAttributes.end();
-			}
-			classAttributes.erase(attribute);
-			return attribute;
-		}
+		vector<UMLAttribute>::iterator deleteAttribute (string attributeName);
 
+		// Params: string attributeName (name of attribute to be found) 
 		// Finds attribute within attribute vector
-		vector<UMLAttribute>::iterator findAttribute (string attributeName) {
-			for (vector<UMLAttribute>::iterator ptr = classAttributes.begin(); ptr != classAttributes.end(); ++ptr){
-				if (ptr->getAttributeName() == attributeName){
-					return ptr;
-				}
-			}
-			// return empty if attribute not found
-			return classAttributes.end();
-		}
+		vector<UMLAttribute>::iterator findAttribute (string attributeName);
 
 		// Returns vector of attributes 
-		vector<UMLAttribute> getAttributes () {
-			return classAttributes;
-		}
+		vector<UMLAttribute> getAttributes ();
 };
+
+string UMLClass::getName () const
+{
+	return className;
+}
+
+void UMLClass::changeName (string newClassName)
+{
+	className = newClassName;
+}
+
+void UMLClass::addAttribute (UMLAttribute newAttribute) {
+	classAttributes.push_back(newAttribute);
+}
+
+vector<UMLAttribute>::iterator UMLClass::deleteAttribute (string attributeName) {
+	auto attribute = findAttribute(attributeName);
+	// attribute not found 
+	if (attribute == classAttributes.end()) {
+		// return empty if attribute not found
+		return classAttributes.end();
+	}
+	classAttributes.erase(attribute);
+	return attribute;
+}
+
+vector<UMLAttribute>::iterator UMLClass::findAttribute (string attributeName) {
+	for (vector<UMLAttribute>::iterator ptr = classAttributes.begin(); ptr != classAttributes.end(); ++ptr) {
+		if (ptr->getAttributeName() == attributeName){
+			return ptr;
+		}
+	}
+	// return empty if attribute not found
+	return classAttributes.end();
+}
+
+vector<UMLAttribute> UMLClass::getAttributes () {
+	return classAttributes;
+}
