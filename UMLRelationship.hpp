@@ -1,5 +1,5 @@
 /*
-  Filename   : UMLClass.cpp
+  Filename   : UMLRelationship.hpp
   Description: Serves as an object for which information about a relationship
   in the UML diagram is stored. To be further expanded with different types
   of relationships.
