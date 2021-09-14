@@ -8,10 +8,11 @@
 // System includes
 #include <string>
 #include <iostream>
-#include "UMLFile.hpp"
 #include <vector>
 #include "UMLClass.hpp"
+#include "UMLFile.hpp"
 #include "UMLData.hpp"
+//--------------------------------------------------------------------
 
 int main()
 {
