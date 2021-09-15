@@ -91,9 +91,8 @@ void CLI::displayCLI ()
                 cin >> userChoice;
                 cout << endl;
                 
-                // class names
-                string name;
-                string name2;
+                // class name input storage
+                string name, name2;
 
                 // Add class
                 if (userChoice == "0") {
@@ -152,7 +151,9 @@ void CLI::displayCLI ()
                 cin >> userChoice;
                 cout << endl;
 
+                // class and attribute name input storage
                 string className, attributeName;
+                
                 // Add attribute
                 if (userChoice == "0") {
                     // prompt name of class and attribute then add attribute
@@ -180,9 +181,9 @@ void CLI::displayCLI ()
                 else if (userChoice == "2") {
                     // prompt name of class, old attribute name, and new attribute name. 
                     // replace attribute with one of new name.
-                    cout << "Enter the name of the class: "<< endl;
+                    cout << "Enter the name of the class: " << endl;
                     cin >> className;
-                    cout << "Enter the name of the attribute: "<< endl;
+                    cout << "Enter the name of the attribute: " << endl;
                     cin >> attributeName;
                     cout << "Enter new name of attribute:" << endl;
                     string attributeName2;
@@ -223,9 +224,9 @@ void CLI::displayCLI ()
 
                 // Add relationship
                 if (userChoice == "0") {
-                    cout << "Enter the name of the source: "<< endl;
+                    cout << "Enter the name of the source: " << endl;
                     cin >> source;
-                    cout << "Enter the name of the destination: "<< endl;
+                    cout << "Enter the name of the destination: " << endl;
                     cin >> destination;
                     data.addRelationship(source, destination);
                     cout << endl <<"Relationship added between " << source << " and " << destination << endl << endl;
@@ -234,9 +235,9 @@ void CLI::displayCLI ()
                 // Remove relationship
                 else if (userChoice == "1") {
                     // prompt name of source and destination and removes relationship
-                    cout << "Enter the name of the source: "<< endl;
+                    cout << "Enter the name of the source: " << endl;
                     cin >> source;
-                    cout << "Enter the name of the destination: "<< endl;
+                    cout << "Enter the name of the destination: " << endl;
                     cin >> destination;
                     data.deleteRelationship(source, destination);
                     cout << endl << "Relationship deleted between " << source << " and " << destination << endl << endl;
@@ -268,11 +269,13 @@ void CLI::displayCLI ()
                 cin >> userChoice;
                 cout << endl;
 
+                // class name input storage
+                string name;
+
                 // Display single class
                 if (userChoice == "0") {
                     // prompt class name, shows information about class
                     cout << "Enter name of class:" << endl;
-                    string name;
                     cin >> name;
                     cout << "Attributes:" << endl;
                     UMLClass c = data.getClassCopy(name);
@@ -309,7 +312,6 @@ void CLI::displayCLI ()
                         }
                     }  
                     cout << endl << "Enter anything to continue..." << endl;
-                    std::string name;
                     cin >> name; //just to have a pause so user can have time to view attributes and relationships                 
                     subLoop = false;
                 } 
@@ -361,6 +363,8 @@ void CLI::displayCLI ()
                     myfile.close();
                 }
                 else cout << "Unable to open file";
+                cout << endl << "Enter anything to continue..." << endl;
+                cin >> line; //just to have a pause so user can have time to view help
                 cout << endl; 
                 subLoop = false;
             }
