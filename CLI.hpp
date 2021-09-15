@@ -183,7 +183,7 @@ void CLI::displayCLI ()
                     cout << "Enter new name of attribute:" << endl;
                     string attributeName2;
                     cin >> attributeName2;
-                    data.removeClassAttribute(className, attributeName2);
+                    data.removeClassAttribute(className, attributeName);
                     data.addClassAttribute(className, attributeName2);
                     subLoop = false;
                 }
