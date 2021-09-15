@@ -263,7 +263,24 @@ void CLI::displayCLI ()
                 }
                 // Display all information
                 else if (userChoice == "1") {
-                    // show all information and return back to base loop                    
+                    std::vector<UMLClass> classes = data.getClasses();
+                    for (UMLClass umlclass : classes)
+                    {
+                        std::cout << "Name: " << umlclass.getName() << std::endl;
+                        std::cout << "Attributes:" << std::endl;
+                        for (UMLAttribute attr : data.getClassAttributes(umlclass.getName()))
+                        {
+                            std::cout << attr.getAttributeName() << std::endl;
+                        }
+                        std::cout << "Relationships:" << std::endl;
+                        for (UMLRelationship rel : data.getRelationshipsByClass(umlclass.getName()))
+                        {
+                            std::cout << rel.getSource().getName() << " <=> " << rel.getDestination().getName() << std::endl;
+                        }
+                    }  
+                    cout << endl << "Enter anything to continue..." << endl;
+                    std::string name;
+                    cin >> name; //just to have a pause so user can have time to view attributes and relationships                 
                     subLoop = false;
                 } 
                 // Go back
@@ -282,12 +299,23 @@ void CLI::displayCLI ()
             // Save UML
             else if (userChoice == "4") {
                 // Saves UML diagram to a JSON file in the same directory as the executable
+                std::cout << "Name of file: ";
+                std::string fileName;
+                std::cin >> fileName;
+                UMLFile file(fileName + ".json");
+                file.save(data);
+                std::cout << "Your file has been saved!" << std::endl;
                 subLoop = false;
             }
 
             // Load UML
             else if (userChoice == "5") {
-                // Prompts for a directory. If the directory exists, UML diagram info is displayed
+                std::cout << "Name of file (<name>.json): ";
+                std::string fileName;
+                std::cin >> fileName;
+                UMLFile file(fileName);
+                data = file.load();
+                std::cout << "Your file has been loaded!" << std::endl;
                 subLoop = false;
             }
 
