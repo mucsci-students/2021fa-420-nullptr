@@ -59,14 +59,14 @@ void CLI::displayCLI ()
     while (mainLoop) {
         // Main prompt: prompts user for options.
         cout << "Choose an option:"<< endl;
-        cout << "Class [0]" << endl;
-        cout << "Attribute [1]" << endl;
-        cout << "Relationship [2]" << endl;
-        cout << "List [3]" << endl;
-        cout << "Save [4]" << endl;
-        cout << "Load [5]" << endl;
-        cout << "Help [6]" << endl;
-        cout << "Exit [7]" << endl;
+        cout << "[0] Class" << endl;
+        cout << "[1] Attribute" << endl;
+        cout << "[2] Relationship" << endl;
+        cout << "[3] List" << endl;
+        cout << "[4] Save" << endl;
+        cout << "[5] Load" << endl;
+        cout << "[6] Help" << endl;
+        cout << "[7] Exit" << endl;
 
         // store user option
         cout << endl << "Choice: ";
@@ -81,10 +81,10 @@ void CLI::displayCLI ()
             if(userChoice == "0") {
                 // Lists operations for modifying classes
                 cout << "Choose an option:"<< endl;
-                cout << "Add [0]" << endl;
-                cout << "Remove [1]" << endl;
-                cout << "Rename [2]" << endl;
-                cout << "Back [3]" << endl;
+                cout << "[0] Add" << endl;
+                cout << "[1] Remove" << endl;
+                cout << "[2] Rename" << endl;
+                cout << "[3] Back" << endl;
 
                 // store user option
                 cout << endl << "Choice: ";
@@ -138,10 +138,10 @@ void CLI::displayCLI ()
             else if(userChoice == "1") {
                 // Lists operations for modifying attributes
                 cout << "Choose an option:"<< endl;
-                cout << "Add [0]" << endl;
-                cout << "Remove [1]" << endl;
-                cout << "Rename [2]" << endl;
-                cout << "Back [3]" << endl;
+                cout << "[0] Add" << endl;
+                cout << "[1] Remove" << endl;
+                cout << "[2] Rename" << endl;
+                cout << "[3] Back" << endl;
 
                 // store user option
                 cout << endl << "Choice: ";
@@ -204,9 +204,9 @@ void CLI::displayCLI ()
             else if(userChoice == "2") {
                 // Lists operations for modifying relationships
                 cout << "Choose an option:"<< endl;
-                cout << "Add [0]" << endl;
-                cout << "Remove [1]" << endl;
-                cout << "Back [2]" << endl;
+                cout << "[0] Add" << endl;
+                cout << "[1] Remove" << endl;
+                cout << "[2] Back" << endl;
 
                 // store user option
                 cout << endl << "Choice: ";
@@ -254,9 +254,9 @@ void CLI::displayCLI ()
             else if(userChoice == "3") {
                 // Lists operations for viewing information within the diagram
                 cout << "Choose an option:"<< endl;
-                cout << "Class [0]" << endl;
-                cout << "Diagram [1]" << endl;
-                cout << "Back [2]" << endl;
+                cout << "[0] Class" << endl;
+                cout << "[1] Diagram" << endl;
+                cout << "[2] Back" << endl;
 
                 // store user option
                 cout << endl << "Choice: ";
