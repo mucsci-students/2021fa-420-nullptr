@@ -1,6 +1,6 @@
 #pragma once
 /*
-  Filename   : UMLFile.cpp
+  Filename   : UMLFile.hpp
   Description: Serves as an object for which information about a class
   in the UML diagram is stored in a JSON file. 
 */
@@ -20,63 +20,48 @@
 
 //--------------------------------------------------------------------
 // Using declarations
+using std::string;
+using std::vector;
 using json = nlohmann::json;
 //--------------------------------------------------------------------
 
 class UMLFile
 {
-      private:
-        //takes in vector of classes and adds a json string to the jsonFile
-        void addUMLClassVec(const std::vector<UMLClass>& umlclasses);
-
-        //takes in vector of relationships and adds them to the jsonFile
-        void addUMLRelationshipVec(const std::vector<UMLRelationship>& relationships);
-
-        //gets the classes from the json file and returns classes vector
-        std::vector<UMLClass> getUMLClassVec();
-        
-        //takes in UML Data object
-        //gets the relationships from the json file and adds them to the UMLData object
-        void getUMLRelationshipVec(UMLData& data);
+    private:
 
         json jsonFile;
-        std::string path;
+        string path;
+
     public:
+
         //constructor: takes in the name of the file to save
-        UMLFile(const std::string&);
+        UMLFile(const string&);
 
         //saving file
         void save(const UMLData& data);
 
         //loads a system file and returns a UML data object
         UMLData load();  
+
+    private:
+
+        //takes in vector of classes and adds a json string to the jsonFile
+        void addUMLClassVec(const vector<UMLClass>& umlclasses);
+
+        //takes in vector of relationships and adds them to the jsonFile
+        void addUMLRelationshipVec(const vector<UMLRelationship>& relationships);
+
+        //gets the classes from the json file and returns classes vector
+        vector<UMLClass> getUMLClassVec();
+        
+        //takes in UML Data object
+        //gets the relationships from the json file and adds them to the UMLData object
+        void getUMLRelationshipVec(UMLData& data);
 };
 
-UMLFile::UMLFile(const std::string& path) 
+UMLFile::UMLFile(const string& newpath)
+:path(newpath)
 {
-    this->path = path;
-}
-
-void UMLFile::addUMLClassVec(const std::vector<UMLClass>& classes)
-{
-    for (UMLClass umlclass : classes)
-    {
-        json jsonattr;
-        for (UMLAttribute attribute : umlclass.getAttributes())
-        {
-            jsonattr += {{"name", attribute.getAttributeName()}};
-        }
-
-        jsonFile["Class"] += {{"name", umlclass.getName()}, {"Attributes", jsonattr}};
-    }    
-}
-
-void UMLFile::addUMLRelationshipVec(const std::vector<UMLRelationship>& relationships)
-{
-    for (UMLRelationship relationship : relationships)
-    {
-        jsonFile["Relationship"] += {{"src", relationship.getSource().getName()}, {"dest", relationship.getDestination().getName()}};
-    }    
 }
 
 void UMLFile::save(const UMLData& data)
@@ -103,13 +88,37 @@ UMLData UMLFile::load()
     return data;
 }
 
-std::vector<UMLClass> UMLFile::getUMLClassVec()
+void UMLFile::addUMLClassVec(const vector<UMLClass>& classes)
 {
-    std::vector<UMLClass> classVec;
+    for (UMLClass umlclass : classes)
+    {
+        json jsonattr;
+        for (UMLAttribute attribute : umlclass.getAttributes())
+        {
+            jsonattr += {{"name", attribute.getAttributeName()}};
+        }
+
+        jsonFile["Class"] += {{"name", umlclass.getName()}, {"Attributes", jsonattr}};
+    }    
+}
+
+void UMLFile::addUMLRelationshipVec(const vector<UMLRelationship>& relationships)
+{
+    for (UMLRelationship relationship : relationships)
+    {
+        jsonFile["Relationship"] += {{"src", relationship.getSource().getName()}, {"dest", relationship.getDestination().getName()}};
+    }    
+}
+
+
+
+vector<UMLClass> UMLFile::getUMLClassVec()
+{
+    vector<UMLClass> classVec;
     for (auto member : jsonFile["Class"])
     {
-        std::string name = member["name"];
-        std::vector<UMLAttribute> attrVec;
+        string name = member["name"];
+        vector<UMLAttribute> attrVec;
         for (auto attributes : member["Attributes"])
         {
             attrVec.push_back({attributes["name"]});
@@ -123,8 +132,8 @@ void UMLFile::getUMLRelationshipVec(UMLData& data)
 {
     for (auto rel : jsonFile["Relationship"])
     {
-        std::string dest = rel["dest"];
-        std::string src = rel["src"];
+        string dest = rel["dest"];
+        string src = rel["src"];
 
         data.addRelationship(dest, src);
 
