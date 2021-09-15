@@ -90,23 +90,27 @@ void CLI::displayCLI ()
                 cout << endl << "Choice: ";
                 cin >> userChoice;
                 cout << endl;
+                
+                // class names
+                string name;
+                string name2;
 
                 // Add class
                 if (userChoice == "0") {
                     // prompt name of class then add class
                     cout << "Enter name of class:" << endl;
-                    string name;
                     cin >> name;
                     data.addClass(name);
+                    cout << endl << "Class named " << name << " added" << endl << endl;
                     subLoop = false;
                 }
                 // Remove class
                 else if (userChoice == "1") {
                     // prompt name of class then remove class
                     cout << "Enter name of class:" << endl;
-                    string name;
                     cin >> name;
                     data.deleteClass(name);
+                    cout << endl << "Class named " << name << " removed" << endl << endl;
                     subLoop = false;
                 } 
                 // Rename class
@@ -116,9 +120,9 @@ void CLI::displayCLI ()
                     string name;
                     cin >> name;
                     cout << "Enter new name of class:" << endl;
-                    string name2;
                     cin >> name2;
                     data.changeClassName(name, name2);
+                    cout << endl << "Class named " << name << " renamed to " << name2 << endl << endl;
                     subLoop = false;
                 }
                 // Go back
