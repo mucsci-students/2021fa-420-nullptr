@@ -36,6 +36,9 @@ class UMLData
 
         //returns vector of all classes
         vector<UMLClass> getClasses() const;
+
+        //return a single class
+        UMLClass getClassCopy(std::string name);
    
         //returns vector of all relationships
         vector<UMLRelationship> getRelationships() const;
@@ -123,6 +126,11 @@ UMLData::UMLData(const vector<UMLClass>& vclass)
 vector<UMLClass> UMLData::getClasses() const
 {
     return classes;
+}
+
+UMLClass UMLData::getClassCopy(std::string name)
+{
+    return getClass(name);
 }
 
 vector<UMLRelationship> UMLData::getRelationships() const
