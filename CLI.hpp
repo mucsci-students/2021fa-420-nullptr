@@ -147,19 +147,43 @@ void CLI::displayCLI ()
                 cin >> userChoice;
                 cout << endl;
 
+                string className, attributeName;
                 // Add attribute
                 if (userChoice == "0") {
                     // prompt name of class and attribute then add attribute
+                    cout << "Enter the name of the class: "<< endl;
+                    cin >> className;
+                    cout << "Enter the name of the attribute: "<< endl;
+                    cin >> attributeName;
+                    data.addClassAttribute(className, attributeName);
+                    cout << "Attribute " << attributeName << " added to " << className << endl;
                     subLoop = false;
+
                 }
                 // Remove class
                 else if (userChoice == "1") {
                     // prompt name of class and attribute then remove attribute
+                    cout << "Enter the name of the class: "<< endl;
+                    cin >> className;
+                    cout << "Enter the name of the attribute: "<< endl;
+                    cin >> attributeName;
+                    data.removeClassAttribute(className, attributeName);
+                    cout << "Attribute " << attributeName << " removed from " << className << endl;
                     subLoop = false;
                 } 
                 // Rename class
                 else if (userChoice == "2") {
-                    // prompt name of class and attribute then rename attribute
+                    // prompt name of class, old attribute name, and new attribute name. 
+                    // replace attribute with one of new name.
+                    cout << "Enter the name of the class: "<< endl;
+                    cin >> className;
+                    cout << "Enter the name of the attribute: "<< endl;
+                    cin >> attributeName;
+                    cout << "Enter new name of attribute:" << endl;
+                    string attributeName2;
+                    cin >> attributeName2;
+                    data.removeClassAttribute(className, attributeName2);
+                    data.addClassAttribute(className, attributeName2);
                     subLoop = false;
                 }
                 // Go back
