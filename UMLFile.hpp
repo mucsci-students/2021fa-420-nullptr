@@ -110,8 +110,6 @@ void UMLFile::addUMLRelationshipVec(const vector<UMLRelationship>& relationships
     }    
 }
 
-
-
 vector<UMLClass> UMLFile::getUMLClassVec()
 {
     vector<UMLClass> classVec;

@@ -227,7 +227,7 @@ void UMLData::addClassAttribute(string className, UMLAttribute attribute)
     getClass(className).addAttribute(attribute);
 }
 
-void UMLData::removeClassAttriubte(string className, string attributeName)
+void UMLData::removeClassAttribute(string className, string attributeName)
 {
     getClass(className).deleteAttribute(attributeName);
 }

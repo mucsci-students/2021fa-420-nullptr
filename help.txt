@@ -1,0 +1,55 @@
+UML++ serves as an editor for an implementation of a UML class diagram.
+
+The program's command interface is operated by inputting numbers into the 
+console that correspond to a given command. For example, to go through
+operations for Class, input a 0 and press Enter to enter it.
+
+UML++ has the following hierarchy for its command-line interface:
+
+- Class [0]: Lists operations for modifying classes.
+    - Add [0]: Prompts for a class name. If the class does not already exist
+               and is valid, the class will be inserted into the diagram.
+    - Remove [1]: Prompts for a class name. If the class exists, the class will
+                  be removed from the UML class diagram.
+    - Rename [2]: Prompts for a class name. If the class exists and the new 
+                  name is valid, the class will have its name modified to the
+                  new name prompted.
+    - Back [3]: Returns back to the main set of commands.
+    
+- Attribute [1]: Lists operations for modifying attributes.
+    - Add [0]: Prompts for a class and an attribute name. If the class exists
+               and the attribute does not already exist in the class and is 
+               valid, it will be inserted into the class.
+    - Remove [1]: Prompts for a class and an attribute name. If the class 
+                  exists alongside the attribute, the attribute will be 
+                  removed.
+    - Rename [2]: Prompts for a class and an attribute name. If the class 
+                  exists alongside the attribute, and the attribute name is 
+                  valid, the attribute will be renamed.
+    - Back [3]: Returns back to the main set of commands.
+    
+- Relationship [2]: Lists operations for modifying relationships.
+    - Add [0]: Prompts for a source class and a destination class. If both 
+               classes exist and the relationship doesn't already exist, a new
+               relationship is made.
+    - Remove [1]: Prompts for a source class and a destination class. If the 
+                  relationship exists, it will be removed.
+    - Back [3]: Returns back to the main set of commands.
+    
+- List [3]: Lists operations for viewing information within the diagram.
+    - Class [0]: Prompts for a class name. If the class exists, information 
+                 about the class, its attributes, and its relationships will 
+                 be displayed.
+    - Diagram [1]: Displays all information for all classes, alongside their 
+                   attributes and relationships.
+    
+- Save [4]: Saves your UML diagram to a JSON file in the same directory as the
+            executable.
+
+- Load [5]: Prompts for a directory. If the directory exists, a UML diagram 
+            made previously by this program will be loaded for modification.
+
+- Help [6]: Loads this help file into the console.
+
+- Exit [7]: Exits the program. If the UML class diagram is not saved 
+            beforehand, data will be lost.
