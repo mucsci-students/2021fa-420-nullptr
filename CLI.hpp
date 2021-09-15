@@ -183,6 +183,7 @@ void CLI::displayCLI ()
                     cout << "Enter the name of the destination: "<< endl;
                     cin >> destination;
                     data.addRelationship(source, destination);
+                    cout << "Relationship added between " << source << " and " << destination << endl;
                     subLoop = false;
                 }
                 // Remove relationship
@@ -193,6 +194,7 @@ void CLI::displayCLI ()
                     cout << "Enter the name of the destination: "<< endl;
                     cin >> destination;
                     data.deleteRelationship(source, destination);
+                    cout << "Relationship deleted between " << source << " and " << destination << endl;
                     subLoop = false;
                 } 
                 // Go back
