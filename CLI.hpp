@@ -93,16 +93,31 @@ void CLI::displayCLI ()
                 // Add class
                 if (userChoice == "0") {
                     // prompt name of class then add class
+                    cout << "Enter name of class:" << endl;
+                    string name;
+                    cin >> name;
+                    data.addClass(name);
                     subLoop = false;
                 }
                 // Remove class
                 else if (userChoice == "1") {
                     // prompt name of class then remove class
+                    cout << "Enter name of class:" << endl;
+                    string name;
+                    cin >> name;
+                    data.deleteClass(name);
                     subLoop = false;
                 } 
                 // Rename class
                 else if (userChoice == "2") {
                     // prompt name of class then rename class
+                    cout << "Enter old name of class:" << endl;
+                    string name;
+                    cin >> name;
+                    cout << "Enter new name of class:" << endl;
+                    string name2;
+                    cin >> name2;
+                    data.changeClassName(name, name2);
                     subLoop = false;
                 }
                 // Go back
@@ -226,11 +241,29 @@ void CLI::displayCLI ()
                 // Display single class
                 if (userChoice == "0") {
                     // prompt class name, shows information about class
+                    cout << "Enter name of class:" << endl;
+                    string name;
+                    cin >> name;
+                    cout << "Attributes:" << endl;
+                    UMLClass c = data.getClassCopy(name);
+                    vector<UMLAttribute> attributeList = c.getAttributes();
+                    for(UMLAttribute attribute : attributeList)
+                    {
+                        cout << attribute.getAttributeName() << endl;
+                    }
+                    cout << "Relationships:" << endl;
+                    vector<UMLRelationship> relationshipList = data.getRelationshipsByClass(name);
+                    for(UMLRelationship relationship : relationshipList)
+                    {
+                        cout << relationship.getSource().getName() << " <=> " << relationship.getDestination().getName() << endl;
+                    }
+                    cout << endl << "Enter anything to continue..." << endl;
+                    cin >> name; //just to have a pause so user can have time to view attributes and relationships
                     subLoop = false;
                 }
                 // Display all information
                 else if (userChoice == "1") {
-                    // show all information and return back to base loop
+                    // show all information and return back to base loop                    
                     subLoop = false;
                 } 
                 // Go back
