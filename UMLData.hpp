@@ -85,7 +85,7 @@ class UMLData
 
         //params: string className, string attribute name
         //removes className class attribute by the name
-        void removeClassAttriubte(string className, string attributeName);
+        void removeClassAttribute(string className, string attributeName);
 
     private:
 
