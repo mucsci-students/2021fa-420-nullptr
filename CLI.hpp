@@ -122,7 +122,7 @@ void CLI::displayCLI ()
                     cout << "Enter new name of class:" << endl;
                     cin >> name2;
                     data.changeClassName(name, name2);
-                    cout << endl << "Class named " << name << " renamed to " << name2 << endl << endl;
+                    cout << endl << "Class named " << name << " renamed as " << name2 << endl << endl;
                     subLoop = false;
                 }
                 // Go back
@@ -161,7 +161,7 @@ void CLI::displayCLI ()
                     cout << "Enter the name of the attribute: "<< endl;
                     cin >> attributeName;
                     data.addClassAttribute(className, attributeName);
-                    cout << "Attribute " << attributeName << " added to " << className << endl;
+                    cout << endl << "Attribute " << attributeName << " added to " << className << endl << endl;
                     subLoop = false;
 
                 }
@@ -173,7 +173,7 @@ void CLI::displayCLI ()
                     cout << "Enter the name of the attribute: "<< endl;
                     cin >> attributeName;
                     data.removeClassAttribute(className, attributeName);
-                    cout << "Attribute " << attributeName << " removed from " << className << endl;
+                    cout << endl << "Attribute " << attributeName << " removed from " << className << endl << endl;
                     subLoop = false;
                 } 
                 // Rename class
@@ -189,6 +189,7 @@ void CLI::displayCLI ()
                     cin >> attributeName2;
                     data.removeClassAttribute(className, attributeName);
                     data.addClassAttribute(className, attributeName2);
+                    cout << endl << "Attribute " << attributeName << " renamed as " << attributeName2 << endl << endl;
                     subLoop = false;
                 }
                 // Go back
@@ -227,7 +228,7 @@ void CLI::displayCLI ()
                     cout << "Enter the name of the destination: "<< endl;
                     cin >> destination;
                     data.addRelationship(source, destination);
-                    cout << "Relationship added between " << source << " and " << destination << endl;
+                    cout << endl <<"Relationship added between " << source << " and " << destination << endl << endl;
                     subLoop = false;
                 }
                 // Remove relationship
@@ -238,7 +239,7 @@ void CLI::displayCLI ()
                     cout << "Enter the name of the destination: "<< endl;
                     cin >> destination;
                     data.deleteRelationship(source, destination);
-                    cout << "Relationship deleted between " << source << " and " << destination << endl;
+                    cout << endl << "Relationship deleted between " << source << " and " << destination << endl << endl;
                     subLoop = false;
                 } 
                 // Go back
