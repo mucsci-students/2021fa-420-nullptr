@@ -41,6 +41,8 @@ class CLI
         bool mainLoop;
         // loop boolean that maintains CLI subrountines
         bool subLoop;
+        // main UML data object storing UML stuff
+        UMLData data;
     public:
         // displays command line interface
         void displayCLI();
@@ -171,14 +173,26 @@ void CLI::displayCLI ()
                 cin >> userChoice;
                 cout << endl;
 
+                // class name representing source and destination
+                string source, destination;
+
                 // Add relationship
                 if (userChoice == "0") {
-                    // prompt name of source and destination and adds relationship
+                    cout << "Enter the name of the source: "<< endl;
+                    cin >> source;
+                    cout << "Enter the name of the destination: "<< endl;
+                    cin >> destination;
+                    data.addRelationship(source, destination);
                     subLoop = false;
                 }
                 // Remove relationship
                 else if (userChoice == "1") {
                     // prompt name of source and destination and removes relationship
+                    cout << "Enter the name of the source: "<< endl;
+                    cin >> source;
+                    cout << "Enter the name of the destination: "<< endl;
+                    cin >> destination;
+                    data.deleteRelationship(source, destination);
                     subLoop = false;
                 } 
                 // Go back
