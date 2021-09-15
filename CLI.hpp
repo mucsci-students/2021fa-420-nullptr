@@ -20,6 +20,7 @@
 #include "UMLFile.hpp"
 #include <vector>
 #include <iostream>
+#include <fstream>
 //--------------------------------------------------------------------
 
 //--------------------------------------------------------------------
@@ -345,7 +346,17 @@ void CLI::displayCLI ()
 
             // Help
             else if (userChoice == "6") {
-                // Loads this help file into the console
+                // Displays help if help file exists, otherwise display error
+                string line;
+                std::ifstream myfile ("../help.txt");
+                if (myfile.is_open()) {
+                    while (getline (myfile,line) ) {
+                        cout << line << '\n';
+                    }
+                    myfile.close();
+                }
+                else cout << "Unable to open file";
+                cout << endl; 
                 subLoop = false;
             }
 
