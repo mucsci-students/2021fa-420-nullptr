@@ -56,7 +56,7 @@ class UMLClass
 		vector<UMLAttribute>::iterator findAttribute(string attributeName);
 
 		// Returns vector of attributes 
-		vector<UMLAttribute> getAttributes();
+		vector<UMLAttribute> getAttributes() const;
 };
 
 UMLClass::UMLClass(string newClass) 
@@ -108,7 +108,7 @@ vector<UMLAttribute>::iterator UMLClass::findAttribute(string attributeName)
 	return classAttributes.end();
 }
 
-vector<UMLAttribute> UMLClass::getAttributes() 
+vector<UMLAttribute> UMLClass::getAttributes() const
 {
 	return classAttributes;
 }

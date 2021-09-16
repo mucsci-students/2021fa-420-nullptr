@@ -47,6 +47,11 @@ class CLI
     public:
         // Displays command line interface
         void displayCLI();
+        // Displays information about classes within the diagram.
+        // Has conditional booleans to optionally display attributes and relationships.
+        void displayDiagram (bool displayAttribute, bool displayRelationship);
+        // Displays information about a single class with the name className.
+        void displayClass (string className);
 };
 
 
@@ -107,6 +112,8 @@ void CLI::displayCLI ()
                 }
                 // Remove class
                 else if (userChoice == "1") {
+                    // Display all classes
+                    displayDiagram(false, false);
                     // Prompt name of class then remove class
                     cout << "Enter name of class:" << endl;
                     cin >> name;
@@ -116,6 +123,8 @@ void CLI::displayCLI ()
                 } 
                 // Rename class
                 else if (userChoice == "2") {
+                    // Display all classes
+                    displayDiagram(false, false);
                     // Prompt name of class then rename class
                     cout << "Enter old name of class:" << endl;
                     string name;
@@ -158,6 +167,8 @@ void CLI::displayCLI ()
                 
                 // Add attribute
                 if (userChoice == "0") {
+                    // Display all classes
+                    displayDiagram(false, false);
                     // Prompt name of class and attribute then add attribute
                     cout << "Enter the name of the class: "<< endl;
                     cin >> className;
@@ -168,8 +179,10 @@ void CLI::displayCLI ()
                     subLoop = false;
 
                 }
-                // Remove class
+                // Remove attribute
                 else if (userChoice == "1") {
+                    // Display all classes and attributes
+                    displayDiagram(true, false);
                     // Prompt name of class and attribute then remove attribute
                     cout << "Enter the name of the class: "<< endl;
                     cin >> className;
@@ -179,8 +192,10 @@ void CLI::displayCLI ()
                     cout << endl << "Attribute " << attributeName << " removed from " << className << endl << endl;
                     subLoop = false;
                 } 
-                // Rename class
+                // Rename attribute
                 else if (userChoice == "2") {
+                    // Display all classes and attributes
+                    displayDiagram(true, false);
                     // Prompt name of class, old attribute name, and new attribute name. 
                     // Replace attribute with one of new name.
                     cout << "Enter the name of the class: " << endl;
@@ -226,6 +241,8 @@ void CLI::displayCLI ()
 
                 // Add relationship
                 if (userChoice == "0") {
+                    // Display all classes
+                    displayDiagram(false, false);
                     // Prompt name of source and destination and removes relationship
                     cout << "Enter the name of the source: " << endl;
                     cin >> source;
@@ -237,6 +254,8 @@ void CLI::displayCLI ()
                 }
                 // Remove relationship
                 else if (userChoice == "1") {
+                    // Display all classes and relationships
+                    displayDiagram(false, true);
                     // Prompt name of source and destination and removes relationship
                     cout << "Enter the name of the source: " << endl;
                     cin >> source;
@@ -280,24 +299,7 @@ void CLI::displayCLI ()
                     // Prompt class name
                     cout << "Enter name of class:" << endl;
                     cin >> name;
-                    
-                    // Grab copy of class in order to display attributes
-                    cout << "Attributes:" << endl;
-                    UMLClass c = data.getClassCopy(name);
-                    vector<UMLAttribute> attributeList = c.getAttributes();
-                    for(UMLAttribute attribute : attributeList)
-                    {
-                        cout << attribute.getAttributeName() << endl;
-                    }
-
-                    // Find relationships based on name of the class
-                    cout << "Relationships:" << endl;
-                    vector<UMLRelationship> relationshipList = data.getRelationshipsByClass(name);
-                    for(UMLRelationship relationship : relationshipList)
-                    {
-                        cout << relationship.getSource().getName() << " => " << relationship.getDestination().getName() << endl;
-                    }
-
+                    displayClass(name);
                     cout << endl << "Enter anything to continue..." << endl;
                     cin >> name; // Pause for input
                     cout << endl; 
@@ -305,21 +307,7 @@ void CLI::displayCLI ()
                 }
                 // Display all information
                 else if (userChoice == "1") {
-                    std::vector<UMLClass> classes = data.getClasses();
-                    for (UMLClass umlclass : classes)
-                    {
-                        std::cout << "Name: " << umlclass.getName() << std::endl;
-                        std::cout << "Attributes:" << std::endl;
-                        for (UMLAttribute attr : data.getClassAttributes(umlclass.getName()))
-                        {
-                            std::cout << attr.getAttributeName() << std::endl;
-                        }
-                        std::cout << "Relationships:" << std::endl;
-                        for (UMLRelationship rel : data.getRelationshipsByClass(umlclass.getName()))
-                        {
-                            std::cout << rel.getSource().getName() << " => " << rel.getDestination().getName() << std::endl;
-                        }
-                    }  
+                    displayDiagram (true, true); 
                     cout << endl << "Enter anything to continue..." << endl;
                     cin >> name; // Pause for input
                     cout << endl;                  
@@ -341,24 +329,24 @@ void CLI::displayCLI ()
             // Save UML
             else if (userChoice == "4") {
                 // Saves UML diagram to a JSON file in the same directory as the executable
-                std::cout << "Name of file: ";
+                cout << "Name of file: ";
                 std::string fileName;
                 std::cin >> fileName;
                 UMLFile file(fileName + ".json");
                 file.save(data);
-                std::cout << "Your file has been saved" << endl;
+                cout << "Your file has been saved" << endl;
                 subLoop = false;
             }
 
             // Load UML routine
             else if (userChoice == "5") {
                 // Ask for name of file, and then load UML data given the proper format
-                std::cout << "Name of file: ";
+                cout << "Name of file: ";
                 std::string fileName;
                 std::cin >> fileName;
                 UMLFile file(fileName + ".json");
                 data = file.load();
-                std::cout << "Your file has been loaded" << endl;
+                cout << "Your file has been loaded" << endl;
                 subLoop = false;
             }
 
@@ -395,6 +383,55 @@ void CLI::displayCLI ()
             }
         }  
     } 
+}
+
+void CLI::displayDiagram (bool displayAttribute, bool displayRelationship) 
+{
+    vector<UMLClass> classes = data.getClasses();
+    cout << "Classes:" << endl << endl;
+    for (UMLClass umlclass : classes)
+    {
+        cout << umlclass.getName() << std::endl;
+        if (displayAttribute) {
+            cout << "Attributes:" << std::endl;
+            for (UMLAttribute attr : data.getClassAttributes(umlclass.getName()))
+            {
+                cout << attr.getAttributeName() << std::endl;
+            }
+        }
+        if (displayRelationship) {
+            cout << "Relationships:" << std::endl;
+            for (UMLRelationship rel : data.getRelationshipsByClass(umlclass.getName()))
+            {
+                cout << rel.getSource().getName() << " => " << rel.getDestination().getName() << std::endl;
+            }
+        }
+        // Don't cause spacing within loop if only showing classes
+        if (displayAttribute || displayRelationship) cout << endl;
+    }
+    // Display single line break if only showing classes
+    if (!displayAttribute && !displayRelationship) cout << endl;
+}
+
+void CLI::displayClass (string className) 
+{
+    // Grab copy of class in order to display attributes
+    cout << "Attributes:" << endl;
+    UMLClass c = data.getClassCopy(className);
+    vector<UMLAttribute> attributeList = c.getAttributes();
+    for(UMLAttribute attribute : attributeList)
+    {
+        cout << attribute.getAttributeName() << endl;
+    }
+
+    // Find relationships based on name of the class
+    cout << "Relationships:" << endl;
+    vector<UMLRelationship> relationshipList = data.getRelationshipsByClass(className);
+    for(UMLRelationship relationship : relationshipList)
+    {
+        cout << relationship.getSource().getName() << " => " << relationship.getDestination().getName() << endl;
+    }
+    cout << endl;
 }
 
 /************************************************************/
