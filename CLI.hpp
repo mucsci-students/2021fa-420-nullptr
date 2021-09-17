@@ -8,6 +8,13 @@
 // Macro guard
 #ifndef CLI_HPP
 #define CLI_HPP
+#define ERR_CATCH(fun)           \
+    try {                        \
+        fun;                     \
+    }                            \
+    catch (const char* error) {  \
+        cout << error << endl;   \
+    }
 /************************************************************/
 
 //--------------------------------------------------------------------
@@ -97,7 +104,7 @@ void CLI::displayCLI ()
                     cout << "Enter name of class:" << endl;
                     string name;
                     cin >> name;
-                    data.addClass(name);
+                    ERR_CATCH(data.addClass(name));
                     subLoop = false;
                 }
                 // Remove class
@@ -106,7 +113,7 @@ void CLI::displayCLI ()
                     cout << "Enter name of class:" << endl;
                     string name;
                     cin >> name;
-                    data.deleteClass(name);
+                    ERR_CATCH(data.deleteClass(name));
                     subLoop = false;
                 } 
                 // Rename class
@@ -118,7 +125,7 @@ void CLI::displayCLI ()
                     cout << "Enter new name of class:" << endl;
                     string name2;
                     cin >> name2;
-                    data.changeClassName(name, name2);
+                    ERR_CATCH(data.changeClassName(name, name2));
                     subLoop = false;
                 }
                 // Go back
