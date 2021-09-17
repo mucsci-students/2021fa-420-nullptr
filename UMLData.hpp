@@ -82,7 +82,7 @@ class UMLData
     private:
 
         //params: string name
-        //finds class by name and returns index within member classes vector
+        //finds class by name and returns index within member classes vector, returns -1 if not found
         int findClass(string name);
 
         //params: UMLClass sourceClassIn, UMLClass destClassIn
@@ -134,8 +134,8 @@ void UMLData::addClass(const UMLClass& classIn)
 {
     //check if already exists
     int loc = findClass(classIn.getName());
-    if (loc > 0)
-        throw "class name already exists";
+    if (loc >= 0)
+        throw "Class name already exists";
 
     classes.push_back(classIn);
 }
@@ -180,7 +180,7 @@ void UMLData::deleteRelationship(string srcName, string destName)
 {
     int loc = findRelationship(getClass(srcName), getClass(destName));
     if (loc < 0)
-        throw "relationship not found";
+        throw "Relationship not found";
     relationships.erase(relationships.begin() + loc);
 }
 
@@ -188,7 +188,7 @@ void UMLData::deleteClass(string name)
 {
     int loc = findClass(name);
     if (loc < 0)
-        throw "class not found";
+        throw "Class not found";
     
     //delete relationships associated with class
     vector<UMLRelationship> relationshipsFromClass = getRelationshipsByClass(name);
@@ -205,7 +205,7 @@ void UMLData::deleteClass(string name)
 void UMLData::changeClassName(string oldName, string newName)
 {
     if (findClass(newName) >= 0)
-        throw "new name already exists";
+        throw "New name already exists";
     getClass(oldName).changeName(newName);
 }
 
@@ -261,7 +261,7 @@ UMLClass& UMLData::getClass(string name)
 {
     int loc = findClass(name);
     if (loc < 0)
-        throw "name not found";
+        throw "Name not found";
     return classes[loc];
 }
 
@@ -269,16 +269,16 @@ UMLRelationship& UMLData::getRelationship(string srcName, string destName)
 {
     int loc = findRelationship(getClass(srcName), getClass(destName));
     if (loc < 0)
-        throw "relationship not found";
+        throw "Relationship not found";
     return relationships[loc];
 }
 
 void UMLData::addRelationship(const UMLRelationship& relIn)
 {
     int loc = findRelationship(relIn.getSource(), relIn.getDestination());
-    if (loc > 0)
-        throw "relationship already exists";
-    
+    if (loc >= 0)
+        throw "Relationship already exists";
+
     relationships.push_back(relIn); 
 }
 
