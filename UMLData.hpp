@@ -281,6 +281,7 @@ void UMLData::addRelationship(const UMLRelationship& relIn)
     int loc = findRelationship(relIn.getSource(), relIn.getDestination());
     if (loc >= 0)
         throw "Relationship already exists";
+
     relationships.push_back(relIn); 
 }
 
