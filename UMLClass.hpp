@@ -52,7 +52,6 @@ class UMLClass
 		// Finds attribute within attribute vector
 		vector<UMLAttribute>::iterator findAttribute(string attributeName);
 
-
 		// Returns vector of attributes 
 		vector<UMLAttribute> getAttributes() const;
 };

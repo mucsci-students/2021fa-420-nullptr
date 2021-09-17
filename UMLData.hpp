@@ -205,7 +205,7 @@ void UMLData::deleteClass(string name)
 void UMLData::changeClassName(string oldName, string newName)
 {
     if (findClass(newName) >= 0)
-        throw "New name already exists";
+        throw "Class name already exists";
     getClass(oldName).changeName(newName);
 }
 
@@ -261,7 +261,7 @@ UMLClass& UMLData::getClass(string name)
 {
     int loc = findClass(name);
     if (loc < 0)
-        throw "Name not found";
+        throw "Class not found";
     return classes[loc];
 }
 
@@ -277,7 +277,7 @@ void UMLData::addRelationship(const UMLRelationship& relIn)
 {
     int loc = findRelationship(relIn.getSource(), relIn.getDestination());
     if (loc >= 0)
-        throw "Relationship already exists";
+        throw "New relationship already exists";
 
     relationships.push_back(relIn); 
 }
