@@ -8,6 +8,7 @@
 // Macro guard
 #ifndef CLI_HPP
 #define CLI_HPP
+// Catch for functions to protect from invalid inputs
 #define ERR_CATCH(fun)           \
     try {                        \
         fun;                     \
@@ -104,6 +105,7 @@ void CLI::displayCLI ()
                     cout << "Enter name of class:" << endl;
                     string name;
                     cin >> name;
+                    // Catch for duplicate/invalid name
                     ERR_CATCH(data.addClass(name));
                     subLoop = false;
                 }
@@ -113,6 +115,7 @@ void CLI::displayCLI ()
                     cout << "Enter name of class:" << endl;
                     string name;
                     cin >> name;
+                    // Catch to see if name exists
                     ERR_CATCH(data.deleteClass(name));
                     subLoop = false;
                 } 
@@ -125,6 +128,7 @@ void CLI::displayCLI ()
                     cout << "Enter new name of class:" << endl;
                     string name2;
                     cin >> name2;
+                    // Catch for duplicate/invalid name
                     ERR_CATCH(data.changeClassName(name, name2));
                     subLoop = false;
                 }
