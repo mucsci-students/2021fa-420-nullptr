@@ -142,7 +142,7 @@ void UMLData::addClass(const UMLClass& classIn)
 {
     //check if already exists
     int loc = findClass(classIn.getName());
-    if (loc > 0)
+    if (loc >= 0)
         throw "class name already exists";
 
     classes.push_back(classIn);
@@ -279,7 +279,7 @@ UMLRelationship& UMLData::getRelationship(string srcName, string destName)
 void UMLData::addRelationship(const UMLRelationship& relIn)
 {
     int loc = findRelationship(relIn.getSource(), relIn.getDestination());
-    if (loc > 0)
+    if (loc >= 0)
         throw "relationship already exists";
     
     relationships.push_back(relIn); 
