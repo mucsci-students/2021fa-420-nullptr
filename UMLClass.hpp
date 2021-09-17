@@ -82,6 +82,12 @@ void UMLClass::changeName(string newClassName)
 
 void UMLClass::addAttribute(UMLAttribute newAttribute) 
 {
+	//should be check for dup
+	for(UMLAttribute attribute : classAttributes)
+	{
+		if(attribute.getAttributeName() == newAttribute.getAttributeName())
+			throw "No duplicate attributes";
+	}
 	classAttributes.push_back(newAttribute);
 }
 
