@@ -28,32 +28,30 @@ class UMLClass
 		vector<UMLAttribute> classAttributes;
 
 	public:
-		// Params: newClass (name of class)
 		// Constructor for class object without attributes
 		UMLClass(string newClass);
 
-		// Params: newClass (name of class), attributes (vector of attributes)
 		// Constructor for class object with attributes
 		UMLClass(string newClass, const std::vector<UMLAttribute>& attributes);
 
 		// Grab name from given class object
 		string getName() const;
 
-		// Params: string newClassName (name of class to be changed)
 		// Change name of given class object
 		void changeName(string newClassName);
 
-		// Params: UMLAttribute newAttribute (attribute object to be added)
 		// Adds attribute to attribute vector
 		void addAttribute(UMLAttribute newAttribute);
 
-		// Params: string attributeName (name of attribute to be deleted)
+		//Changes name of attribute within class
+		void changeAttributeName(string oldAttributeName, string newAttributeName);
+
 		// Removes attribute from attribute vector
 		vector<UMLAttribute>::iterator deleteAttribute(string attributeName);
 
-		// Params: string attributeName (name of attribute to be found) 
 		// Finds attribute within attribute vector
 		vector<UMLAttribute>::iterator findAttribute(string attributeName);
+
 
 		// Returns vector of attributes 
 		vector<UMLAttribute> getAttributes() const;
@@ -83,6 +81,11 @@ void UMLClass::changeName(string newClassName)
 void UMLClass::addAttribute(UMLAttribute newAttribute) 
 {
 	classAttributes.push_back(newAttribute);
+}
+
+void UMLClass::changeAttributeName(string oldAttributeName, string newAttributeName)
+{
+	(*findAttribute(oldAttributeName)).changeName(newAttributeName);
 }
 
 vector<UMLAttribute>::iterator UMLClass::deleteAttribute(string attributeName) 

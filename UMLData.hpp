@@ -43,49 +43,41 @@ class UMLData
         //returns vector of all relationships
         vector<UMLRelationship> getRelationships() const;
 
-        //params: classIn
         //takes in class and adds it to vector
         void addClass(const UMLClass& classIn);
 
-        //params: string name
         //takes in string name and creates class and adds to classes vector
         void addClass(string name);
 
-        //params: string name, vector<UMLAttributes> attributes
         //takes in name and vector of attributes and creates class and adds to vector of classes
         void addClass(string name, vector<UMLAttribute> attributes);
 
-        //params: string srcName, destName
         //takes in src string and dest string, creates relationship and adds to relationships vector
         void addRelationship(string srcName, string destName);
         
-        //params: std:string className
         //takes in className string and returns a vector of all the relationshps associated with that class
         vector<UMLRelationship> getRelationshipsByClass(string className);
 
-        //params: string srcName, string destName
         //deletes relationshp based on two strings
         void deleteRelationship(string srcName, string destName);
 
-        //params: string name
         //deletes a class by string in the classes vector
         void deleteClass(string name);
 
-        //params: string oldName, string newName
         //changes class name from old name and new name
         void changeClassName(string oldName, string newName);
 
-        //params string className
         //gets class attributes for a className class and returns them in a vector
         vector<UMLAttribute> getClassAttributes(string className);
 
-        //params string className, UMLAttribute attribute
         //adds class attribute to specified className
         void addClassAttribute(string className, UMLAttribute attribute);
 
-        //params: string className, string attribute name
         //removes className class attribute by the name
         void removeClassAttribute(string className, string attributeName);
+
+        //removes className class attribute by the name
+        void changeAttributeName(string className, string oldAttributeName, string newAttributeName);
 
     private:
 
@@ -230,6 +222,11 @@ void UMLData::addClassAttribute(string className, UMLAttribute attribute)
 void UMLData::removeClassAttribute(string className, string attributeName)
 {
     getClass(className).deleteAttribute(attributeName);
+}
+
+void UMLData::changeAttributeName(string className, string oldAttributeName, string newAttributeName)
+{
+    getClass(className).changeAttributeName(oldAttributeName, newAttributeName);
 }
 
 int UMLData::findClass(string name)
