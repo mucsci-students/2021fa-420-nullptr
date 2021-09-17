@@ -74,7 +74,7 @@ void CLI::displayCLI ()
     mainLoop = true;
     subLoop = false;
 
-    cout << "Welcome to CLI++!" << endl << endl;
+    cout << "Welcome to UML++!" << endl << endl;
 
     // Primary display routine
     while (mainLoop) {
@@ -386,7 +386,7 @@ void CLI::displayCLI ()
                     myfile.close();
                 }
                 else cout << "Unable to open file";
-                
+
                 cout << endl << "Enter anything to continue..." << endl;
                 cin >> line; // Pause for input
                 cout << endl; 
