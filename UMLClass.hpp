@@ -86,7 +86,7 @@ void UMLClass::addAttribute(UMLAttribute newAttribute)
 	for(UMLAttribute attribute : classAttributes)
 	{
 		if(attribute.getAttributeName() == newAttribute.getAttributeName())
-			throw "no duplicate attributes";
+			throw "No duplicate attributes";
 	}
 	classAttributes.push_back(newAttribute);
 }
