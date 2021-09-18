@@ -9,12 +9,13 @@
 #ifndef CLI_HPP
 #define CLI_HPP
 // Catch for functions to protect from invalid inputs
-#define ERR_CATCH(fun)           \
-    try {                        \
-        fun;                     \
-    }                            \
-    catch (const char* error) {  \
-        cout << error << endl;   \
+#define ERR_CATCH(fun)                           \
+    try {                                        \
+        fun;                                     \
+    }                                            \
+    catch (const char* error) {                  \
+        cout << endl << error << endl << endl;   \
+        errorStatus = true;                      \
     }
 /************************************************************/
 
@@ -44,319 +45,337 @@
 class CLI
 {
     private:
-        // stores choice input by user
+        // Stores choice input by user, representing position within diagram
+        // When an invalid input is set, reverts to its previous position
         string userChoice;
-        // loop boolean that maintains CLI routine
+        // Loop boolean that maintains CLI routine
         bool mainLoop;
-        // loop boolean that maintains CLI subrountines
+        // Loop boolean that maintains CLI subrountines
         bool subLoop;
-        // main UML data object storing UML stuff
+        // Error check to prevent 'success' print 
+        bool errorStatus;
+        // Main UML data object storing UML stuff
         UMLData data;
     public:
-        // displays command line interface
+        // Displays command line interface
         void displayCLI();
+        // Displays information about classes within the diagram.
+        // Has conditional booleans to optionally display attributes and relationships.
+        void displayDiagram (bool displayAttribute, bool displayRelationship);
+        // Displays information about a single class with the name className.
+        void displayClass (string className);
 };
 
+
+// Displays CLI using a large loop routine.
 void CLI::displayCLI ()
 {
-    // loop boolean that maintains CLI routine
+    // Start default state of loops
     mainLoop = true;
-    // loop boolean that maintains CLI subrountines
     subLoop = false;
 
+    cout << "Welcome to UML++!" << endl << endl;
+
+    // Primary display routine
     while (mainLoop) {
         // Main prompt: prompts user for options.
-        cout << "Choose an option:"<< endl;
-        cout << "Class [0]" << endl;
-        cout << "Attribute [1]" << endl;
-        cout << "Relationship [2]" << endl;
-        cout << "List [3]" << endl;
-        cout << "Save [4]" << endl;
-        cout << "Load [5]" << endl;
-        cout << "Help [6]" << endl;
-        cout << "Exit [7]" << endl;
+        cout << "Choose an option:" << endl;
+        cout << "[1] Class" << endl;
+        cout << "[2] Attribute" << endl;
+        cout << "[3] Relationship" << endl;
+        cout << "[4] List" << endl;
+        cout << "[5] Save" << endl;
+        cout << "[6] Load" << endl;
+        cout << "[7] Help" << endl;
+        cout << "[8] Exit" << endl;
 
-        // store user option
         cout << endl << "Choice: ";
         cin >> userChoice;
         cout << endl;
 
-        // start subloop
+        // Start subloop
         subLoop = true;
 
         while (subLoop) { 
-            // Class
-            if(userChoice == "0") {
+            // Class subroutine
+            if(userChoice == "1") {
                 // Lists operations for modifying classes
-                cout << "Choose an option:"<< endl;
-                cout << "Add [0]" << endl;
-                cout << "Remove [1]" << endl;
-                cout << "Rename [2]" << endl;
-                cout << "Back [3]" << endl;
-
-                // store user option
+                cout << "Choose an option:" << endl;
+                cout << "[1] Add" << endl;
+                cout << "[2] Remove" << endl;
+                cout << "[3] Rename" << endl;
+                cout << "[4] Back" << endl;
+                
                 cout << endl << "Choice: ";
                 cin >> userChoice;
                 cout << endl;
+                
+                // Class name input storage
+                string name, name2;
 
                 // Add class
-                if (userChoice == "0") {
-                    // prompt name of class then add class
-                    cout << "Enter name of class:" << endl;
-                    string name;
+                if (userChoice == "1") {
+                    cout << "Enter name of class: ";
                     cin >> name;
+                    
                     // Catch for duplicate/invalid name
                     ERR_CATCH(data.addClass(name));
+                    // Prevent success message if error was caught
+                    if(errorStatus == false) cout << endl << "Class named " << name << " added" << endl << endl;
+                    else errorStatus = false;
                     subLoop = false;
                 }
                 // Remove class
-                else if (userChoice == "1") {
-                    // prompt name of class then remove class
-                    cout << "Enter name of class:" << endl;
-                    string name;
+                else if (userChoice == "2") {
+                    // Display all class names for user clarity
+                    displayDiagram(false, false);
+
+                    cout << "Enter name of class: ";
                     cin >> name;
+
                     // Catch to see if name exists
                     ERR_CATCH(data.deleteClass(name));
+                    // Prevent success message if error was caught
+                    if(errorStatus == false) cout << endl << "Class named " << name << " removed" << endl << endl;
+                    else errorStatus = false;
                     subLoop = false;
                 } 
                 // Rename class
-                else if (userChoice == "2") {
-                    // prompt name of class then rename class
-                    cout << "Enter old name of class:" << endl;
+                else if (userChoice == "3") {
+                    // Display all class names for user clarity
+                    displayDiagram(false, false);
+
+                    cout << "Enter old name of class: ";
                     string name;
                     cin >> name;
-                    cout << "Enter new name of class:" << endl;
-                    string name2;
+                    cout << "Enter new name of class: ";
                     cin >> name2;
+
                     // Catch for duplicate/invalid name
                     ERR_CATCH(data.changeClassName(name, name2));
+                    // Prevent success message if error was caught
+                    if(errorStatus == false) cout << endl << "Class named " << name << " renamed to " << name2 << endl << endl;
+                    else errorStatus = false;
                     subLoop = false;
                 }
                 // Go back
-                else if (userChoice == "3") {
-                    // exits loop, goes back
+                else if (userChoice == "4") {
+                    // Exits subroutine to go back to main routine
                     subLoop = false;
                 }
                 // Invalid choice
                 else {
-                    // show error, reset user choice
-                    cout << "Invalid choice!" << endl << endl;
-                    userChoice = "0";
-                }
-            }
-
-            // Attribute
-            else if(userChoice == "1") {
-                // Lists operations for modifying attributes
-                cout << "Choose an option:"<< endl;
-                cout << "Add [0]" << endl;
-                cout << "Remove [1]" << endl;
-                cout << "Rename [2]" << endl;
-                cout << "Back [3]" << endl;
-
-                // store user option
-                cout << endl << "Choice: ";
-                cin >> userChoice;
-                cout << endl;
-
-                string className, attributeName;
-                // Add attribute
-                if (userChoice == "0") {
-                    // prompt name of class and attribute then add attribute
-                    cout << "Enter the name of the class: "<< endl;
-                    cin >> className;
-                    cout << "Enter the name of the attribute: "<< endl;
-                    cin >> attributeName;
-                    data.addClassAttribute(className, attributeName);
-                    cout << "Attribute " << attributeName << " added to " << className << endl;
-                    subLoop = false;
-
-                }
-                // Remove class
-                else if (userChoice == "1") {
-                    // prompt name of class and attribute then remove attribute
-                    cout << "Enter the name of the class: "<< endl;
-                    cin >> className;
-                    cout << "Enter the name of the attribute: "<< endl;
-                    cin >> attributeName;
-                    data.removeClassAttribute(className, attributeName);
-                    cout << "Attribute " << attributeName << " removed from " << className << endl;
-                    subLoop = false;
-                } 
-                // Rename class
-                else if (userChoice == "2") {
-                    // prompt name of class, old attribute name, and new attribute name. 
-                    // replace attribute with one of new name.
-                    cout << "Enter the name of the class: "<< endl;
-                    cin >> className;
-                    cout << "Enter the name of the attribute: "<< endl;
-                    cin >> attributeName;
-                    cout << "Enter new name of attribute:" << endl;
-                    string attributeName2;
-                    cin >> attributeName2;
-                    data.removeClassAttribute(className, attributeName);
-                    data.addClassAttribute(className, attributeName2);
-                    subLoop = false;
-                }
-                // Go back
-                else if (userChoice == "3") {
-                    // exits loop, goes back
-                    subLoop = false;
-                }
-                // Invalid choice
-                else {
-                    // show error, reset user choice
                     cout << "Invalid choice!" << endl << endl;
                     userChoice = "1";
                 }
             }
 
-            // Relationship
+            // Attribute subroutine
             else if(userChoice == "2") {
-                // Lists operations for modifying relationships
-                cout << "Choose an option:"<< endl;
-                cout << "Add [0]" << endl;
-                cout << "Remove [1]" << endl;
-                cout << "Back [2]" << endl;
+                // Lists operations for modifying attributes
+                cout << "Choose an option:" << endl;
+                cout << "[1] Add" << endl;
+                cout << "[2] Remove" << endl;
+                cout << "[3] Rename" << endl;
+                cout << "[4] Back" << endl;
 
-                // store user option
                 cout << endl << "Choice: ";
                 cin >> userChoice;
                 cout << endl;
 
-                // class name representing source and destination
-                string source, destination;
+                // Class and attribute name input storage
+                string className, attributeName, attributeName2;
+                
+                // Add attribute
+                if (userChoice == "1") {
+                    // Display all class names for user clarity
+                    displayDiagram(false, false);
+                   
+                    cout << "Enter the name of the class: ";
+                    cin >> className;
+                    cout << "Enter the name of the attribute: ";
+                    cin >> attributeName;
 
-                // Add relationship
-                if (userChoice == "0") {
-                    cout << "Enter the name of the source: "<< endl;
-                    cin >> source;
-                    cout << "Enter the name of the destination: "<< endl;
-                    cin >> destination;
-                    data.addRelationship(source, destination);
-                    cout << "Relationship added between " << source << " and " << destination << endl;
+                    data.addClassAttribute(className, attributeName);
+                    cout << endl << "Attribute " << attributeName << " added to " << className << endl << endl;
                     subLoop = false;
+
                 }
-                // Remove relationship
-                else if (userChoice == "1") {
-                    // prompt name of source and destination and removes relationship
-                    cout << "Enter the name of the source: "<< endl;
-                    cin >> source;
-                    cout << "Enter the name of the destination: "<< endl;
-                    cin >> destination;
-                    data.deleteRelationship(source, destination);
-                    cout << "Relationship deleted between " << source << " and " << destination << endl;
+                // Remove attribute
+                else if (userChoice == "2") {
+                    // Display all classes and attributes for user clarity
+                    displayDiagram(true, false);
+                    
+                    cout << "Enter the name of the class: ";
+                    cin >> className;
+                    cout << "Enter the name of the attribute: ";
+                    cin >> attributeName;
+
+                    data.removeClassAttribute(className, attributeName);
+                    cout << endl << "Attribute " << attributeName << " removed from " << className << endl << endl;
                     subLoop = false;
                 } 
+                // Rename attribute
+                else if (userChoice == "3") {
+                    // Display all classes and attributes for user clarity
+                    displayDiagram(true, false);
+
+                    cout << "Enter the name of the class: ";
+                    cin >> className;
+                    cout << "Enter the name of the attribute: ";
+                    cin >> attributeName;
+                    cout << "Enter new name of attribute: ";
+                    cin >> attributeName2;
+
+                    data.changeAttributeName(className, attributeName, attributeName2);
+                    cout << endl << "Attribute " << attributeName << " renamed to " << attributeName2 << endl << endl;
+                    subLoop = false;
+                }
                 // Go back
-                else if (userChoice == "2") {
-                    // exits loop, goes back
+                else if (userChoice == "4") {
+                    // Exits subroutine to go back to main routine
                     subLoop = false;
                 }
                 // Invalid choice
                 else {
-                    // show error, reset user choice
-                    cout << "Invalid choice!" << endl << endl;
+                    cout << "Invalid choice" << endl << endl;
                     userChoice = "2";
                 }
             }
 
-            // Diagram
+            // Relationship subroutine
             else if(userChoice == "3") {
-                // Lists operations for viewing information within the diagram
-                cout << "Choose an option:"<< endl;
-                cout << "Class [0]" << endl;
-                cout << "Diagram [1]" << endl;
-                cout << "Back [2]" << endl;
+                // Lists operations for modifying relationships
+                cout << "Choose an option:" << endl;
+                cout << "[1] Add" << endl;
+                cout << "[2] Remove" << endl;
+                cout << "[3] Back" << endl;
 
-                // store user option
                 cout << endl << "Choice: ";
                 cin >> userChoice;
                 cout << endl;
 
-                // Display single class
-                if (userChoice == "0") {
-                    // prompt class name, shows information about class
-                    cout << "Enter name of class:" << endl;
-                    string name;
-                    cin >> name;
-                    cout << "Attributes:" << endl;
-                    UMLClass c = data.getClassCopy(name);
-                    vector<UMLAttribute> attributeList = c.getAttributes();
-                    for(UMLAttribute attribute : attributeList)
-                    {
-                        cout << attribute.getAttributeName() << endl;
-                    }
-                    cout << "Relationships:" << endl;
-                    vector<UMLRelationship> relationshipList = data.getRelationshipsByClass(name);
-                    for(UMLRelationship relationship : relationshipList)
-                    {
-                        cout << relationship.getSource().getName() << " <=> " << relationship.getDestination().getName() << endl;
-                    }
-                    cout << endl << "Enter anything to continue..." << endl;
-                    cin >> name; //just to have a pause so user can have time to view attributes and relationships
+                // Class name representing source and destination
+                string source, destination;
+
+                // Add relationship
+                if (userChoice == "1") {
+                    // Display all classes for user clarity
+                    displayDiagram(false, false);
+
+                    cout << "Enter the name of the source: " << endl;
+                    cin >> source;
+                    cout << "Enter the name of the destination: " << endl;
+                    cin >> destination;
+
+                    data.addRelationship(source, destination);
+                    cout << endl <<"Relationship added between " << source << " and " << destination << endl << endl;
                     subLoop = false;
                 }
-                // Display all information
-                else if (userChoice == "1") {
-                    std::vector<UMLClass> classes = data.getClasses();
-                    for (UMLClass umlclass : classes)
-                    {
-                        std::cout << "Name: " << umlclass.getName() << std::endl;
-                        std::cout << "Attributes:" << std::endl;
-                        for (UMLAttribute attr : data.getClassAttributes(umlclass.getName()))
-                        {
-                            std::cout << attr.getAttributeName() << std::endl;
-                        }
-                        std::cout << "Relationships:" << std::endl;
-                        for (UMLRelationship rel : data.getRelationshipsByClass(umlclass.getName()))
-                        {
-                            std::cout << rel.getSource().getName() << " <=> " << rel.getDestination().getName() << std::endl;
-                        }
-                    }  
-                    cout << endl << "Enter anything to continue..." << endl;
-                    std::string name;
-                    cin >> name; //just to have a pause so user can have time to view attributes and relationships                 
+                // Remove relationship
+                else if (userChoice == "2") {
+                    // Display all classes and relationships for user clarity
+                    displayDiagram(false, true);
+
+                    cout << "Enter the name of the source: " << endl;
+                    cin >> source;
+                    cout << "Enter the name of the destination: " << endl;
+                    cin >> destination;
+
+                    data.deleteRelationship(source, destination);
+                    cout << endl << "Relationship deleted between " << source << " and " << destination << endl << endl;
                     subLoop = false;
                 } 
                 // Go back
-                else if (userChoice == "2") {
-                    // exits loop, goes back
+                else if (userChoice == "3") {
+                    // Exits subroutine to go back to main routine
                     subLoop = false;
                 }
                 // Invalid choice
                 else {
-                    // show error, reset user choice
                     cout << "Invalid choice!" << endl << endl;
                     userChoice = "3";
                 }
             }
 
-            // Save UML
-            else if (userChoice == "4") {
+            // List subroutine
+            else if(userChoice == "4") {
+                // Lists operations for viewing information within the diagram
+                cout << "Choose an option:" << endl;
+                cout << "[1] Class" << endl;
+                cout << "[2] Diagram" << endl;
+                cout << "[3] Back" << endl;
+
+                cout << endl << "Choice: ";
+                cin >> userChoice;
+                cout << endl;
+
+                // Class name input storage
+                string name;
+
+                // Display single class
+                if (userChoice == "1") {
+                    // Display class names for user clarity
+                    displayDiagram (false, false); 
+
+                    cout << "Enter name of class:" << endl;
+                    cin >> name;
+
+                    displayClass(name);
+                    cout << endl << "Enter anything to continue..." << endl;
+                    cin >> name; // Pause for input
+                    cout << endl; 
+                    subLoop = false;
+                }
+                // Display all information
+                else if (userChoice == "2") {
+                    displayDiagram (true, true); 
+                    
+                    cout << "Enter anything to continue..." << endl;
+                    cin >> name; // Pause for input
+                    cout << endl;                  
+                    subLoop = false;
+                } 
+                // Go back
+                else if (userChoice == "3") {
+                    // Exits subroutine to go back to main routine
+                    subLoop = false;
+                }
+                // Invalid choice
+                else {
+                    cout << "Invalid choice!" << endl << endl;
+                    userChoice = "4";
+                }
+            }
+
+            // Save UML subroutine
+            else if (userChoice == "5") {
                 // Saves UML diagram to a JSON file in the same directory as the executable
-                std::cout << "Name of file: ";
-                std::string fileName;
-                std::cin >> fileName;
+                cout << "Name of file: ";
+                string fileName;
+                cin >> fileName;
+
                 UMLFile file(fileName + ".json");
                 file.save(data);
-                std::cout << "Your file has been saved!" << std::endl;
+                cout << "Your file has been saved" << endl;
                 subLoop = false;
             }
 
-            // Load UML
-            else if (userChoice == "5") {
-                std::cout << "Name of file (<name>.json): ";
-                std::string fileName;
-                std::cin >> fileName;
-                UMLFile file(fileName);
-                data = file.load();
-                std::cout << "Your file has been loaded!" << std::endl;
-                subLoop = false;
-            }
-
-            // Help
+            // Load UML subroutine
             else if (userChoice == "6") {
+                // Ask for name of file, and then load UML data given the proper format
+                cout << "Name of file: ";
+                string fileName;
+                cin >> fileName;
+
+                UMLFile file(fileName + ".json");
+                data = file.load();
+                cout << "Your file has been loaded" << endl;
+                subLoop = false;
+            }
+
+            // Help subroutine
+            else if (userChoice == "7") {
                 // Displays help if help file exists, otherwise display error
                 string line;
                 std::ifstream myfile ("../help.txt");
@@ -367,25 +386,75 @@ void CLI::displayCLI ()
                     myfile.close();
                 }
                 else cout << "Unable to open file";
+
+                cout << endl << "Enter anything to continue..." << endl;
+                cin >> line; // Pause for input
                 cout << endl; 
                 subLoop = false;
             }
 
             // Exits the program
-            else if (userChoice == "7") {
+            else if (userChoice == "8") {
+                cout << "Exiting program..." << endl << endl;
                 subLoop = false;
                 mainLoop = false;
             }
 
             // Invalid choice
             else {
-                // show error, reset user choice and break loop
                 cout << "Invalid choice!" << endl << endl;
                 userChoice = "";
                 subLoop = false;
             }
         }  
     } 
+}
+
+void CLI::displayDiagram (bool displayAttribute, bool displayRelationship) 
+{
+    vector<UMLClass> classes = data.getClasses();
+    cout << "Classes:" << endl << endl;
+    for (UMLClass umlclass : classes) {
+        cout << umlclass.getName() << endl;
+        if (displayAttribute) {
+            cout << "Attributes:" << endl;
+            for (UMLAttribute attr : data.getClassAttributes(umlclass.getName()))
+            {
+                cout << attr.getAttributeName() << endl;
+            }
+        }
+        if (displayRelationship) {
+            cout << "Relationships:" << endl;
+            for (UMLRelationship rel : data.getRelationshipsByClass(umlclass.getName()))
+            {
+                cout << rel.getSource().getName() << " => " << rel.getDestination().getName() << endl;
+            }
+        }
+        // Don't cause spacing within loop if only showing classes
+        if (displayAttribute || displayRelationship) cout << endl;
+    }
+    // Display single line break if only showing classes. but NOT if classes are empty
+    if (!displayAttribute && !displayRelationship && data.getClasses().size() > 0) cout << endl;
+}
+
+void CLI::displayClass (string className) 
+{
+    // Grab copy of class in order to display attributes
+    cout << "Attributes:" << endl;
+    UMLClass c = data.getClassCopy(className);
+    vector<UMLAttribute> attributeList = c.getAttributes();
+    for(UMLAttribute attribute : attributeList)
+    {
+        cout << attribute.getAttributeName() << endl;
+    }
+
+    // Find relationships based on name of the class
+    cout << "Relationships:" << endl;
+    vector<UMLRelationship> relationshipList = data.getRelationshipsByClass(className);
+    for(UMLRelationship relationship : relationshipList)
+    {
+        cout << relationship.getSource().getName() << " => " << relationship.getDestination().getName() << endl;
+    }
 }
 
 /************************************************************/

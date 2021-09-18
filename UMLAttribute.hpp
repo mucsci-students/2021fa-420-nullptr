@@ -33,7 +33,7 @@ class UMLAttribute
 		UMLAttribute(string newAttribute);
 
 		// Grab name of the given attribute
-		string getAttributeName();
+		string getAttributeName() const;
 
 		// Change name of the given attribute
 		void changeName(string newAttributeName);
@@ -45,7 +45,7 @@ UMLAttribute::UMLAttribute(string newAttribute)
 {
 }
 
-string UMLAttribute::getAttributeName()
+string UMLAttribute::getAttributeName() const
 {
 	return attributeName;
 }
