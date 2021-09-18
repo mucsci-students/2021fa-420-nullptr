@@ -63,8 +63,11 @@ UMLClass::UMLClass(string newClass)
 
 UMLClass::UMLClass(string newClass, const std::vector<UMLAttribute>& attributes) 
 :className(newClass)
-,classAttributes(attributes)
 {
+	for (UMLAttribute attr : attributes)
+	{
+		addAttribute(attr);
+	}
 }
 
 string UMLClass::getName() const

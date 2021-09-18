@@ -79,6 +79,9 @@ class UMLData
         //removes className class attribute by the name
         void changeAttributeName(string className, string oldAttributeName, string newAttributeName);
 
+        //checks if class/attribute name is valid
+        bool isValidName(string name);
+
     private:
 
         //params: string name
@@ -111,8 +114,11 @@ UMLData::UMLData()
 }
 
 UMLData::UMLData(const vector<UMLClass>& vclass)
-:classes(vclass)
 {
+    for (UMLClass uclass : vclass )
+    {
+        addClass(uclass);
+    }
 }
 
 vector<UMLClass> UMLData::getClasses() const
@@ -136,7 +142,8 @@ void UMLData::addClass(const UMLClass& classIn)
     int loc = findClass(classIn.getName());
     if (loc >= 0)
         throw "Class name already exists";
-
+    if (!isValidName(classIn.getName()))
+        throw "Class name not valid";
     classes.push_back(classIn);
 }
 
@@ -206,6 +213,8 @@ void UMLData::changeClassName(string oldName, string newName)
 {
     if (findClass(newName) >= 0)
         throw "Class name already exists";
+    if (!isValidName(newName))
+        throw "New class name is not valid";
     getClass(oldName).changeName(newName);
 }
 
@@ -216,6 +225,8 @@ vector<UMLAttribute> UMLData::getClassAttributes(string className)
 
 void UMLData::addClassAttribute(string className, UMLAttribute attribute)
 {
+    if (!isValidName(attribute.getAttributeName()))
+        throw "Attribute name is not valid";
     getClass(className).addAttribute(attribute);
 }
 
@@ -226,6 +237,8 @@ void UMLData::removeClassAttribute(string className, string attributeName)
 
 void UMLData::changeAttributeName(string className, string oldAttributeName, string newAttributeName)
 {
+    if (!isValidName(newAttributeName))
+        throw "New attribute name is not valid";
     getClass(className).changeAttributeName(oldAttributeName, newAttributeName);
 }
 
@@ -285,4 +298,23 @@ void UMLData::addRelationship(const UMLRelationship& relIn)
 void UMLData::addRelationship(const UMLClass& sourceClass, const UMLClass& destClass)
 {
     addRelationship(UMLRelationship(sourceClass, destClass));
+}
+
+bool UMLData::isValidName(string name)
+{
+    //checking first character
+    if (name.size() < 1)
+    {
+        return false;
+    } else 
+    {
+        //check first character
+        if (!((name[0] >= 'a' && name[0] <= 'z') || (name[0] >= 'A' && name[0] <= 'Z'))) return false;
+        //check the rest of the chracters 
+        for (int i = 1; i < name.length(); i++) 
+        {
+            if (!((name[i] >= 'a' && name[i] <= 'z') || (name[i] >= 'A' && name[i] <= 'Z') || (name[i] >= '0' && name[i] <= '9') || name[i] == '_')) return false;
+        }
+    }
+    return true;
 }

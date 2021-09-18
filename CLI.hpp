@@ -196,8 +196,9 @@ void CLI::displayCLI ()
                     cout << "Enter the name of the attribute: ";
                     cin >> attributeName;
 
-                    data.addClassAttribute(className, attributeName);
-                    cout << endl << "Attribute " << attributeName << " added to " << className << endl << endl;
+                    ERR_CATCH(data.addClassAttribute(className, attributeName));
+                    if (errorStatus == false) cout << endl << "Attribute " << attributeName << " added to " << className << endl << endl;
+                    else errorStatus = false;
                     subLoop = false;
 
                 }
@@ -211,8 +212,9 @@ void CLI::displayCLI ()
                     cout << "Enter the name of the attribute: ";
                     cin >> attributeName;
 
-                    data.removeClassAttribute(className, attributeName);
-                    cout << endl << "Attribute " << attributeName << " removed from " << className << endl << endl;
+                    ERR_CATCH(data.removeClassAttribute(className, attributeName));
+                    if (errorStatus == false) cout << endl << "Attribute " << attributeName << " removed from " << className << endl << endl;
+                    else errorStatus = false;
                     subLoop = false;
                 } 
                 // Rename attribute
@@ -227,8 +229,9 @@ void CLI::displayCLI ()
                     cout << "Enter new name of attribute: ";
                     cin >> attributeName2;
 
-                    data.changeAttributeName(className, attributeName, attributeName2);
-                    cout << endl << "Attribute " << attributeName << " renamed to " << attributeName2 << endl << endl;
+                    ERR_CATCH(data.changeAttributeName(className, attributeName, attributeName2));
+                    if (errorStatus == false) cout << endl << "Attribute " << attributeName << " renamed to " << attributeName2 << endl << endl;
+                    else errorStatus = false;
                     subLoop = false;
                 }
                 // Go back
@@ -268,9 +271,9 @@ void CLI::displayCLI ()
                     cout << "Enter the name of the destination: " << endl;
                     cin >> destination;
 
-                    data.addRelationship(source, destination);
-                    cout << endl <<"Relationship added between " << source << " and " << destination << endl << endl;
-                    subLoop = false;
+                    ERR_CATCH(data.addRelationship(source, destination));
+                    if (errorStatus == false) cout << endl <<"Relationship added between " << source << " and " << destination << endl << endl;
+                    else subLoop = false;
                 }
                 // Remove relationship
                 else if (userChoice == "2") {
@@ -282,8 +285,9 @@ void CLI::displayCLI ()
                     cout << "Enter the name of the destination: " << endl;
                     cin >> destination;
 
-                    data.deleteRelationship(source, destination);
-                    cout << endl << "Relationship deleted between " << source << " and " << destination << endl << endl;
+                    ERR_CATCH(data.deleteRelationship(source, destination));
+                    if (errorStatus == false) cout << endl << "Relationship deleted between " << source << " and " << destination << endl << endl;
+                    else errorStatus = false;
                     subLoop = false;
                 } 
                 // Go back
@@ -369,8 +373,15 @@ void CLI::displayCLI ()
                 cin >> fileName;
 
                 UMLFile file(fileName + ".json");
-                data = file.load();
-                cout << "Your file has been loaded" << endl;
+                try {
+                    data = file.load();
+                } catch (const std::exception& ex)
+                {
+                    cout << endl << "Error loading file" << endl << endl;
+                    bool errorStatus = true;
+                }
+                if (errorStatus == false) cout << "Your file has been loaded" << endl;
+                else errorStatus = false;
                 subLoop = false;
             }
 
