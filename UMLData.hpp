@@ -88,6 +88,10 @@ class UMLData
         //finds class by name and returns index within member classes vector, returns -1 if not found
         int findClass(string name);
 
+        //params: string name, vector<UMLAttribute> attributes
+        //finds attribute by name and returns index within the attribute's vector, returns -1 if not found
+        int findAttribute(string name, vector<UMLAttribute> attributes);
+
         //params: UMLClass sourceClassIn, UMLClass destClassIn
         //finds relationship using two UML classes and returns index within member classes vector
         int findRelationship(const UMLClass& sourceClassIn, const UMLClass& destClassIn);
@@ -237,6 +241,8 @@ void UMLData::removeClassAttribute(string className, string attributeName)
 
 void UMLData::changeAttributeName(string className, string oldAttributeName, string newAttributeName)
 {
+    if (findAttribute(newAttributeName, getClassAttributes(className)) >= 0)
+        throw "Attribute name already exists";
     if (!isValidName(newAttributeName))
         throw "New attribute name is not valid";
     getClass(className).changeAttributeName(oldAttributeName, newAttributeName);
@@ -247,6 +253,18 @@ int UMLData::findClass(string name)
     for (int i = 0; i < classes.size(); ++i)
     {
         if (classes[i].getName() == name)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int UMLData::findAttribute(string name, vector<UMLAttribute> attributes)
+{
+    for (int i = 0; i < attributes.size(); ++i)
+    {
+        if (attributes[i].getAttributeName() == name)
         {
             return i;
         }
