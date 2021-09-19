@@ -232,7 +232,17 @@ void UMLData::addClassAttribute(string className, UMLAttribute attribute)
 
 void UMLData::removeClassAttribute(string className, string attributeName)
 {
-    getClass(className).deleteAttribute(attributeName);
+      for (UMLAttribute attr : getClass(className).getAttributes()) {
+           if(attr.getAttributeName() == attributeName){
+                getClass(className).deleteAttribute(attributeName);
+                return;
+           }
+           
+       }
+
+        throw "Attribute does not exist";
+
+   
 }
 
 void UMLData::changeAttributeName(string className, string oldAttributeName, string newAttributeName)
