@@ -233,10 +233,92 @@ TEST(UMLClassFileTest, ChangeNameWorks) {
 TEST(UMLClassFileTest, AddAttributeWorks) {
     UMLClass class1("test");
     UMLAttribute attribute("testattribute");
-    class1.addAttribute("testattribute");
-    ASSERT_EQ(class1.getName(), "newTest");
+    class1.addAttribute(attribute);
+    bool attrFound = false;
+
+    for(UMLAttribute attr : class1.getAttributes())
+    {
+        if(attr.getAttributeName() == "testattribute")
+        {
+            attrFound = true;
+        }
+    }
+
+    ASSERT_EQ(attrFound, true);
 }
 
-// Adds attribute to attribute vector
-		void addAttribute(UMLAttribute newAttribute);
+TEST(UMLClassFileTest, ChangeAttributeWorks) {
+    UMLClass class1("test");
+    UMLAttribute attribute("testattributeOld");
+    class1.addAttribute(attribute);
+    class1.changeAttributeName("testattributeOld","testattributeNew");
+    bool attrFound = false;
 
+    for(UMLAttribute attr : class1.getAttributes())
+    {
+        if(attr.getAttributeName() == "testattributeNew")
+        {
+            attrFound = true;
+        }
+    }
+
+    ASSERT_EQ(attrFound, true);
+
+    for(UMLAttribute attr : class1.getAttributes())
+    {
+        if(attr.getAttributeName() == "testattributeOld")
+        {
+            attrFound = false;
+        }
+    }
+
+    ASSERT_EQ(attrFound, true);
+}
+
+TEST(UMLClassFileTest, DeleteAttributeWorks) {
+    UMLClass class1("test");
+    UMLAttribute attribute("testattribute");
+    class1.addAttribute(attribute);
+    bool attrFound = false;
+    class1.deleteAttribute("testattribute");
+
+    for(UMLAttribute attr : class1.getAttributes())
+    {
+        if(attr.getAttributeName() == "testattribute")
+        {
+            attrFound = true;
+        }
+    }
+
+    ASSERT_EQ(attrFound, false);
+}
+
+TEST(UMLClassFileTest, FindAttributeWorks) {
+    UMLClass class1("test");
+    UMLAttribute attribute("testattribute");
+    class1.addAttribute(attribute);
+    
+
+    ASSERT_EQ(class1.findAttribute("testattribute")->getAttributeName(), attribute.getAttributeName());
+}
+
+TEST(UMLClassFileTest, GetAttributesWorks) {
+    UMLClass class1("test");
+    UMLAttribute attribute("testattribute");
+    class1.addAttribute(attribute);
+    
+    vector<UMLAttribute> test;
+    test.push_back(attribute);
+    
+    bool isEqual = true;
+    vector<UMLAttribute> test2 = class1.getAttributes();
+
+    for(int i = 0; i < test.size(); i++)
+    {
+        if(test[i].getAttributeName() != test2[i].getAttributeName())
+        {
+            isEqual = false;
+        }
+    }
+    ASSERT_EQ(isEqual, true);
+}
