@@ -202,7 +202,8 @@ TEST(UMLRelationshipTest, GetDestinationTest2) {
     UMLClass class1("class1");
     UMLClass class2("class2");
     UMLRelationship relate(class1, class2);
-    ASSERT_EQ(&relate.getDestination(), &class1);
+    bool test = &relate.getDestination() == &class1;
+    ASSERT_EQ(test, false);
 
 }
 //Tests for UMLAttribute.hpp
@@ -216,3 +217,26 @@ TEST(UMLAttributeTest, RenameAttributeNameTest) {
     attribute.changeName("test2");
     ASSERT_EQ(attribute.getAttributeName(), "test2");
 }
+
+//Tests for UMLClass.hpp
+TEST(UMLClassFileTest, GetNameWorks) {
+    UMLClass class1("test");
+    ASSERT_EQ(class1.getName(), "test");
+}
+
+TEST(UMLClassFileTest, ChangeNameWorks) {
+    UMLClass class1("test");
+    class1.changeName("newTest");
+    ASSERT_EQ(class1.getName(), "newTest");
+}
+
+TEST(UMLClassFileTest, AddAttributeWorks) {
+    UMLClass class1("test");
+    UMLAttribute attribute("testattribute");
+    class1.addAttribute("testattribute");
+    ASSERT_EQ(class1.getName(), "newTest");
+}
+
+// Adds attribute to attribute vector
+		void addAttribute(UMLAttribute newAttribute);
+
