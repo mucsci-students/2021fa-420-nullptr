@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include "UMLData.hpp"
 #include "CLI.hpp"
+#include "UMLClass.hpp"
+#include "UMLRelationship.hpp"
 #include <string>
 #include <iostream>
 // TEST(TestSuiteName, TestName) {
@@ -120,3 +122,28 @@ TEST(SquareRootTest, PositiveNos) {
 */
 
 
+//Tests for UMLRelationship.hpp
+
+TEST(UMLRelationshipTest, GetSourceTest) {
+    UMLClass class1("class1");
+    UMLClass class2("class2");
+    UMLRelationship relate(class1, class2);
+
+    ASSERT_EQ(&relate.getSource(), &class1);
+}
+
+TEST(UMLRelationshipTest, GetDestinationTest) {
+    UMLClass class1("class1");
+    UMLClass class2("class2");
+    UMLRelationship relate(class1, class2);
+
+    ASSERT_EQ(&relate.getDestination(), &class2);
+}
+
+TEST(UMLRelationshipTest, GetDestinationTest2) {
+    UMLClass class1("class1");
+    UMLClass class2("class2");
+    UMLRelationship relate(class1, class2);
+
+    ASSERT_EQ(&relate.getDestination(), &class1);
+}
