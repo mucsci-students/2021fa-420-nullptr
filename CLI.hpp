@@ -325,7 +325,10 @@ void CLI::displayCLI ()
                     cout << "Enter name of class:" << endl;
                     cin >> name;
 
-                    displayClass(name);
+                    ERR_CATCH(displayClass(name));
+                    if (errorStatus == false) cout << endl << "Class named " << name << " listed" << endl << endl;
+                    else errorStatus = false;
+                    subLoop = false;
                     cout << endl << "Enter anything to continue..." << endl;
                     cin >> name; // Pause for input
                     cout << endl; 
@@ -333,7 +336,11 @@ void CLI::displayCLI ()
                 }
                 // Display all information
                 else if (userChoice == "2") {
-                    displayDiagram (true, true); 
+                    ERR_CATCH(displayDiagram (true, true));
+                    if (errorStatus == false) cout << endl << "Diagram displayed" << endl << endl;
+                    else errorStatus = false;
+                    subLoop = false;
+                     
                     
                     cout << "Enter anything to continue..." << endl;
                     cin >> name; // Pause for input

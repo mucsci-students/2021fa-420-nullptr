@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
 #include "UMLData.hpp"
 #include "CLI.hpp"
-#include "UMLRelationship.hpp"
 #include "UMLClass.hpp"
+#include "UMLRelationship.hpp"
+#include "UMLAttribute.hpp"
 #include <string>
 #include <iostream>
-
 // TEST(TestSuiteName, TestName) {
 //   ... test body ...
 // }
@@ -89,7 +89,6 @@ TEST(UMLDataAttributeTest, RemovingNonExistantAttribute) {
     ASSERT_ANY_THROW(data.removeClassAttribute("test", "hastestt"));
 }
 
-
 /*
 TEST(UMLDataRelationshipTest, AddingRelationshipWorks) {
    
@@ -122,6 +121,35 @@ TEST(UMLDataRelationshipTest, AddingRelationshipWorks) {
 
     ASSERT_EQ(haveRelationship, true); 
 
+/*
+TEST(UMLDataAttributeTest, RemovingAttributeWorks) {
+    UMLData data;
+    data.addClass("test");
+    UMLAttribute attribute("hastest");
+    data.addClassAttribute("test", attribute);
+    data.removeClassAttribute("test", attribute);
+    ASSERT_EQ(data.getClassCopy("test").removeClassAttribute("test", attribute), "");
+
+}
+*/
+
+//Attribute tests
+/*
+-Removing an attribute works
+-removing an attribute  that doestn exist should throw an error
+- renaming an attribute should work
+- renaming an attribute to another attribute that already exists should throw an error
+*/
+
+
+ //adds class attribute to specified className
+     //   void addClassAttribute(string className, UMLAttribute attribute);
+
+/*
+TEST(SquareRootTest, PositiveNos) { 
+    EXPECT_EQ (18.0, square‑root (324.0));
+    EXPECT_EQ (25.4, square‑root (645.16));
+    EXPECT_EQ (50.3321, square‑root (2533.310224));
 }
 */
 
@@ -154,3 +182,37 @@ TEST(UMLDataAttributeTest, RemovingAttributeWorks) {
 
 
 
+//Tests for UMLRelationship.hpp
+
+TEST(UMLRelationshipTest, GetSourceTest) {
+    UMLClass class1("class1");
+    UMLClass class2("class2");
+    UMLRelationship relate(class1, class2);
+    ASSERT_EQ(&relate.getSource(), &class1);
+}
+
+TEST(UMLRelationshipTest, GetDestinationTest) {
+    UMLClass class1("class1");
+    UMLClass class2("class2");
+    UMLRelationship relate(class1, class2);
+    ASSERT_EQ(&relate.getDestination(), &class2);
+}
+
+TEST(UMLRelationshipTest, GetDestinationTest2) {
+    UMLClass class1("class1");
+    UMLClass class2("class2");
+    UMLRelationship relate(class1, class2);
+    ASSERT_EQ(&relate.getDestination(), &class1);
+
+}
+//Tests for UMLAttribute.hpp
+TEST(UMLAttributeTest, GetAttributeNameTest) {
+    UMLAttribute attribute("test");
+    ASSERT_EQ(attribute.getAttributeName(), "test");
+}
+
+TEST(UMLAttributeTest, RenameAttributeNameTest) {
+    UMLAttribute attribute("test");
+    attribute.changeName("test2");
+    ASSERT_EQ(attribute.getAttributeName(), "test2");
+}
