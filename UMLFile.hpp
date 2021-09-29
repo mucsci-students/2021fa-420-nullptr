@@ -5,12 +5,6 @@
   in the UML diagram is stored in a JSON file. 
 */
 
-/************************************************************/
-// Macro guard
-#ifndef UMLFILE_HPP
-#define UMLFILE_HPP
-/************************************************************/
-
 //--------------------------------------------------------------------
 // System includes
 #include <vector>
@@ -62,7 +56,3 @@ class UMLFile
         // gets the relationships from the json file and adds them to the UMLData object
         void getUMLRelationshipVec(UMLData& data);
 };
-
-/************************************************************/
-#endif
-/************************************************************/

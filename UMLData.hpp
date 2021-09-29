@@ -4,12 +4,6 @@
   Description: Stores the Relationship and Class information of the current state 
 */
 
-/************************************************************/
-// Macro guard
-#ifndef UMLDATA_HPP
-#define UMLDATA_HPP
-/************************************************************/
-
 //--------------------------------------------------------------------
 // System includes
 #include "UMLClass.hpp"
@@ -109,7 +103,3 @@ class UMLData
         // Creates relationship from two classes and adds to relationshp vector
         void addRelationship(const UMLClass& sourceClass, const UMLClass& destClass);
 };
-
-/************************************************************/
-#endif
-/************************************************************/

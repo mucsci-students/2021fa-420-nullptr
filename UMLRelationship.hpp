@@ -29,7 +29,3 @@ class UMLRelationship
 		// Grab name of the destination classs
 		const UMLClass& getDestination() const;
 };
-
-/************************************************************/
-#endif
-/************************************************************/

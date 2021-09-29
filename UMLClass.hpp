@@ -5,12 +5,6 @@
   in the UML diagram is stored. 
 */
 
-/************************************************************/
-// Macro guard
-#ifndef UMLCLASS_HPP
-#define UMLCLASS_HPP
-/************************************************************/
-
 //--------------------------------------------------------------------
 // System includes
 #include <string>
@@ -61,7 +55,3 @@ class UMLClass
 		// Returns vector of attributes 
 		vector<UMLAttribute> getAttributes() const;
 };
-
-/************************************************************/
-#endif
-/************************************************************/
