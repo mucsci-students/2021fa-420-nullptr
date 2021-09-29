@@ -5,6 +5,12 @@
   in the UML diagram is stored. 
 */
 
+/************************************************************/
+// Macro guard
+#ifndef UMLCLASS_HPP
+#define UMLCLASS_HPP
+/************************************************************/
+
 //--------------------------------------------------------------------
 // System includes
 #include <string>
@@ -43,7 +49,7 @@ class UMLClass
 		// Adds attribute to attribute vector
 		void addAttribute(UMLAttribute newAttribute);
 
-		//Changes name of attribute within class
+		// Changes name of attribute within class
 		void changeAttributeName(string oldAttributeName, string newAttributeName);
 
 		// Removes attribute from attribute vector
@@ -56,70 +62,6 @@ class UMLClass
 		vector<UMLAttribute> getAttributes() const;
 };
 
-UMLClass::UMLClass(string newClass) 
-:className(newClass)
-{
-}
-
-UMLClass::UMLClass(string newClass, const std::vector<UMLAttribute>& attributes) 
-:className(newClass)
-{
-	for (UMLAttribute attr : attributes)
-	{
-		addAttribute(attr);
-	}
-}
-
-string UMLClass::getName() const
-{
-	return className;
-}
-
-void UMLClass::changeName(string newClassName)
-{
-	className = newClassName;
-}
-
-void UMLClass::addAttribute(UMLAttribute newAttribute) 
-{
-	//should be check for dup
-	for(UMLAttribute attribute : classAttributes)
-	{
-		if(attribute.getAttributeName() == newAttribute.getAttributeName())
-			throw "No duplicate attributes";
-	}
-	classAttributes.push_back(newAttribute);
-}
-
-void UMLClass::changeAttributeName(string oldAttributeName, string newAttributeName)
-{
-	(*findAttribute(oldAttributeName)).changeName(newAttributeName);
-}
-
-vector<UMLAttribute>::iterator UMLClass::deleteAttribute(string attributeName) 
-{
-	auto attribute = findAttribute(attributeName);
-	// attribute not found 
-	if (attribute == classAttributes.end()) {
-		// return empty if attribute not found
-		return classAttributes.end();
-	}
-	classAttributes.erase(attribute);
-	return attribute;
-}
-
-vector<UMLAttribute>::iterator UMLClass::findAttribute(string attributeName) 
-{
-	for (vector<UMLAttribute>::iterator ptr = classAttributes.begin(); ptr != classAttributes.end(); ++ptr) {
-		if (ptr->getAttributeName() == attributeName){
-			return ptr;
-		}
-	}
-	// return empty if attribute not found
-	return classAttributes.end();
-}
-
-vector<UMLAttribute> UMLClass::getAttributes() const
-{
-	return classAttributes;
-}
+/************************************************************/
+#endif
+/************************************************************/

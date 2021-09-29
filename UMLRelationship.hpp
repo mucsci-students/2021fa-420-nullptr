@@ -1,3 +1,4 @@
+#pragma once
 /*
   Filename   : UMLRelationship.hpp
   Description: Serves as an object for which information about a relationship
@@ -5,21 +6,10 @@
   of relationships.
 */
 
-/************************************************************/
-// Macro guard
-#ifndef UMLRELATIONSHIP_HPP
-#define UMLRELATIONSHIP_HPP
-/************************************************************/
-
 //--------------------------------------------------------------------
 // System includes
 #include <string>
 #include "UMLClass.hpp"
-//--------------------------------------------------------------------
-
-//--------------------------------------------------------------------
-// Using declarations
-
 //--------------------------------------------------------------------
 
 class UMLRelationship
@@ -39,22 +29,6 @@ class UMLRelationship
 		// Grab name of the destination classs
 		const UMLClass& getDestination() const;
 };
-
-UMLRelationship::UMLRelationship(const UMLClass& src, const UMLClass& dest)
-:source(&src)
-,destination(&dest)
-{
-}
-
-const UMLClass& UMLRelationship::getSource() const
-{
-	return *source;
-}
-
-const UMLClass& UMLRelationship::getDestination() const
-{
-	return *destination;
-}
 
 /************************************************************/
 #endif
