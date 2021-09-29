@@ -12,6 +12,7 @@
 
 int main()
 {
+   /*
     httplib::Server svr;
     svr.Get("/", [](const httplib::Request&, httplib::Response& res) {
       res.set_redirect("/hi");
@@ -26,7 +27,7 @@ int main()
     svr.listen("localhost", 8080);
 
     
-
+*/
     CLI newInterface;
     newInterface.displayCLI();
     return 0;
