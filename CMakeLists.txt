@@ -4,7 +4,7 @@ project(project C CXX)
 
 add_subdirectory(include/json)
 
-add_executable(project main.cpp)
+add_executable(project main.cpp UMLParameter.cpp)
 
 target_link_libraries(project PUBLIC json)
 
@@ -26,7 +26,7 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(Tests Tests.cpp)
+add_executable(Tests Tests.cpp UMLParameter.cpp)
 target_link_libraries(Tests gtest_main)
 include(GoogleTest)
 gtest_discover_tests(Tests)
