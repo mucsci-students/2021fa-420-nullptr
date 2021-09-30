@@ -5,7 +5,7 @@
 
 //--------------------------------------------------------------------
 // System includes
-#include <UMLAttribute.hpp>
+#include "UMLAttribute.hpp"
 //--------------------------------------------------------------------
 
 // Constructor for attribute objects

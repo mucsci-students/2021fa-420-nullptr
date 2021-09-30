@@ -5,7 +5,7 @@
 
 //--------------------------------------------------------------------
 // System includes
-#include <UMLRelationship.hpp>
+#include "UMLRelationship.hpp"
 //--------------------------------------------------------------------
 
 // Constructor for class objects

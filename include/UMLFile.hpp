@@ -10,7 +10,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
-#include "include/json/json.hpp"
+#include "json/json.hpp"
 #include "UMLClass.hpp"
 #include "UMLData.hpp"
 #include "UMLAttribute.hpp"
@@ -27,12 +27,10 @@ using json = nlohmann::json;
 class UMLFile
 {
     private:
-
         json jsonFile;
         string path;
 
     public:
-
         // constructor: takes in the name of the file to save
         UMLFile(const string&);
 
@@ -43,7 +41,6 @@ class UMLFile
         UMLData load();  
 
     private:
-
         // takes in vector of classes and adds a json string to the jsonFile
         void addUMLClassVec(const vector<UMLClass>& umlclasses);
 
