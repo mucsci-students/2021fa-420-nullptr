@@ -5,7 +5,7 @@
 
 //--------------------------------------------------------------------
 // System includes
-#include "UMLFile.hpp"
+#include "include/UMLFile.hpp"
 //--------------------------------------------------------------------
 
 // constructor: takes in the name of the file to save
