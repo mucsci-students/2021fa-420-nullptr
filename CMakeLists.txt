@@ -3,16 +3,30 @@ cmake_minimum_required(VERSION 3.10)
 project(project C CXX)
 
 add_subdirectory(include/json)
+add_subdirectory(include/httplib)
+
 
 add_executable(project main.cpp UMLParameter.cpp)
 
+# add executables here
+add_executable(project main.cpp)
+
+
+# add threads for http library
+find_package (Threads REQUIRED)
+
+target_link_libraries(project PUBLIC Threads::Threads)
+
 target_link_libraries(project PUBLIC json)
+
+target_link_libraries(project PUBLIC http)
 
 
 
 target_include_directories(project PUBLIC
                           "${PROJECT_BINARY_DIR}"
                           "${PROJECT_SOURCE_DIR}/include/json"
+                          "${PROJECT_SOURCE_DIR}/include/http"
                           )
 
 include(FetchContent)
