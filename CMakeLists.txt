@@ -5,8 +5,12 @@ project(project C CXX)
 add_subdirectory(include/json)
 add_subdirectory(include/httplib)
 
+
+add_executable(project main.cpp UMLParameter.cpp)
+
 # add executables here
 add_executable(project main.cpp)
+
 
 # add threads for http library
 find_package (Threads REQUIRED)
@@ -36,7 +40,7 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(Tests Tests.cpp)
+add_executable(Tests Tests.cpp UMLParameter.cpp)
 target_link_libraries(Tests gtest_main)
 include(GoogleTest)
 gtest_discover_tests(Tests)
