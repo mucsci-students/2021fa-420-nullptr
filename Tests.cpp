@@ -1,9 +1,12 @@
 #include <gtest/gtest.h>
+
 #include "include/UMLData.hpp"
-#include "include/CLI.hpp"
 #include "include/UMLClass.hpp"
 #include "include/UMLRelationship.hpp"
 #include "include/UMLAttribute.hpp"
+#include "UMLParameter.hpp"
+#include "include/CLI.hpp"
+
 #include <string>
 #include <iostream>
 // TEST(TestSuiteName, TestName) {
@@ -321,4 +324,28 @@ TEST(UMLClassFileTest, GetAttributesWorks) {
         }
     }
     ASSERT_EQ(isEqual, true);
+}
+
+
+//Tests for UMLParameter.hpp
+//**************************
+
+//Tests creation of a Parameter and getting it's name and type works
+TEST(UMLParameterTest, GetParameterNameTest) {
+    UMLParameter parameter("name","type");
+    ASSERT_EQ(parameter.getName(), "name");
+    ASSERT_EQ(parameter.getType(), "type");
+}
+
+//Tests renaming Parameter works
+TEST(UMLParameterTest, RenameParameterNameTest) {
+    UMLParameter parameter("name","type");
+    parameter.changeName("name2");
+    ASSERT_EQ(parameter.getName(), "name2");
+}
+//Tests changing Parameter type works
+TEST(UMLParameterTest, ChangeParameterTypeTest) {
+    UMLParameter parameter("name","type");
+    parameter.changeType("type2");
+    ASSERT_EQ(parameter.getType(), "type2");
 }
