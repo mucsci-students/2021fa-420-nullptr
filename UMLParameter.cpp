@@ -1,4 +1,3 @@
-#pragma once
 /*
   Filename   : UMLParameter.cpp
   Description: Implementation of a parameter.
