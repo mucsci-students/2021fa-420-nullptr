@@ -1,0 +1,14 @@
+<html>
+    <head>
+    </head>
+    <body>
+        <form action="/add/class" method="GET">
+            <label for="cname">Class name:</label><br>
+            <input type="text" id="cname" name="cname"><br>
+            <input type="submit" value="Submit">
+        </form>
+        {% for class in classes %}
+            <p>{{ class.name }}</p>
+        {% endfor %}
+    </body>
+</html>

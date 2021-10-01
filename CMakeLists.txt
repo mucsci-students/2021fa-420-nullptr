@@ -4,6 +4,7 @@ project(project C CXX)
 
 add_subdirectory(include/json)
 add_subdirectory(include/httplib)
+add_subdirectory(include/inja)
 
 # add executables here
 add_executable(project main.cpp)
@@ -17,12 +18,15 @@ target_link_libraries(project PUBLIC json)
 
 target_link_libraries(project PUBLIC http)
 
+target_link_libraries(project PUBLIC inja)
+
 
 
 target_include_directories(project PUBLIC
                           "${PROJECT_BINARY_DIR}"
                           "${PROJECT_SOURCE_DIR}/include/json"
                           "${PROJECT_SOURCE_DIR}/include/http"
+                          "${PROJECT_SOURCE_DIR}/include/inja"
                           )
 
 include(FetchContent)
