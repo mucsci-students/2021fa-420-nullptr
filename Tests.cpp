@@ -1,10 +1,12 @@
 #include <gtest/gtest.h>
-#include "UMLData.hpp"
-#include "CLI.hpp"
-#include "UMLClass.hpp"
-#include "UMLRelationship.hpp"
-#include "UMLAttribute.hpp"
-#include "UMLParameter.hpp"
+
+#include "include/UMLData.hpp"
+#include "include/UMLClass.hpp"
+#include "include/UMLRelationship.hpp"
+#include "include/UMLAttribute.hpp"
+#include "include/UMLParameter.hpp"
+#include "include/CLI.hpp"
+
 #include <string>
 #include <iostream>
 // TEST(TestSuiteName, TestName) {

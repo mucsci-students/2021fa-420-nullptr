@@ -1,7 +1,8 @@
 #pragma once
 /*
   Filename   : UMLParameter.hpp
-  Description: Header file for UMPParameter.cpp
+  Description: Serves as an object for which information about a parameter
+  for methods are stored.
 */
 
 //--------------------------------------------------------------------
