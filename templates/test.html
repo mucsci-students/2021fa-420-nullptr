@@ -1,14 +1,35 @@
 <html>
     <head>
     </head>
-    <body>
+    <body></body>
+        <h1>Classes:</h1>
         <form action="/add/class" method="GET">
             <label for="cname">Class name:</label><br>
             <input type="text" id="cname" name="cname"><br>
-            <input type="submit" value="Submit">
+            <input type="submit" value="add class">
         </form>
         {% for class in classes %}
-            <p>{{ class.name }}</p>
+            <h2>{{ class.name }}</h2>
+            <p>Attributes:</p>
+            {% for attribute in class.attributes %}
+                <p>{{ attribute.name }}</p>
+            {% endfor %}
+            <form action="/add/attribute/{{ class.name }}" method="GET">
+                <label for="aname">Attribute name:</label>
+                <input type="text" id="aname" name="aname">
+                <input type="submit" value="add attribute">
+            </form>
+        {% endfor %}
+        <h1>Relationships:</h1>
+        <form action="/add/relationship" method="GET">
+            <label for="cname">Source:</label><br>
+            <input type="text" id="source" name="source"><br>
+            <label for="cname">Destination:</label><br>
+            <input type="text" id="dest" name="dest"><br>
+            <input type="submit" value="add relationship">
+        </form>
+        {% for relationship in relationships %}
+            <p>{{relationship.source}} -> {{relationship.destination}}</p>
         {% endfor %}
     </body>
 </html>

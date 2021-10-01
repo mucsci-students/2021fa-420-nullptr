@@ -17,8 +17,12 @@ using json = nlohmann::json;
 
 int main()
 { 
-    UMLData data;
-    std::cout << data.getJson() << std::endl;
+    // UMLData data;
+    // data.addClass("test");
+    // std::cout << data.getJson() << std::endl;
+    // inja::Environment env;
+    // inja::Template temp = env.parse_template("../templates/test.html");
+    // env.render(temp, data.getJson());
     Server {8080};
     CLI newInterface;
     newInterface.displayCLI();
