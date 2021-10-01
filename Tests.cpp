@@ -4,7 +4,7 @@
 #include "include/UMLClass.hpp"
 #include "include/UMLRelationship.hpp"
 #include "include/UMLAttribute.hpp"
-#include "UMLParameter.hpp"
+#include "include/UMLParameter.hpp"
 #include "include/CLI.hpp"
 
 #include <string>

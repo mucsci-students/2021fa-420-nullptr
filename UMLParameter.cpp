@@ -1,14 +1,13 @@
 #pragma once
 /*
   Filename   : UMLParameter.cpp
-  Description: Serves as an object for which information about a parameter
-  for methods and fields is stored.
+  Description: Implementation of a parameter.
 */
 
 //--------------------------------------------------------------------
 // System includes
 #include <string>
-#include "UMLParameter.hpp"
+#include "include/UMLParameter.hpp"
 //--------------------------------------------------------------------
 
 //--------------------------------------------------------------------
