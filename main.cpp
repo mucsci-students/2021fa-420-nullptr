@@ -6,7 +6,7 @@
 
 //--------------------------------------------------------------------
 // System includes
-#include "CLI.hpp"
+#include "include/CLI.hpp"
 #include "include/httplib/httplib.h"
 //--------------------------------------------------------------------
 

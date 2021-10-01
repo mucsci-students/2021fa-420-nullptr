@@ -5,7 +5,7 @@
 
 //--------------------------------------------------------------------
 // System includes
-#include "CLI.hpp"
+#include "include/CLI.hpp"
 //--------------------------------------------------------------------
 
 // Displays CLI using a large loop routine.
