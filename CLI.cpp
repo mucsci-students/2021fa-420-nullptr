@@ -3,6 +3,18 @@
   Description: Implementation of the command line interface.
 */
 
+/************************************************************/
+// Catch for functions to protect from invalid inputs
+#define ERR_CATCH(fun)                           \
+    try {                                        \
+        fun;                                     \
+    }                                            \
+    catch (const char* error) {                  \
+        cout << endl << error << endl << endl;   \
+        errorStatus = true;                      \
+    }
+/************************************************************/
+
 //--------------------------------------------------------------------
 // System includes
 #include "include/CLI.hpp"
@@ -11,15 +23,13 @@
 // Displays CLI using a large loop routine.
 void CLI::displayCLI ()
 {
-    // Start default state of loops
-    mainLoop = true;
-    subLoop = false;
-
     cout << "Welcome to UML++!" << endl << endl;
-
     // Primary display routine
     while (mainLoop) {
+        // Error status reset when main loop begins
         errorStatus = false;
+        // Subloop toggled to guarantee entry
+        subLoop = true;
         // Main prompt: prompts user for options.
         cout << "Choose an option:" << endl;
         cout << "[1] Class" << endl;
@@ -34,11 +44,10 @@ void CLI::displayCLI ()
         cout << endl << "Choice: ";
         cin >> userChoice;
         cout << endl;
-
         // Start subloop
-        subLoop = true;
-
-        while (subLoop) { 
+        while (subLoop) {
+            // Subloop toggled to break loop unless error occurs
+            subLoop = false;
             // Class subroutine
             if(userChoice == "1") {
                 // Lists operations for modifying classes
@@ -65,7 +74,6 @@ void CLI::displayCLI ()
                     // Prevent success message if error was caught
                     if(errorStatus == false) cout << endl << "Class named " << name << " added" << endl << endl;
                     else errorStatus = false;
-                    subLoop = false;
                 }
                 // Remove class
                 else if (userChoice == "2") {
@@ -80,7 +88,6 @@ void CLI::displayCLI ()
                     // Prevent success message if error was caught
                     if(errorStatus == false) cout << endl << "Class named " << name << " removed" << endl << endl;
                     else errorStatus = false;
-                    subLoop = false;
                 } 
                 // Rename class
                 else if (userChoice == "3") {
@@ -98,17 +105,16 @@ void CLI::displayCLI ()
                     // Prevent success message if error was caught
                     if(errorStatus == false) cout << endl << "Class named " << name << " renamed to " << name2 << endl << endl;
                     else errorStatus = false;
-                    subLoop = false;
                 }
                 // Go back
                 else if (userChoice == "4") {
                     // Exits subroutine to go back to main routine
-                    subLoop = false;
                 }
                 // Invalid choice
                 else {
                     cout << "Invalid choice!" << endl << endl;
                     userChoice = "1";
+                    subLoop = true;
                 }
             }
 
@@ -141,7 +147,6 @@ void CLI::displayCLI ()
                     ERR_CATCH(data.addClassAttribute(className, attributeName));
                     if (errorStatus == false) cout << endl << "Attribute " << attributeName << " added to " << className << endl << endl;
                     else errorStatus = false;
-                    subLoop = false;
                 }
                 // Remove attribute
                 else if (userChoice == "2") {
@@ -156,7 +161,6 @@ void CLI::displayCLI ()
                     ERR_CATCH(data.removeClassAttribute(className, attributeName));
                     if (errorStatus == false) cout << endl << "Attribute " << attributeName << " removed from " << className << endl << endl;
                     else errorStatus = false;
-                    subLoop = false;
                 } 
                 // Rename attribute
                 else if (userChoice == "3") {
@@ -173,17 +177,16 @@ void CLI::displayCLI ()
                     ERR_CATCH(data.changeAttributeName(className, attributeName, attributeName2));
                     if (errorStatus == false) cout << endl << "Attribute " << attributeName << " renamed to " << attributeName2 << endl << endl;
                     else errorStatus = false;
-                    subLoop = false;
                 }
                 // Go back
                 else if (userChoice == "4") {
                     // Exits subroutine to go back to main routine
-                    subLoop = false;
                 }
                 // Invalid choice
                 else {
                     cout << "Invalid choice" << endl << endl;
                     userChoice = "2";
+                    subLoop = true;
                 }
             }
 
@@ -215,6 +218,8 @@ void CLI::displayCLI ()
                     cin >> source;
                     cout << "Enter the name of the destination: " << endl;
                     cin >> destination;
+
+                    // Loop to grab string of type and convert into integer
                     while (typeLoop) {
                         typeLoop = false;
                         cout << "Choose the type of relationship:" << endl;
@@ -231,11 +236,11 @@ void CLI::displayCLI ()
                             typeLoop = true;
                         }
                     }
+
                     ERR_CATCH(data.addRelationship(source, destination, type));
                     if (errorStatus == false) cout << endl << "Relationship added between " << source << " and " << destination
                         << " of type " << data.getRelationshipType(source, destination) << endl << endl;
                     else errorStatus = false;
-                    subLoop = false;
                 }
                 // Remove relationship
                 else if (userChoice == "2") {
@@ -250,17 +255,16 @@ void CLI::displayCLI ()
                     ERR_CATCH(data.deleteRelationship(source, destination));
                     if (errorStatus == false) cout << endl << "Relationship deleted between " << source << " and " << destination << endl << endl;
                     else errorStatus = false;
-                    subLoop = false;
                 } 
                 // Go back
                 else if (userChoice == "3") {
                     // Exits subroutine to go back to main routine
-                    subLoop = false;
                 }
                 // Invalid choice
                 else {
                     cout << "Invalid choice!" << endl << endl;
                     userChoice = "3";
+                    subLoop = true;
                 }
             }
 
@@ -288,36 +292,34 @@ void CLI::displayCLI ()
                     cin >> name;
 
                     ERR_CATCH(displayClass(name));
-                    if (errorStatus == false) cout << endl << "Class named " << name << " listed" << endl << endl;
+                    if (errorStatus == false) cout << endl << "Class named " << name << " listed" << endl;
                     else errorStatus = false;
+                    
                     subLoop = false;
                     cout << endl << "Enter anything to continue..." << endl;
                     cin >> name; // Pause for input
                     cout << endl; 
-                    subLoop = false;
                 }
                 // Display all information
                 else if (userChoice == "2") {
                     ERR_CATCH(displayDiagram (true, true));
-                    if (errorStatus == false) cout << endl << "Diagram displayed" << endl << endl;
+                    if (errorStatus == false) cout << endl << "Diagram displayed" << endl;
                     else errorStatus = false;
-                    subLoop = false;
-                     
                     
+                    subLoop = false;
                     cout << "Enter anything to continue..." << endl;
                     cin >> name; // Pause for input
                     cout << endl;                  
-                    subLoop = false;
                 } 
                 // Go back
                 else if (userChoice == "3") {
                     // Exits subroutine to go back to main routine
-                    subLoop = false;
                 }
                 // Invalid choice
                 else {
                     cout << "Invalid choice!" << endl << endl;
                     userChoice = "4";
+                    subLoop = true;
                 }
             }
 
@@ -331,7 +333,6 @@ void CLI::displayCLI ()
                 UMLFile file(fileName + ".json");
                 file.save(data);
                 cout << "Your file has been saved" << endl;
-                subLoop = false;
             }
 
             // Load UML subroutine
@@ -342,16 +343,16 @@ void CLI::displayCLI ()
                 cin >> fileName;
 
                 UMLFile file(fileName + ".json");
+                // Requires unique try catch in order to handle file loading error
                 try {
                     data = file.load();
                 } catch (const std::exception& ex)
                 {
                     cout << endl << "Error loading file" << endl << endl;
-                    bool errorStatus = true;
+                    errorStatus = true;
                 }
                 if (errorStatus == false) cout << "Your file has been loaded" << endl;
                 else errorStatus = false;
-                subLoop = false;
             }
 
             // Help subroutine
@@ -370,13 +371,11 @@ void CLI::displayCLI ()
                 cout << endl << "Enter anything to continue..." << endl;
                 cin >> line; // Pause for input
                 cout << endl; 
-                subLoop = false;
             }
 
             // Exits the program
             else if (userChoice == "8") {
                 cout << "Exiting program..." << endl << endl;
-                subLoop = false;
                 mainLoop = false;
             }
 
@@ -384,7 +383,6 @@ void CLI::displayCLI ()
             else {
                 cout << "Invalid choice!" << endl << endl;
                 userChoice = "";
-                subLoop = false;
             }
         }  
     } 

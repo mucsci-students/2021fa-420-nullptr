@@ -5,18 +5,6 @@
   for the user to create UML diagrams
 */
 
-/************************************************************/
-// Catch for functions to protect from invalid inputs
-#define ERR_CATCH(fun)                           \
-    try {                                        \
-        fun;                                     \
-    }                                            \
-    catch (const char* error) {                  \
-        cout << endl << error << endl << endl;   \
-        errorStatus = true;                      \
-    }
-/************************************************************/
-
 //--------------------------------------------------------------------
 // System includes
 #include <string>
@@ -48,7 +36,7 @@ class CLI
         string userChoice;
         // Loop boolean that maintains CLI routine
         bool mainLoop;
-        // Loop boolean that maintains CLI subrountines
+        // Loop boolean that maintains CLI subroutines
         bool subLoop;
         // Error check to prevent 'success' print 
         bool errorStatus;
