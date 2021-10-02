@@ -102,6 +102,24 @@ void UMLData::deleteRelationship(string srcName, string destName)
     relationships.erase(relationships.begin() + loc);
 }
 
+// Returns string representation of relationship type
+string UMLData::getRelationshipType(const string& srcName, const string& destName) {
+    Type type = getRelationship(srcName, destName).getType();
+    switch (type) {
+        case aggregation :
+            return "aggregation";
+        case composition :
+            return "composition";
+        case generalization :
+            return "generalization";
+        case realization :
+            return "realization";
+        default :
+            return "none";
+    }
+    return "none";
+}
+
 // Deletes a class by string in the classes vector
 void UMLData::deleteClass(string name)
 {

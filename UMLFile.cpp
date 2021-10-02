@@ -89,7 +89,7 @@ void UMLFile::getUMLRelationshipVec(UMLData& data)
         string dest = rel["dest"];
         string src = rel["src"];
 
-        data.addRelationship(dest, src);
-
+        // Temp value for type
+        data.addRelationship(dest, src, 1);
     }
 }

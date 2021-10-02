@@ -19,6 +19,7 @@ void CLI::displayCLI ()
 
     // Primary display routine
     while (mainLoop) {
+        errorStatus = false;
         // Main prompt: prompts user for options.
         cout << "Choose an option:" << endl;
         cout << "[1] Class" << endl;
@@ -141,7 +142,6 @@ void CLI::displayCLI ()
                     if (errorStatus == false) cout << endl << "Attribute " << attributeName << " added to " << className << endl << endl;
                     else errorStatus = false;
                     subLoop = false;
-
                 }
                 // Remove attribute
                 else if (userChoice == "2") {
@@ -199,8 +199,12 @@ void CLI::displayCLI ()
                 cin >> userChoice;
                 cout << endl;
 
-                // Class name representing source and destination
-                string source, destination;
+                // String representing source, destination, type
+                string source, destination, stringType;
+                // Integer representing type 
+                int type;
+                // Boolean to control type loop
+                bool typeLoop = true;
 
                 // Add relationship
                 if (userChoice == "1") {
@@ -211,10 +215,27 @@ void CLI::displayCLI ()
                     cin >> source;
                     cout << "Enter the name of the destination: " << endl;
                     cin >> destination;
-
-                    ERR_CATCH(data.addRelationship(source, destination));
-                    if (errorStatus == false) cout << endl <<"Relationship added between " << source << " and " << destination << endl << endl;
-                    else subLoop = false;
+                    while (typeLoop) {
+                        typeLoop = false;
+                        cout << "Choose the type of relationship:" << endl;
+                        cout << "[1] Aggregation" << endl;
+                        cout << "[2] Composition" << endl;
+                        cout << "[3] Generalization" << endl;
+                        cout << "[4] Realization" << endl;
+                        cin >> stringType;
+                        if (stringType == "1" || stringType == "2" || stringType == "3" || stringType == "4") {
+                            type = std::stoi(stringType);
+                        }
+                        else {
+                            cout << "Invalid choice!" << endl << endl;
+                            typeLoop = true;
+                        }
+                    }
+                    ERR_CATCH(data.addRelationship(source, destination, type));
+                    if (errorStatus == false) cout << endl << "Relationship added between " << source << " and " << destination
+                        << " of type " << data.getRelationshipType(source, destination) << endl << endl;
+                    else errorStatus = false;
+                    subLoop = false;
                 }
                 // Remove relationship
                 else if (userChoice == "2") {

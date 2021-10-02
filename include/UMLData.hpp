@@ -61,6 +61,9 @@ class UMLData
         // Deletes relationshp based on two strings
         void deleteRelationship(string srcName, string destName);
 
+        // Returns string representation of relationship type
+        string getRelationshipType(const string& srcName, const string& destName);
+
         // Deletes a class by string in the classes vector
         void deleteClass(string name);
 
