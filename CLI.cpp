@@ -1,13 +1,9 @@
 /*
-  Filename   : CLI.hpp
-  Description: File which generates the command line interface
-  for the user to create UML diagrams
+  Filename   : CLI.cpp
+  Description: Implementation of the command line interface.
 */
 
 /************************************************************/
-// Macro guard
-#ifndef CLI_HPP
-#define CLI_HPP
 // Catch for functions to protect from invalid inputs
 #define ERR_CATCH(fun)                           \
     try {                                        \
@@ -21,51 +17,8 @@
 
 //--------------------------------------------------------------------
 // System includes
-#include <string>
-#include "UMLClass.hpp"
-#include "UMLAttribute.hpp"
-#include "UMLRelationship.hpp"
-#include "UMLData.hpp"
-#include "UMLFile.hpp"
-#include <vector>
-#include <iostream>
-#include <fstream>
+#include "include/CLI.hpp"
 //--------------------------------------------------------------------
-
-//--------------------------------------------------------------------
-// Using declarations
- using std::cin;
- using std::cout;
- using std::endl;
- using std::string;
- using std::vector;
- using std::invalid_argument;
-//--------------------------------------------------------------------
-
-class CLI
-{
-    private:
-        // Stores choice input by user, representing position within diagram
-        // When an invalid input is set, reverts to its previous position
-        string userChoice;
-        // Loop boolean that maintains CLI routine
-        bool mainLoop;
-        // Loop boolean that maintains CLI subrountines
-        bool subLoop;
-        // Error check to prevent 'success' print 
-        bool errorStatus;
-        // Main UML data object storing UML stuff
-        UMLData data;
-    public:
-        // Displays command line interface
-        void displayCLI();
-        // Displays information about classes within the diagram.
-        // Has conditional booleans to optionally display attributes and relationships.
-        void displayDiagram (bool displayAttribute, bool displayRelationship);
-        // Displays information about a single class with the name className.
-        void displayClass (string className);
-};
-
 
 // Displays CLI using a large loop routine.
 void CLI::displayCLI ()
@@ -74,6 +27,9 @@ void CLI::displayCLI ()
     cout << "Welcome to UML++!" << endl << endl;
     // Primary display routine
     while (mainLoop) {
+        // Error status reset when main loop begins
+        errorStatus = false;
+        // Subloop toggled to guarantee entry
         subLoop = true;
         // Main prompt: prompts user for options.
         cout << "Choose an option:" << endl;
@@ -91,6 +47,7 @@ void CLI::displayCLI ()
         cout << endl;
         // Start subloop
         while (subLoop) {
+            // Subloop toggled to break loop unless error occurs
             subLoop = false;
             // Class subroutine
             if(userChoice == "1") {
@@ -312,15 +269,22 @@ void CLI::displayCLI ()
                     cout << "Enter name of class:" << endl;
                     cin >> name;
 
-                    displayClass(name);
+                    ERR_CATCH(displayClass(name));
+                    if (errorStatus == false) cout << endl << "Class named " << name << " listed" << endl;
+                    else errorStatus = false;
+                    
+                    subLoop = false;
                     cout << endl << "Enter anything to continue..." << endl;
                     cin >> name; // Pause for input
                     cout << endl; 
                 }
                 // Display all information
                 else if (userChoice == "2") {
-                    displayDiagram (true, true); 
+                    ERR_CATCH(displayDiagram (true, true));
+                    if (errorStatus == false) cout << endl << "Diagram displayed" << endl;
+                    else errorStatus = false;
                     
+                    subLoop = false;
                     cout << "Enter anything to continue..." << endl;
                     cin >> name; // Pause for input
                     cout << endl;                  
@@ -357,12 +321,13 @@ void CLI::displayCLI ()
                 cin >> fileName;
 
                 UMLFile file(fileName + ".json");
+                // Requires unique try catch in order to handle file loading error
                 try {
                     data = file.load();
                 } catch (const std::exception& ex)
                 {
                     cout << endl << "Error loading file" << endl << endl;
-                    bool errorStatus = true;
+                    errorStatus = true;
                 }
                 if (errorStatus == false) cout << "Your file has been loaded" << endl;
                 else errorStatus = false;
@@ -447,7 +412,3 @@ void CLI::displayClass (string className)
         cout << relationship.getSource().getName() << " => " << relationship.getDestination().getName() << endl;
     }
 }
-
-/************************************************************/
-#endif
-/************************************************************/
