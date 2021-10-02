@@ -1,11 +1,12 @@
 /*
-  Filename   : UMLFile.cpp
-  Description: Implementation of a file.
+  Filename   : UMLData.cpp
+  Description: Implementation of the data storage model.
 */
 
 //--------------------------------------------------------------------
 // System includes
 #include "include/UMLFile.hpp"
+#include "include/UMLRelationship.hpp"
 //--------------------------------------------------------------------
 
 // Empty constructor
@@ -64,10 +65,10 @@ void UMLData::addClass(string name, vector<UMLAttribute> attributes)
     addClass(UMLClass(name, attributes));
 }
 
-// Takes in src string and dest string, creates relationship and adds to relationships vector
-void UMLData::addRelationship(string srcName, string destName)
+// Takes in src string, dest string, and type int creates relationship and adds to relationships vector
+void UMLData::addRelationship(string srcName, string destName, int type)
 {
-    addRelationship(getClass(srcName), getClass(destName));
+    addRelationship(UMLRelationship(getClass(srcName), getClass(destName), type-1));
 }
 
 // Takes in className string and returns a vector of all the relationshps associated with that class
@@ -250,15 +251,23 @@ UMLRelationship& UMLData::getRelationship(string srcName, string destName)
 // Takes in relationship object and adds it to relationship vector
 void UMLData::addRelationship(const UMLRelationship& relIn)
 {
+    // Check to see if relationship already exists
     int loc = findRelationship(relIn.getSource(), relIn.getDestination());
     if (loc >= 0)
         throw "New relationship already exists";
-
+    // Generalization/realization check for self relationships
+    else if (relIn.getType() == generalization || relIn.getType() == realization) {
+        if (relIn.getSource().getName() == relIn.getDestination().getName()) {
+            throw "Cannot have self-relationship of generalizations or realizations";
+        }
+    }
+    // Composition check for duplicate destinations
+    else if (relIn.getType() == composition) {
+        for(UMLRelationship relationship : getRelationships()) {
+            if (relationship.getDestination().getName() == relIn.getDestination().getName()) {
+                throw "Class can not be the destination for more than one composition";
+            }
+        }
+    }
     relationships.push_back(relIn); 
-}
-
-// Creates relationship from two classes and adds to relationshp vector
-void UMLData::addRelationship(const UMLClass& sourceClass, const UMLClass& destClass)
-{
-    addRelationship(UMLRelationship(sourceClass, destClass));
 }

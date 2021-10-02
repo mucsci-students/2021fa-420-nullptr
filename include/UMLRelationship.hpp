@@ -31,7 +31,7 @@ class UMLRelationship
 
 	public:
 		// Constructor for class objects
-		UMLRelationship(const UMLClass& src, const UMLClass& dest, Type type);
+		UMLRelationship(const UMLClass& src, const UMLClass& dest, int type);
 
 		// Grab name of the source class
 		const UMLClass& getSource() const;

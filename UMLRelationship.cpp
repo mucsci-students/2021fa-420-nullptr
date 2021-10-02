@@ -9,10 +9,10 @@
 //--------------------------------------------------------------------
 
 // Constructor for class objects
-UMLRelationship::UMLRelationship(const UMLClass& src, const UMLClass& dest, Type type)
+UMLRelationship::UMLRelationship(const UMLClass& src, const UMLClass& dest, int type)
 :source(&src)
 ,destination(&dest)
-,relationshipType(type)
+,relationshipType((Type) type)
 {
 }
 
