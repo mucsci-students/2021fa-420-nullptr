@@ -388,6 +388,8 @@ void CLI::displayCLI ()
     } 
 }
 
+// Displays information about classes within the diagram.
+// Has conditional booleans to optionally display attributes and relationships.
 void CLI::displayDiagram (bool displayAttribute, bool displayRelationship) 
 {
     vector<UMLClass> classes = data.getClasses();
@@ -406,6 +408,7 @@ void CLI::displayDiagram (bool displayAttribute, bool displayRelationship)
             for (UMLRelationship rel : data.getRelationshipsByClass(umlclass.getName()))
             {
                 cout << rel.getSource().getName() << " => " << rel.getDestination().getName() << endl;
+                cout << "Type: " << data.getRelationshipType(rel.getSource().getName(), rel.getDestination().getName()) << endl;
             }
         }
         // Don't cause spacing within loop if only showing classes
@@ -415,6 +418,7 @@ void CLI::displayDiagram (bool displayAttribute, bool displayRelationship)
     if (!displayAttribute && !displayRelationship && data.getClasses().size() > 0) cout << endl;
 }
 
+// Displays information about a single class with the name className.
 void CLI::displayClass (string className) 
 {
     // Grab copy of class in order to display attributes
@@ -429,8 +433,9 @@ void CLI::displayClass (string className)
     // Find relationships based on name of the class
     cout << "Relationships:" << endl;
     vector<UMLRelationship> relationshipList = data.getRelationshipsByClass(className);
-    for(UMLRelationship relationship : relationshipList)
+    for(UMLRelationship rel : relationshipList)
     {
-        cout << relationship.getSource().getName() << " => " << relationship.getDestination().getName() << endl;
+        cout << rel.getSource().getName() << " => " << rel.getDestination().getName() << endl;
+        cout << "Type: " << data.getRelationshipType(rel.getSource().getName(), rel.getDestination().getName()) << endl;
     }
 }
