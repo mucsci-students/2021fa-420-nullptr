@@ -8,9 +8,9 @@
 
 using json = nlohmann::json;
 
-struct Server
+namespace umlserver
 {
-    Server (int port)
+    void start (int port)
     {
         httplib::Server svr;
         UMLData data;
@@ -48,6 +48,36 @@ struct Server
             data.addRelationship(source, dest);
             res.set_redirect("/");
          });
+
+        //source/dest
+        svr.Get(R"(/delete/relationship/(\w+)/(\w+))", [&](const httplib::Request& req, httplib::Response& res) {
+            std::string source = req.matches[1].str();
+            std::string dest = req.matches[2].str();
+            data.deleteRelationship(source, dest);
+            res.set_redirect("/");
+         });
+
+        //class/attribute 
+        svr.Get(R"(/delete/attribute/(\w+)/(\w+))", [&](const httplib::Request& req, httplib::Response& res) {
+            std::string uclass = req.matches[1].str();
+            std::string attribute = req.matches[2].str();
+            data.removeClassAttribute(uclass, attribute);
+            res.set_redirect("/");
+         });
+
+        svr.Get(R"(/delete/class/(\w+))", [&](const httplib::Request& req, httplib::Response& res) {
+            std::string uclass = req.matches[1].str();
+            data.deleteClass(uclass);
+            res.set_redirect("/");
+         });
+
+        svr.Get(R"(/edit/class/(\w+))", [&](const httplib::Request& req, httplib::Response& res) {
+        std::string oldClassName = req.matches[1].str();
+        std::string newClassName = req.params.find("cname")->second;
+        data.changeClassName(oldClassName, newClassName);
+        res.set_redirect("/");
+        });
+
 
         std::cout << "running at http:://localhost:8080/" << std::endl;
 

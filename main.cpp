@@ -23,7 +23,7 @@ int main()
     // inja::Environment env;
     // inja::Template temp = env.parse_template("../templates/test.html");
     // env.render(temp, data.getJson());
-    Server {8080};
+    umlserver::start(8080);
     CLI newInterface;
     newInterface.displayCLI();
     return 0;
