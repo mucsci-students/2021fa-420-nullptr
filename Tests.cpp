@@ -1,3 +1,9 @@
+/*
+  Filename   : Tests.cpp
+  Description: UML++ unit tests using the GoogleTest framework.
+  When compiled, performs all tests and displays any errors that occur.
+*/
+
 #include <gtest/gtest.h>
 
 #include "include/UMLData.hpp"
@@ -9,29 +15,42 @@
 
 #include <string>
 #include <iostream>
-// TEST(TestSuiteName, TestName) {
+
+// Test Format
+// **************************
+// TEST(TestSuiteName, TestName) 
+// {
 //   ... test body ...
 // }
+// **************************
 
-//Tests for UMLData.hpp
-TEST(UMLDataAddClassTest, AddClassAndGetCopy) {
+// ****************************************************
+
+// Tests for UMLData.hpp
+// **************************
+
+TEST(UMLDataAddClassTest, AddClassAndGetCopy) 
+{
     UMLData data;
     data.addClass("test");
     ASSERT_EQ("test", data.getClassCopy("test").getName());
 }
 
-TEST(UMLDataAddClassTest, AddClassThatAlreadyExists) {
+TEST(UMLDataAddClassTest, AddClassThatAlreadyExists) 
+{
     UMLData data;
     data.addClass("test");
     ASSERT_ANY_THROW(data.addClass("test"));
 }
 
-TEST(UMLDataRemoveClassTest, RemoveClassThatDoesntExist) {
+TEST(UMLDataRemoveClassTest, RemoveClassThatDoesntExist) 
+{
     UMLData data;
     ASSERT_ANY_THROW(data.deleteClass("test"));
 }
 
-TEST(UMLDataRenameClassTest, RenameAClassWorks) {
+TEST(UMLDataRenameClassTest, RenameAClassWorks) 
+{
     UMLData data;
     string oldName;
     string updatedName;
@@ -42,13 +61,15 @@ TEST(UMLDataRenameClassTest, RenameAClassWorks) {
     ASSERT_EQ(updatedName, updatedName);
 }
 
-TEST(UMLDataRenameClassTest, RenameClassIntoClassThatAlreadyExists) {
+TEST(UMLDataRenameClassTest, RenameClassIntoClassThatAlreadyExists) 
+{
     UMLData data;
     data.addClass("test");
     ASSERT_ANY_THROW(data.changeClassName("test", "test"));
 }
 
-TEST(UMLDataAttributeTest, AddAttributeWorks) {
+TEST(UMLDataAttributeTest, AddAttributeWorks) 
+{
     UMLData data;
     data.addClass("test");
     UMLAttribute attribute("hastest");
@@ -60,12 +81,12 @@ TEST(UMLDataAttributeTest, AddAttributeWorks) {
        }
 }
 
-TEST(UMLDataAttributeTest, ChangeAttributeNameWorks) {
-   
+TEST(UMLDataAttributeTest, ChangeAttributeNameWorks) 
+{
     bool hasTestGone;
-    hasTestGone == true;
+    hasTestGone = true;
     bool newHasTestPresent;
-    newHasTestPresent == false;
+    newHasTestPresent = false;
 
     UMLData data;
     data.addClass("test");
@@ -75,17 +96,17 @@ TEST(UMLDataAttributeTest, ChangeAttributeNameWorks) {
 
         for (UMLAttribute attr : data.getClassAttributes("test")) {
            if(attr.getAttributeName() == "hastest"){
-               hasTestGone == false;
+               hasTestGone = false;
            }
             if(attr.getAttributeName() == "newHasTest"){
-              newHasTestPresent == true;
+              newHasTestPresent = true;
            }
        }
       ASSERT_EQ(hasTestGone, newHasTestPresent);  
 }
 
-
-TEST(UMLDataAttributeTest, RemovingNonExistantAttribute) {
+TEST(UMLDataAttributeTest, RemovingNonExistantAttribute) 
+{
     UMLData data;
     data.addClass("test");
     UMLAttribute attribute("hastestt");
@@ -93,8 +114,8 @@ TEST(UMLDataAttributeTest, RemovingNonExistantAttribute) {
 }
 
 /*
-TEST(UMLDataRelationshipTest, AddingRelationshipWorks) {
-   
+TEST(UMLDataRelationshipTest, AddingRelationshipWorks) 
+{
     bool haveRelationship;
     haveRelationship == false;
     UMLData data;
@@ -102,27 +123,19 @@ TEST(UMLDataRelationshipTest, AddingRelationshipWorks) {
     data.addClass("test1");
     vector<UMLRelationship> rel = data.getRelationships();
     
-
-
     data.addRelationship("test", "test1");
    
-
-
-
-   for(auto i = rel.begin(); i != rel.end(); ++i){
-
-           if(&(rel[i].getSource()) == "test1"){
-          
-             haveRelationship == true;
-           }
-           else if(&(rel[i].getDestination()) == "test1"){
-               haveRelationship == true;
-           }
+    for(auto i = rel.begin(); i != rel.end(); ++i){
+        if(&(rel[i].getSource()) == "test1"){
+            haveRelationship == true;
+        }
+        else if(&(rel[i].getDestination()) == "test1"){
+            haveRelationship == true;
+        }
    }
-  
-
-
     ASSERT_EQ(haveRelationship, true); 
+}
+*/
 
 /*
 TEST(UMLDataAttributeTest, RemovingAttributeWorks) {
@@ -132,21 +145,19 @@ TEST(UMLDataAttributeTest, RemovingAttributeWorks) {
     data.addClassAttribute("test", attribute);
     data.removeClassAttribute("test", attribute);
     ASSERT_EQ(data.getClassCopy("test").removeClassAttribute("test", attribute), "");
-
 }
 */
 
 //Attribute tests
 /*
 -Removing an attribute works
--removing an attribute  that doestn exist should throw an error
-- renaming an attribute should work
-- renaming an attribute to another attribute that already exists should throw an error
+-Removing an attribute  that doestn exist should throw an error
+-Renaming an attribute should work
+-Renaming an attribute to another attribute that already exists should throw an error
 */
 
-
- //adds class attribute to specified className
-     //   void addClassAttribute(string className, UMLAttribute attribute);
+//adds class attribute to specified className
+//void addClassAttribute(string className, UMLAttribute attribute);
 
 /*
 TEST(SquareRootTest, PositiveNos) { 
@@ -156,9 +167,9 @@ TEST(SquareRootTest, PositiveNos) {
 }
 */
 
-
 /*
-TEST(UMLDataAttributeTest, RemovingAttributeWorks) {
+TEST(UMLDataAttributeTest, RemovingAttributeWorks) 
+{
       
     bool hasTestGone;
     hasTestGone == true;
@@ -178,62 +189,130 @@ TEST(UMLDataAttributeTest, RemovingAttributeWorks) {
            }
        }
     ASSERT_EQ(hasTestGone, true); 
- */
-    
+*/
 
+// ****************************************************
 
+// Tests for UMLRelationship.hpp
+// **************************
 
-
-
-//Tests for UMLRelationship.hpp
-
-TEST(UMLRelationshipTest, GetSourceTest) {
+// Test to check if constructing a generic relationship works at all
+TEST(UMLRelationshipTest, ConstructorTest) 
+{
     UMLClass class1("class1");
     UMLClass class2("class2");
-    UMLRelationship relate(class1, class2);
+    ASSERT_ANY_THROW(UMLRelationship relate(class1, class2, 0));
+}
+
+// Test to check if a throw occurs when an invalid integer is sent
+TEST(UMLRelationshipTest, IncorrectTypeTest) 
+{
+    UMLClass class1("class1");
+    UMLClass class2("class2");
+    EXPECT_ANY_THROW(UMLRelationship relate(class1, class2, 4));
+}
+
+// Test to check if getting a source works at all
+TEST(UMLRelationshipTest, GetSourceTest) 
+{
+    UMLClass class1("class1");
+    UMLClass class2("class2");
+    // Relationship type doesn't matter for this test
+    UMLRelationship relate(class1, class2, 0);
     ASSERT_EQ(&relate.getSource(), &class1);
 }
 
-TEST(UMLRelationshipTest, GetDestinationTest) {
+// Test to check if getting a destination works at all
+TEST(UMLRelationshipTest, GetDestinationTest) 
+{
     UMLClass class1("class1");
     UMLClass class2("class2");
-    UMLRelationship relate(class1, class2);
+    // Relationship type doesn't matter for this test
+    UMLRelationship relate(class1, class2, 0);
     ASSERT_EQ(&relate.getDestination(), &class2);
 }
 
-TEST(UMLRelationshipTest, GetDestinationTest2) {
+// Test to see if the destination was simultaneously set as the source
+TEST(UMLRelationshipTest, GetDestinationTest2) 
+{
     UMLClass class1("class1");
     UMLClass class2("class2");
-    UMLRelationship relate(class1, class2);
+    // Relationship type doesn't matter for this test
+    UMLRelationship relate(class1, class2, 0);
     bool test = &relate.getDestination() == &class1;
     ASSERT_EQ(test, false);
-
 }
-//Tests for UMLAttribute.hpp
-TEST(UMLAttributeTest, GetAttributeNameTest) {
+
+// Test to check if getting a type works at all
+TEST(UMLRelationshipTest, GetTypeTest) {
+    UMLClass class1("class1");
+    UMLClass class2("class2");
+    UMLRelationship relate(class1, class2, 0);
+    ASSERT_EQ(relate.getType() == aggregation, true);
+}
+
+// Test to check if setting a type works at all
+TEST(UMLRelationshipTest, SetTypeTest) {
+    UMLClass class1("class1");
+    UMLClass class2("class2");
+    UMLRelationship relate(class1, class2, 0);
+    relate.setType(composition);
+    ASSERT_EQ(relate.getType() == composition, true);
+}
+
+// Make and set relationships of each type and see if they hold the correct type
+TEST(UMLRelationshipTest, GetAllTypeTest) 
+{
+    UMLClass class1("class1");
+    UMLClass class2("class2");
+    UMLRelationship relate(class1, class2, 0);
+    ASSERT_EQ(relate.getType() == aggregation, true);
+    relate.setType(composition);
+    ASSERT_EQ(relate.getType() == composition, true);
+    relate.setType(generalization);
+    ASSERT_EQ(relate.getType() == generalization, true);
+    relate.setType(realization);
+    ASSERT_EQ(relate.getType() == realization, true);
+}
+
+// ****************************************************
+
+// Tests for UMLAttribute.hpp
+// **************************
+
+TEST(UMLAttributeTest, GetAttributeNameTest) 
+{
     UMLAttribute attribute("test");
     ASSERT_EQ(attribute.getAttributeName(), "test");
 }
 
-TEST(UMLAttributeTest, RenameAttributeNameTest) {
+TEST(UMLAttributeTest, RenameAttributeNameTest) 
+{
     UMLAttribute attribute("test");
     attribute.changeName("test2");
     ASSERT_EQ(attribute.getAttributeName(), "test2");
 }
 
-//Tests for UMLClass.hpp
-TEST(UMLClassFileTest, GetNameWorks) {
+// ****************************************************
+
+// Tests for UMLClass.hpp
+// **************************
+
+TEST(UMLClassFileTest, GetNameWorks) 
+{
     UMLClass class1("test");
     ASSERT_EQ(class1.getName(), "test");
 }
 
-TEST(UMLClassFileTest, ChangeNameWorks) {
+TEST(UMLClassFileTest, ChangeNameWorks) 
+{
     UMLClass class1("test");
     class1.changeName("newTest");
     ASSERT_EQ(class1.getName(), "newTest");
 }
 
-TEST(UMLClassFileTest, AddAttributeWorks) {
+TEST(UMLClassFileTest, AddAttributeWorks) 
+{
     UMLClass class1("test");
     UMLAttribute attribute("testattribute");
     class1.addAttribute(attribute);
@@ -250,7 +329,8 @@ TEST(UMLClassFileTest, AddAttributeWorks) {
     ASSERT_EQ(attrFound, true);
 }
 
-TEST(UMLClassFileTest, ChangeAttributeWorks) {
+TEST(UMLClassFileTest, ChangeAttributeWorks) 
+{
     UMLClass class1("test");
     UMLAttribute attribute("testattributeOld");
     class1.addAttribute(attribute);
@@ -278,7 +358,8 @@ TEST(UMLClassFileTest, ChangeAttributeWorks) {
     ASSERT_EQ(attrFound, true);
 }
 
-TEST(UMLClassFileTest, DeleteAttributeWorks) {
+TEST(UMLClassFileTest, DeleteAttributeWorks) 
+{
     UMLClass class1("test");
     UMLAttribute attribute("testattribute");
     class1.addAttribute(attribute);
@@ -296,7 +377,8 @@ TEST(UMLClassFileTest, DeleteAttributeWorks) {
     ASSERT_EQ(attrFound, false);
 }
 
-TEST(UMLClassFileTest, FindAttributeWorks) {
+TEST(UMLClassFileTest, FindAttributeWorks) 
+{
     UMLClass class1("test");
     UMLAttribute attribute("testattribute");
     class1.addAttribute(attribute);
@@ -305,7 +387,8 @@ TEST(UMLClassFileTest, FindAttributeWorks) {
     ASSERT_EQ(class1.findAttribute("testattribute")->getAttributeName(), attribute.getAttributeName());
 }
 
-TEST(UMLClassFileTest, GetAttributesWorks) {
+TEST(UMLClassFileTest, GetAttributesWorks) 
+{
     UMLClass class1("test");
     UMLAttribute attribute("testattribute");
     class1.addAttribute(attribute);
@@ -326,26 +409,32 @@ TEST(UMLClassFileTest, GetAttributesWorks) {
     ASSERT_EQ(isEqual, true);
 }
 
+// ****************************************************
 
-//Tests for UMLParameter.hpp
-//**************************
+// Tests for UMLParameter.hpp
+// **************************
 
-//Tests creation of a Parameter and getting it's name and type works
-TEST(UMLParameterTest, GetParameterNameTest) {
+// Tests creation of a Parameter and getting it's name and type works
+TEST(UMLParameterTest, GetParameterNameTest) 
+{
     UMLParameter parameter("name","type");
     ASSERT_EQ(parameter.getName(), "name");
     ASSERT_EQ(parameter.getType(), "type");
 }
 
-//Tests renaming Parameter works
-TEST(UMLParameterTest, RenameParameterNameTest) {
+// Tests renaming Parameter works
+TEST(UMLParameterTest, RenameParameterNameTest) 
+{
     UMLParameter parameter("name","type");
     parameter.changeName("name2");
     ASSERT_EQ(parameter.getName(), "name2");
 }
-//Tests changing Parameter type works
-TEST(UMLParameterTest, ChangeParameterTypeTest) {
+// Tests changing Parameter type works
+TEST(UMLParameterTest, ChangeParameterTypeTest) 
+{
     UMLParameter parameter("name","type");
     parameter.changeType("type2");
     ASSERT_EQ(parameter.getType(), "type2");
 }
+
+// ****************************************************

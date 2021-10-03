@@ -68,7 +68,7 @@ void UMLData::addClass(string name, vector<UMLAttribute> attributes)
 // Takes in src string, dest string, and type int creates relationship and adds to relationships vector
 void UMLData::addRelationship(string srcName, string destName, int type)
 {
-    addRelationship(UMLRelationship(getClass(srcName), getClass(destName), type-1));
+    addRelationship(UMLRelationship(getClass(srcName), getClass(destName), type));
 }
 
 // Takes in className string and returns a vector of all the relationshps associated with that class

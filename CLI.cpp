@@ -229,7 +229,8 @@ void CLI::displayCLI ()
                         cout << "[4] Realization" << endl;
                         cin >> stringType;
                         if (stringType == "1" || stringType == "2" || stringType == "3" || stringType == "4") {
-                            type = std::stoi(stringType);
+                            // Type is enum starting from 0, so subtract by 1
+                            type = std::stoi(stringType) - 1;
                         }
                         else {
                             cout << "Invalid choice!" << endl << endl;
