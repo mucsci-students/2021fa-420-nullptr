@@ -4,15 +4,15 @@
     <body></body>
         <h1>Classes:</h1>
         <form action="/add/class" method="GET">
-            <label for="cname">Class name:</label><br>
-            <input type="text" id="cname" name="cname"><br>
+            <label for="cname">Class name:</label>
+            <input type="text" id="cname" name="cname">
             <input type="submit" value="add class">
         </form>
         {% for class in classes %}
-            <h2 id="{{ class.name }}"><span>{{ class.name }}</span> <span id="{{ class.name }}edit">edit</span> <a href="/delete/class/{{ class.name }}">delete</a></h2>
+            <h2 id="{{ class.name }}"><span>{{ class.name }}</span> <button id="{{ class.name }}edit">edit</button> <a href="/delete/class/{{ class.name }}">delete</a></h2>
             <p>Attributes:</p>
             {% for attribute in class.attributes %}
-                <p>{{ attribute.name }} <a href="#">edit</a> <a href="/delete/attribute/{{ class.name }}/{{ attribute.name }}">delete</a></p>
+                <p id="{{ attribute.name }}">{{ attribute.name }} <button id="{{ attribute.name }}edit">edit</button> <a href="/delete/attribute/{{ class.name }}/{{ attribute.name }}">delete</a></p>
             {% endfor %}
             <form action="/add/attribute/{{ class.name }}" method="GET">
                 <label for="aname">Attribute name:</label>
@@ -22,10 +22,10 @@
         {% endfor %}
         <h1>Relationships:</h1>
         <form action="/add/relationship" method="GET">
-            <label for="cname">Source:</label><br>
-            <input type="text" id="source" name="source"><br>
-            <label for="cname">Destination:</label><br>
-            <input type="text" id="dest" name="dest"><br>
+            <label for="cname">Source:</label>
+            <input type="text" id="source" name="source">
+            <label for="cname">Destination:</label>
+            <input type="text" id="dest" name="dest">
             <input type="submit" value="add relationship">
         </form>
         {% for relationship in relationships %}
@@ -44,12 +44,12 @@
                     "</form>";
             });
             {% for attribute in class.attributes %}
-            element = document.getElementById('{{ class.name }}edit');
+            element = document.getElementById('{{ attribute.name }}edit');
             element.addEventListener("click", () => {
-                document.getElementById("{{class.name}}").innerHTML =
-                    "<form action='/edit/class/{{ class.name }}' method='GET'>" + 
-                        "<input type='text' id='cname' name='cname' value='{{ class.name }}'>" +
-                        "<input type='submit' value='edit class'>"
+                document.getElementById("{{attribute.name}}").innerHTML =
+                    "<form action='/edit/attribute/{{ class.name }}/{{ attribute.name }}' method='GET'>" + 
+                        "<input type='text' id='aname' name='aname' value='{{ attribute.name }}'>" +
+                        "<input type='submit' value='edit attribute'>"
                     "</form>";
             });
             {% endfor %}

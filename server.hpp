@@ -72,10 +72,19 @@ namespace umlserver
          });
 
         svr.Get(R"(/edit/class/(\w+))", [&](const httplib::Request& req, httplib::Response& res) {
-        std::string oldClassName = req.matches[1].str();
-        std::string newClassName = req.params.find("cname")->second;
-        data.changeClassName(oldClassName, newClassName);
-        res.set_redirect("/");
+            std::string oldClassName = req.matches[1].str();
+            std::string newClassName = req.params.find("cname")->second;
+            data.changeClassName(oldClassName, newClassName);
+            res.set_redirect("/");
+        });
+
+        
+        svr.Get(R"(/edit/attribute/(\w+)/(\w+))", [&](const httplib::Request& req, httplib::Response& res) {
+            std::string className = req.matches[1].str();
+            std::string oldAttributeName = req.matches[2].str();
+            std::string newAttributeName = req.params.find("aname")->second;
+            data.changeAttributeName(className, oldAttributeName, newAttributeName);
+            res.set_redirect("/");
         });
 
 
