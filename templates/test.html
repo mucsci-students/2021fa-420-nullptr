@@ -1,7 +1,10 @@
 <html>
     <head>
     </head>
-    <body></body>
+    <body>
+        {% for error in errors %}
+            <p style="color:red;">{{ error }}</p>
+        {% endfor %}
         <h1>Classes:</h1>
         <form action="/add/class" method="GET">
             <label for="cname">Class name:</label>
@@ -32,6 +35,8 @@
             <p>{{relationship.source}} -> {{relationship.destination}} 
                 <a href="/delete/relationship/{{relationship.source}}/{{relationship.destination}}">delete</a></p>
         {% endfor %}
+        <h1>File:</h1>
+        <button>Save</button><button>Load</button>
     </body>
     <script>
         {% for class in classes %}
