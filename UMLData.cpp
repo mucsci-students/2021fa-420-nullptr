@@ -68,16 +68,16 @@ void UMLData::addClass(string name, vector<UMLAttribute> attributes)
 // Takes in src string, dest string, and type int creates relationship and adds to relationships vector
 void UMLData::addRelationship(string srcName, string destName, int type)
 {
+    if(type < 0 || type > 3) 
+        throw "Invalid type";
     addRelationship(UMLRelationship(getClass(srcName), getClass(destName), type));
 }
 
-// Takes in className string and returns a vector of all the relationshps associated with that class
+// Takes in className string and returns a vector of all the relationships associated with that class
 vector<UMLRelationship> UMLData::getRelationshipsByClass(string classNameIn)
 {
     vector<UMLRelationship> relationshipsContainingClass;
-
     string className = getClass(classNameIn).getName();
-
     for (int i = 0; i < relationships.size(); ++i)
     {
         //pull src and destination classes from vector location
@@ -90,7 +90,6 @@ vector<UMLRelationship> UMLData::getRelationshipsByClass(string classNameIn)
         }
     }
     return relationshipsContainingClass;
-
 }
 
 // Deletes relationshp based on two strings

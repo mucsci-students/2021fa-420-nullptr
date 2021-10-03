@@ -55,7 +55,7 @@ class UMLData
         // Takes in src string, dest string, and type int creates relationship and adds to relationships vector
         void addRelationship(string srcName, string destName, int type);
         
-        // Takes in className string and returns a vector of all the relationshps associated with that class
+        // Takes in className string and returns a vector of all the relationships associated with that class
         vector<UMLRelationship> getRelationshipsByClass(string className);
 
         // Deletes relationshp based on two strings

@@ -113,29 +113,158 @@ TEST(UMLDataAttributeTest, RemovingNonExistantAttribute)
     ASSERT_ANY_THROW(data.removeClassAttribute("test", "hastestt"));
 }
 
-/*
 TEST(UMLDataRelationshipTest, AddingRelationshipWorks) 
 {
-    bool haveRelationship;
-    haveRelationship == false;
+    bool haveRelationship = false;
     UMLData data;
     data.addClass("test");
     data.addClass("test1");
-    vector<UMLRelationship> rel = data.getRelationships();
+    // Relationship type doesn't matter for this test
+    data.addRelationship("test", "test1", 0);
     
-    data.addRelationship("test", "test1");
-   
+    vector<UMLRelationship> rel = data.getRelationships();
+   // Loop through vector to find proper relationship
     for(auto i = rel.begin(); i != rel.end(); ++i){
-        if(&(rel[i].getSource()) == "test1"){
-            haveRelationship == true;
+        // Check and see if the valid relationship was added
+        if(i->getSource().getName() == "test" && 
+        i->getDestination().getName() == "test1" && 
+        i->getType() == aggregation){
+            haveRelationship = true;
         }
-        else if(&(rel[i].getDestination()) == "test1"){
-            haveRelationship == true;
-        }
-   }
-    ASSERT_EQ(haveRelationship, true); 
+    }
+
+    // Relationship should exist
+    ASSERT_EQ(haveRelationship, true);
+    // Only one relationship should have been added
+    ASSERT_EQ(rel.size(), std::size_t(1));
 }
-*/
+
+TEST(UMLDataRelationshipTest, AddingInvalidType) 
+{
+    UMLData data;
+
+    data.addClass("test");
+    data.addClass("test1");
+    // Relationship type shouldn't be over 3
+    ASSERT_ANY_THROW(data.addRelationship("test", "test1", 4));
+
+    data.addClass("test2");
+    data.addClass("test3");
+    // Relationship type shouldn't be less than 0
+    ASSERT_ANY_THROW(data.addRelationship("test2", "test3", -1));
+}
+
+TEST(UMLDataRelationshipTest, AddingSelfInheritance) 
+{
+    UMLData data;
+
+    data.addClass("test");
+    data.addClass("test1");
+    // Cannot have self-generalization or self-realization
+    ASSERT_ANY_THROW(data.addRelationship("test", "test", 2));
+    ASSERT_ANY_THROW(data.addRelationship("test1", "test1", 3));
+}
+
+TEST(UMLDataRelationshipTest, AddingMultipleCompositions) 
+{
+    UMLData data;
+
+    data.addClass("test");
+    data.addClass("test1");
+    data.addClass("test2");
+    data.addRelationship("test", "test1", 1);
+    // Cannot be the destination of multiple compositions
+    ASSERT_ANY_THROW(data.addRelationship("test2", "test1", 1));
+} 
+
+TEST(UMLDataRelationshipTest, DeletingRelationshipWorks)
+{
+    bool haveRelationship = false;
+    UMLData data;
+    data.addClass("test");
+    data.addClass("test1");
+    // Relationship type doesn't matter for this test
+    data.addRelationship("test", "test1", 0);
+    data.deleteRelationship("test", "test1");
+    
+    vector<UMLRelationship> rel = data.getRelationships();
+    // Loop through vector to find proper relationship
+    for(auto i = rel.begin(); i != rel.end(); ++i){
+        // Check and see if the valid relationship still exists
+        if(i->getSource().getName() == "test" && 
+        i->getDestination().getName() == "test1" && 
+        i->getType() == aggregation){
+            haveRelationship = true;
+        }
+    }
+
+    // Relationship should be deleted
+    ASSERT_EQ(haveRelationship, false);
+
+    // Vector should now be empty
+    ASSERT_EQ(rel.size(), std::size_t(0));
+}
+
+TEST(UMLDataRelationshipTest, DeletingNonexistentRelationship)
+{
+    UMLData data;
+
+    // Attempt to delete relationship that does not exist
+    ASSERT_ANY_THROW(data.deleteRelationship("test", "test"));
+    
+    // Same as above, but with the class existing and two different classes
+    data.addClass("test");
+    data.addClass("test1");
+    ASSERT_ANY_THROW(data.deleteRelationship("test", "test"));
+    ASSERT_ANY_THROW(data.deleteRelationship("test", "test1"));
+}
+
+TEST(UMLDataRelationshipTest, GetRelationshipTypeWorks)
+{
+    bool foundRelationship = false;
+    UMLData data;
+    data.addClass("test");
+    data.addClass("test1");
+    // Check for aggregation
+    data.addRelationship("test", "test1", 0);
+    ASSERT_EQ(data.getRelationshipType("test", "test1"), "aggregation");
+    data.deleteRelationship("test", "test1");
+    // Check for composition
+    data.addRelationship("test", "test1", 1);
+    ASSERT_EQ(data.getRelationshipType("test", "test1"), "composition");
+    data.deleteRelationship("test", "test1");
+    // Check for generalization
+    data.addRelationship("test", "test1", 2);
+    ASSERT_EQ(data.getRelationshipType("test", "test1"), "generalization");
+    data.deleteRelationship("test", "test1");
+    // Check for realization
+    data.addRelationship("test", "test1", 3);
+    ASSERT_EQ(data.getRelationshipType("test", "test1"), "realization");
+}
+
+TEST(UMLDataRelationshipTest, GetRelationshipByClassWorks)
+{
+    UMLData data;
+
+    data.addClass("test");
+    data.addClass("test1");
+    data.addClass("test2");
+    data.addRelationship("test", "test1", 0);
+    data.addRelationship("test", "test2", 0);
+    
+    // Vector obtained and relationship vector should be equivalent
+    vector<UMLRelationship> vector1 = data.getRelationshipsByClass("test");
+    vector<UMLRelationship> vector2 = data.getRelationships();
+
+    // Check for identical vector size
+    ASSERT_EQ(vector1.size(), vector2.size());
+    // Check for identical vector contents
+    for (size_t i = 0; i < vector1.size(); ++i) {
+        ASSERT_EQ(vector1[i].getSource().getName(), vector2[i].getSource().getName());
+        ASSERT_EQ(vector1[i].getDestination().getName(), vector2[i].getDestination().getName());
+        ASSERT_EQ(vector1[i].getType(), vector2[i].getType());
+    }
+} 
 
 /*
 TEST(UMLDataAttributeTest, RemovingAttributeWorks) {
@@ -158,14 +287,6 @@ TEST(UMLDataAttributeTest, RemovingAttributeWorks) {
 
 //adds class attribute to specified className
 //void addClassAttribute(string className, UMLAttribute attribute);
-
-/*
-TEST(SquareRootTest, PositiveNos) { 
-    EXPECT_EQ (18.0, square‑root (324.0));
-    EXPECT_EQ (25.4, square‑root (645.16));
-    EXPECT_EQ (50.3321, square‑root (2533.310224));
-}
-*/
 
 /*
 TEST(UMLDataAttributeTest, RemovingAttributeWorks) 
@@ -201,15 +322,7 @@ TEST(UMLRelationshipTest, ConstructorTest)
 {
     UMLClass class1("class1");
     UMLClass class2("class2");
-    ASSERT_ANY_THROW(UMLRelationship relate(class1, class2, 0));
-}
-
-// Test to check if a throw occurs when an invalid integer is sent
-TEST(UMLRelationshipTest, IncorrectTypeTest) 
-{
-    UMLClass class1("class1");
-    UMLClass class2("class2");
-    EXPECT_ANY_THROW(UMLRelationship relate(class1, class2, 4));
+    ASSERT_NO_THROW(UMLRelationship relate(class1, class2, 0));
 }
 
 // Test to check if getting a source works at all
