@@ -13,10 +13,10 @@
 
 //--------------------------------------------------------------------
 /* Types of relationships 
-Aggregation: shared, ownerless collection 
-Composition: unshared, 'has-a' relationship collection
-Generalization: inheritance relationship
-Realization: interface implementation relationship */
+[0] Aggregation: shared, ownerless collection 
+[1] Composition: unshared, 'has-a' relationship collection
+[2] Generalization: inheritance relationship
+[3] Realization: interface implementation relationship */
 //--------------------------------------------------------------------
 enum Type {aggregation, composition, generalization, realization};
 
@@ -43,5 +43,5 @@ class UMLRelationship
 		Type getType() const;
 
 		// Set type of relationship
-		void setType(Type newType);
+		void setType(int newType);
 };

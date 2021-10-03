@@ -68,7 +68,8 @@ void UMLData::addClass(string name, vector<UMLAttribute> attributes)
 // Takes in src string, dest string, and type int creates relationship and adds to relationships vector
 void UMLData::addRelationship(string srcName, string destName, int type)
 {
-    if(type < 0 || type > 3) 
+    // Type must be in bounds
+    if (type < 0 || type > 3) 
         throw "Invalid type";
     addRelationship(UMLRelationship(getClass(srcName), getClass(destName), type));
 }
@@ -102,7 +103,8 @@ void UMLData::deleteRelationship(string srcName, string destName)
 }
 
 // Returns string representation of relationship type
-string UMLData::getRelationshipType(const string& srcName, const string& destName) {
+string UMLData::getRelationshipType(const string& srcName, const string& destName) 
+{
     Type type = getRelationship(srcName, destName).getType();
     switch (type) {
         case aggregation :
@@ -118,6 +120,48 @@ string UMLData::getRelationshipType(const string& srcName, const string& destNam
     }
     return "none";
 }
+
+// Modifies relationship type given a new relationship type 
+void UMLData::changeRelationshipType(const string& srcName, const string& destName, int newType) 
+{
+    int oldType = getRelationship(srcName, destName).getType();
+    // Type must be in bounds
+    if (newType < 0 || newType > 3) {
+        throw "Invalid type";
+    }
+    // Type must not be the same as the previous type
+    else if (newType == oldType) {
+        throw "Type is already set as " + getRelationshipType(srcName, destName);
+    }
+    // Generalization/realization check for self relationships
+    else if (newType == 2 || newType == 3) {
+        if (srcName == destName) {
+            throw "Cannot have self-relationship of generalizations or realizations";
+        }
+    }
+    // Composition check for duplicate destinations
+    else if (newType == 1) {
+        for(UMLRelationship relationship : getRelationships()) {
+            // Need to check for identical destination name and type without counting itself
+            if (relationship.getDestination().getName() == destName 
+            && relationship.getSource().getName() != srcName
+            && relationship.getType() == composition) {
+                throw "Class can not be the destination for more than one composition";
+            }
+        }
+    }
+    getRelationship(srcName, destName).setType(newType);
+}
+
+// Gets relationship reference for the given string class names
+UMLRelationship& UMLData::getRelationship(string srcName, string destName)
+{
+    int loc = findRelationship(getClass(srcName), getClass(destName));
+    if (loc < 0)
+        throw "Relationship not found";
+    return relationships[loc];
+}
+
 
 // Deletes a class by string in the classes vector
 void UMLData::deleteClass(string name)
@@ -166,7 +210,7 @@ void UMLData::addClassAttribute(string className, UMLAttribute attribute)
 void UMLData::removeClassAttribute(string className, string attributeName)
 {
       for (UMLAttribute attr : getClass(className).getAttributes()) {
-           if(attr.getAttributeName() == attributeName){
+           if (attr.getAttributeName() == attributeName){
                 getClass(className).deleteAttribute(attributeName);
                 return;
            }
@@ -239,7 +283,7 @@ int UMLData::findRelationship(const UMLClass& sourceClassIn, const UMLClass& des
         string src = relationships[i].getSource().getName();
         string dest = relationships[i].getDestination().getName();
         //compare
-        if ((src == sourceClassIn.getName()) and (dest == destClassIn.getName()))
+        if ((src == sourceClassIn.getName()) && (dest == destClassIn.getName()))
         {
             return i;
         }
@@ -254,15 +298,6 @@ UMLClass& UMLData::getClass(string name)
     if (loc < 0)
         throw "Class not found";
     return classes[loc];
-}
-
-// Gets relationship reference for the given string class names
-UMLRelationship& UMLData::getRelationship(string srcName, string destName)
-{
-    int loc = findRelationship(getClass(srcName), getClass(destName));
-    if (loc < 0)
-        throw "Relationship not found";
-    return relationships[loc];
 }
 
 // Takes in relationship object and adds it to relationship vector
@@ -281,7 +316,9 @@ void UMLData::addRelationship(const UMLRelationship& relIn)
     // Composition check for duplicate destinations
     else if (relIn.getType() == composition) {
         for(UMLRelationship relationship : getRelationships()) {
-            if (relationship.getDestination().getName() == relIn.getDestination().getName()) {
+            // Need to check for identical destination name and type
+            if (relationship.getDestination().getName() == relIn.getDestination().getName()
+                && relationship.getType() == composition) {
                 throw "Class can not be the destination for more than one composition";
             }
         }

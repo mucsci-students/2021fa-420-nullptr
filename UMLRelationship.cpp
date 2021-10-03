@@ -35,6 +35,20 @@ Type UMLRelationship::getType() const
 }
 
 // Set type of relationship
-void UMLRelationship::setType(Type newType) {
-  relationshipType = newType;
+void UMLRelationship::setType(int newType) {
+  if (newType == 0) {
+    relationshipType = aggregation;
+  }
+  else if (newType == 1) {
+    relationshipType = composition;
+  }
+  else if (newType == 2) {
+    relationshipType = generalization;
+  }
+  else if (newType == 3) {
+    relationshipType = realization;
+  }
+  else {
+    throw "Invalid type";
+  }
 }

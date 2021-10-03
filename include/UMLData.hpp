@@ -64,6 +64,12 @@ class UMLData
         // Returns string representation of relationship type
         string getRelationshipType(const string& srcName, const string& destName);
 
+        // Modifies relationship type given a new relationship type 
+        void changeRelationshipType(const string& srcName, const string& destName, int newType);
+
+        // Gets relationship reference for the given string class names
+        UMLRelationship& getRelationship(string srcName, string destName);
+
         // Deletes a class by string in the classes vector
         void deleteClass(string name);
 
@@ -97,9 +103,6 @@ class UMLData
 
         // Gets class reference for the given name
         UMLClass& getClass(string name);
-
-        // Gets relationship reference for the given string class names
-        UMLRelationship& getRelationship(string srcName, string destName);
 
         // Takes in relationship object and adds it to relationship vector
         void addRelationship(const UMLRelationship& relationshipIn);

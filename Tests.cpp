@@ -264,7 +264,43 @@ TEST(UMLDataRelationshipTest, GetRelationshipByClassWorks)
         ASSERT_EQ(vector1[i].getDestination().getName(), vector2[i].getDestination().getName());
         ASSERT_EQ(vector1[i].getType(), vector2[i].getType());
     }
-} 
+}
+
+TEST(UMLDataRelationshipTest, ChangeRelationshipTypeWorks)
+{
+    UMLData data;
+
+    data.addClass("test");
+    data.addClass("test1");
+
+    // Test to see if relationship was changed
+    data.addRelationship("test", "test1", 0);
+    data.changeRelationshipType("test", "test1", 1);
+    ASSERT_EQ(data.getRelationship("test", "test1").getType(), composition);
+}
+
+TEST(UMLDataRelationshipTest, ChangeRelationshipTypeErrors)
+{
+    UMLData data;
+
+    data.addClass("test");
+    data.addClass("test1");
+    data.addClass("test2");
+
+    data.addRelationship("test", "test1", 0);
+    // Test for bounds
+    ASSERT_ANY_THROW(data.changeRelationshipType("test", "test1", 4));
+    ASSERT_ANY_THROW(data.changeRelationshipType("test", "test1", -1));
+    // Test for identical type
+    ASSERT_ANY_THROW(data.changeRelationshipType("test", "test1", 0));
+    // Test for self-inheritance
+    data.addRelationship("test", "test", 0);
+    ASSERT_ANY_THROW(data.changeRelationshipType("test", "test", 2));
+    ASSERT_ANY_THROW(data.changeRelationshipType("test", "test", 3));
+    // Test for multiple compositions
+    data.addRelationship("test2", "test1", 1);
+    ASSERT_ANY_THROW(data.changeRelationshipType("test", "test1", 1));
+}
 
 /*
 TEST(UMLDataAttributeTest, RemovingAttributeWorks) {

@@ -196,7 +196,8 @@ void CLI::displayCLI ()
                 cout << "Choose an option:" << endl;
                 cout << "[1] Add" << endl;
                 cout << "[2] Remove" << endl;
-                cout << "[3] Back" << endl;
+                cout << "[3] Modify Type" << endl;
+                cout << "[4] Back" << endl;
 
                 cout << endl << "Choice: ";
                 cin >> userChoice;
@@ -257,8 +258,41 @@ void CLI::displayCLI ()
                     if (errorStatus == false) cout << endl << "Relationship deleted between " << source << " and " << destination << endl << endl;
                     else errorStatus = false;
                 } 
-                // Go back
                 else if (userChoice == "3") {
+                    // Display all classes and relationships for user clarity
+                    displayDiagram(false, true);
+
+                    cout << "Enter the name of the source: " << endl;
+                    cin >> source;
+                    cout << "Enter the name of the destination: " << endl;
+                    cin >> destination;
+                    
+                    // Loop to grab string of type and convert into integer
+                    while (typeLoop) {
+                        typeLoop = false;
+                        cout << "Enter the new type of relationship:" << endl;
+                        cout << "[1] Aggregation" << endl;
+                        cout << "[2] Composition" << endl;
+                        cout << "[3] Generalization" << endl;
+                        cout << "[4] Realization" << endl;
+                        cin >> stringType;
+                        if (stringType == "1" || stringType == "2" || stringType == "3" || stringType == "4") {
+                            // Type is enum starting from 0, so subtract by 1
+                            type = std::stoi(stringType) - 1;
+                        }
+                        else {
+                            cout << "Invalid choice!" << endl << endl;
+                            typeLoop = true;
+                        }
+                    }
+
+                    ERR_CATCH(data.changeRelationshipType(source, destination, type));
+                    if (errorStatus == false) cout << endl << "Relationship between " << source << " and " << destination
+                        << " changed to type " << data.getRelationshipType(source, destination) << endl << endl;
+                    else errorStatus = false;
+                }
+                // Go back
+                else if (userChoice == "4") {
                     // Exits subroutine to go back to main routine
                 }
                 // Invalid choice
