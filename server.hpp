@@ -1,8 +1,9 @@
-#include "UMLAttribute.hpp"
-#include "UMLData.hpp"
+#include "include/UMLAttribute.hpp"
+#include "include/UMLData.hpp"
 #include "include/httplib/httplib.h"
 #include "include/json/json.hpp"
 #include "include/inja/inja.hpp"
+#include <string>
 
 using json = nlohmann::json;
 
@@ -51,7 +52,8 @@ namespace umlserver
         svr.Get("/add/relationship", [&](const httplib::Request& req, httplib::Response& res) {
             std::string source = req.params.find("source")->second;
             std::string dest = req.params.find("dest")->second;
-            ERR_ADD(data.addRelationship(source, dest));
+            std::string type = req.params.find("type")->second;
+            ERR_ADD(data.addRelationship(source, dest, std::stoi(type)));
             res.set_redirect("/");
          });
 

@@ -6,14 +6,11 @@
 
 //--------------------------------------------------------------------
 // System includes
-#include "CLI.hpp"
-#include "UMLAttribute.hpp"
-#include "UMLData.hpp"
+#include "include/CLI.hpp"
+#include "include/UMLAttribute.hpp"
+#include "include/UMLData.hpp"
 #include "server.hpp"
-#include "include/json/json.hpp"
-#include <filesystem>
-
-using json = nlohmann::json;
+#include "include/CLI.hpp"
 //--------------------------------------------------------------------
 
 int main()

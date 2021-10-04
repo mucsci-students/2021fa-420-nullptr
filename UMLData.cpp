@@ -1,127 +1,20 @@
-#pragma once
 /*
-  Filename   : UMLData.hpp
-  Description: Stores the Relationship and Class information of the current state 
+  Filename   : UMLData.cpp
+  Description: Implementation of the data storage model.
 */
+
 //--------------------------------------------------------------------
 // System includes
-#include "UMLClass.hpp"
-#include "UMLAttribute.hpp"
-#include "UMLRelationship.hpp"
-#include <vector>
-#include <iostream>
-#include "include/json/json.hpp"
+#include "include/UMLFile.hpp"
+#include "include/UMLRelationship.hpp"
 //--------------------------------------------------------------------
 
-//--------------------------------------------------------------------
-// Using declarations
-using std::string;
-using std::vector;
-using json = nlohmann::json;
-//--------------------------------------------------------------------
-
-class UMLData
-{
-    
-    private:
-
-        vector<UMLClass> classes;
-        vector<UMLRelationship> relationships;
-
-    public: 
-        
-        //Empty constructor
-        UMLData();
-
-        //Constructor that takes in vector of classes 
-        UMLData(const vector<UMLClass>& vclass);
-
-        //returns vector of all classes
-        vector<UMLClass> getClasses() const;
-
-        //return a single class
-        UMLClass getClassCopy(std::string name);
-   
-        //returns vector of all relationships
-        vector<UMLRelationship> getRelationships() const;
-
-        //takes in class and adds it to vector
-        void addClass(const UMLClass& classIn);
-
-        //takes in string name and creates class and adds to classes vector
-        void addClass(string name);
-
-        //takes in name and vector of attributes and creates class and adds to vector of classes
-        void addClass(string name, vector<UMLAttribute> attributes);
-
-        //takes in src string and dest string, creates relationship and adds to relationships vector
-        void addRelationship(string srcName, string destName);
-        
-        //takes in className string and returns a vector of all the relationshps associated with that class
-        vector<UMLRelationship> getRelationshipsByClass(string className);
-
-        //deletes relationshp based on two strings
-        void deleteRelationship(string srcName, string destName);
-
-        //deletes a class by string in the classes vector
-        void deleteClass(string name);
-
-        //changes class name from old name and new name
-        void changeClassName(string oldName, string newName);
-
-        //gets class attributes for a className class and returns them in a vector
-        vector<UMLAttribute> getClassAttributes(string className);
-
-        //adds class attribute to specified className
-        void addClassAttribute(string className, UMLAttribute attribute);
-
-        //removes className class attribute by the name
-        void removeClassAttribute(string className, string attributeName);
-
-        //removes className class attribute by the name
-        void changeAttributeName(string className, string oldAttributeName, string newAttributeName);
-
-        //checks if class/attribute name is valid
-        bool isValidName(string name);
-
-        //returns json object representing all of UMLData
-        json getJson();
-
-    private:
-
-        //params: string name
-        //finds class by name and returns index within member classes vector, returns -1 if not found
-        int findClass(string name);
-
-        //params: string name, vector<UMLAttribute> attributes
-        //finds attribute by name and returns index within the attribute's vector, returns -1 if not found
-        int findAttribute(string name, vector<UMLAttribute> attributes);
-
-        //params: UMLClass sourceClassIn, UMLClass destClassIn
-        //finds relationship using two UML classes and returns index within member classes vector
-        int findRelationship(const UMLClass& sourceClassIn, const UMLClass& destClassIn);
-
-        //params: string name
-        //gets class reference for the given name
-        UMLClass& getClass(string name);
-
-        //params: string name
-        //gets relationship reference for the given string class names
-        UMLRelationship& getRelationship(string srcName, string destName);
-
-        //params: UMLRelationship relationshipIn
-        //takes in relationship object and adds it to relationship vector
-        void addRelationship(const UMLRelationship& relationshipIn);
-
-        //params: UMLClass source, UMLClass destClass
-        //creates relationship from two classes and adds to relationshp vector
-        void addRelationship(const UMLClass& sourceClass, const UMLClass& destClass);
-};
-
+// Empty constructor
 UMLData::UMLData()
 {
 }
 
+// Constructor that takes in vector of classes 
 UMLData::UMLData(const vector<UMLClass>& vclass)
 {
     for (UMLClass uclass : vclass )
@@ -130,21 +23,25 @@ UMLData::UMLData(const vector<UMLClass>& vclass)
     }
 }
 
+// Returns vector of all classes
 vector<UMLClass> UMLData::getClasses() const
 {
     return classes;
 }
 
+// Return a single class
 UMLClass UMLData::getClassCopy(std::string name)
 {
     return getClass(name);
 }
 
+// Returns vector of all relationships
 vector<UMLRelationship> UMLData::getRelationships() const
 {
     return relationships;
 }
 
+// Takes in class and adds it to vector
 void UMLData::addClass(const UMLClass& classIn)
 {
     //check if already exists
@@ -156,27 +53,32 @@ void UMLData::addClass(const UMLClass& classIn)
     classes.push_back(classIn);
 }
 
+// Takes in string name and creates class and adds to classes vector
 void UMLData::addClass(string name)
 {
     addClass(UMLClass(name));
 }
 
+// Takes in name and vector of attributes and creates class and adds to vector of classes
 void UMLData::addClass(string name, vector<UMLAttribute> attributes)
 {
     addClass(UMLClass(name, attributes));
 }
 
-void UMLData::addRelationship(string srcName, string destName)
+// Takes in src string, dest string, and type int creates relationship and adds to relationships vector
+void UMLData::addRelationship(string srcName, string destName, int type)
 {
-    addRelationship(getClass(srcName), getClass(destName));
+    // Type must be in bounds
+    if (type < 0 || type > 3) 
+        throw "Invalid type";
+    addRelationship(UMLRelationship(getClass(srcName), getClass(destName), type));
 }
 
+// Takes in className string and returns a vector of all the relationships associated with that class
 vector<UMLRelationship> UMLData::getRelationshipsByClass(string classNameIn)
 {
     vector<UMLRelationship> relationshipsContainingClass;
-
     string className = getClass(classNameIn).getName();
-
     for (int i = 0; i < relationships.size(); ++i)
     {
         //pull src and destination classes from vector location
@@ -189,9 +91,9 @@ vector<UMLRelationship> UMLData::getRelationshipsByClass(string classNameIn)
         }
     }
     return relationshipsContainingClass;
-
 }
 
+// Deletes relationshp based on two strings
 void UMLData::deleteRelationship(string srcName, string destName)
 {
     int loc = findRelationship(getClass(srcName), getClass(destName));
@@ -200,6 +102,68 @@ void UMLData::deleteRelationship(string srcName, string destName)
     relationships.erase(relationships.begin() + loc);
 }
 
+// Returns string representation of relationship type
+string UMLData::getRelationshipType(const string& srcName, const string& destName) 
+{
+    Type type = getRelationship(srcName, destName).getType();
+    switch (type) {
+        case aggregation :
+            return "aggregation";
+        case composition :
+            return "composition";
+        case generalization :
+            return "generalization";
+        case realization :
+            return "realization";
+        default :
+            return "none";
+    }
+    return "none";
+}
+
+// Modifies relationship type given a new relationship type 
+void UMLData::changeRelationshipType(const string& srcName, const string& destName, int newType) 
+{
+    int oldType = getRelationship(srcName, destName).getType();
+    // Type must be in bounds
+    if (newType < 0 || newType > 3) {
+        throw "Invalid type";
+    }
+    // Type must not be the same as the previous type
+    else if (newType == oldType) {
+        throw "Type is already set as " + getRelationshipType(srcName, destName);
+    }
+    // Generalization/realization check for self relationships
+    else if (newType == 2 || newType == 3) {
+        if (srcName == destName) {
+            throw "Cannot have self-relationship of generalizations or realizations";
+        }
+    }
+    // Composition check for duplicate destinations
+    else if (newType == 1) {
+        for(UMLRelationship relationship : getRelationships()) {
+            // Need to check for identical destination name and type without counting itself
+            if (relationship.getDestination().getName() == destName 
+            && relationship.getSource().getName() != srcName
+            && relationship.getType() == composition) {
+                throw "Class can not be the destination for more than one composition";
+            }
+        }
+    }
+    getRelationship(srcName, destName).setType(newType);
+}
+
+// Gets relationship reference for the given string class names
+UMLRelationship& UMLData::getRelationship(string srcName, string destName)
+{
+    int loc = findRelationship(getClass(srcName), getClass(destName));
+    if (loc < 0)
+        throw "Relationship not found";
+    return relationships[loc];
+}
+
+
+// Deletes a class by string in the classes vector
 void UMLData::deleteClass(string name)
 {
     int loc = findClass(name);
@@ -218,6 +182,7 @@ void UMLData::deleteClass(string name)
     classes.erase(classes.begin() + loc);
 }
 
+// Changes class name from old name and new name
 void UMLData::changeClassName(string oldName, string newName)
 {
     if (findClass(newName) >= 0)
@@ -227,11 +192,13 @@ void UMLData::changeClassName(string oldName, string newName)
     getClass(oldName).changeName(newName);
 }
 
+// Gets class attributes for a className class and returns them in a vector
 vector<UMLAttribute> UMLData::getClassAttributes(string className)
 {
     return getClass(className).getAttributes();
 }
 
+// Adds class attribute to specified className
 void UMLData::addClassAttribute(string className, UMLAttribute attribute)
 {
     if (!isValidName(attribute.getAttributeName()))
@@ -239,21 +206,19 @@ void UMLData::addClassAttribute(string className, UMLAttribute attribute)
     getClass(className).addAttribute(attribute);
 }
 
+// Removes className class attribute by the name
 void UMLData::removeClassAttribute(string className, string attributeName)
 {
       for (UMLAttribute attr : getClass(className).getAttributes()) {
-           if(attr.getAttributeName() == attributeName){
+           if (attr.getAttributeName() == attributeName){
                 getClass(className).deleteAttribute(attributeName);
                 return;
            }
-           
        }
-
         throw "Attribute does not exist";
-
-   
 }
 
+// Changes className class attribute by the new attribute name
 void UMLData::changeAttributeName(string className, string oldAttributeName, string newAttributeName)
 {
     if (findAttribute(newAttributeName, getClassAttributes(className)) >= 0)
@@ -263,76 +228,7 @@ void UMLData::changeAttributeName(string className, string oldAttributeName, str
     getClass(className).changeAttributeName(oldAttributeName, newAttributeName);
 }
 
-int UMLData::findClass(string name)
-{
-    for (int i = 0; i < classes.size(); ++i)
-    {
-        if (classes[i].getName() == name)
-        {
-            return i;
-        }
-    }
-    return -1;
-}
-
-int UMLData::findAttribute(string name, vector<UMLAttribute> attributes)
-{
-    for (int i = 0; i < attributes.size(); ++i)
-    {
-        if (attributes[i].getAttributeName() == name)
-        {
-            return i;
-        }
-    }
-    return -1;
-}
-
-int UMLData::findRelationship(const UMLClass& sourceClassIn, const UMLClass& destClassIn)
-{
-    for (int i = 0; i < relationships.size(); ++i)
-    {
-        //pull src and destination classes from vector location
-        string src = relationships[i].getSource().getName();
-        string dest = relationships[i].getDestination().getName();
-        //compare
-        if ((src == sourceClassIn.getName()) and (dest == destClassIn.getName()))
-        {
-            return i;
-        }
-    }
-    return -1;
-}
-
-UMLClass& UMLData::getClass(string name)
-{
-    int loc = findClass(name);
-    if (loc < 0)
-        throw "Class not found";
-    return classes[loc];
-}
-
-UMLRelationship& UMLData::getRelationship(string srcName, string destName)
-{
-    int loc = findRelationship(getClass(srcName), getClass(destName));
-    if (loc < 0)
-        throw "Relationship not found";
-    return relationships[loc];
-}
-
-void UMLData::addRelationship(const UMLRelationship& relIn)
-{
-    int loc = findRelationship(relIn.getSource(), relIn.getDestination());
-    if (loc >= 0)
-        throw "New relationship already exists";
-
-    relationships.push_back(relIn); 
-}
-
-void UMLData::addRelationship(const UMLClass& sourceClass, const UMLClass& destClass)
-{
-    addRelationship(UMLRelationship(sourceClass, destClass));
-}
-
+// Checks if class/attribute name is valid
 bool UMLData::isValidName(string name)
 {
     //checking first character
@@ -350,6 +246,84 @@ bool UMLData::isValidName(string name)
         }
     }
     return true;
+}
+
+// Finds class by name and returns index within member classes vector, returns -1 if not found
+int UMLData::findClass(string name)
+{
+    for (int i = 0; i < classes.size(); ++i)
+    {
+        if (classes[i].getName() == name)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+// Finds attribute by name and returns index within the attribute's vector, returns -1 if not found
+int UMLData::findAttribute(string name, vector<UMLAttribute> attributes)
+{
+    for (int i = 0; i < attributes.size(); ++i)
+    {
+        if (attributes[i].getAttributeName() == name)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+// Finds relationship using two UML classes and returns index within member classes vector
+int UMLData::findRelationship(const UMLClass& sourceClassIn, const UMLClass& destClassIn)
+{
+    for (int i = 0; i < relationships.size(); ++i)
+    {
+        //pull src and destination classes from vector location
+        string src = relationships[i].getSource().getName();
+        string dest = relationships[i].getDestination().getName();
+        //compare
+        if ((src == sourceClassIn.getName()) && (dest == destClassIn.getName()))
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+// Gets class reference for the given name
+UMLClass& UMLData::getClass(string name)
+{
+    int loc = findClass(name);
+    if (loc < 0)
+        throw "Class not found";
+    return classes[loc];
+}
+
+// Takes in relationship object and adds it to relationship vector
+void UMLData::addRelationship(const UMLRelationship& relIn)
+{
+    // Check to see if relationship already exists
+    int loc = findRelationship(relIn.getSource(), relIn.getDestination());
+    if (loc >= 0)
+        throw "New relationship already exists";
+    // Generalization/realization check for self relationships
+    else if (relIn.getType() == generalization || relIn.getType() == realization) {
+        if (relIn.getSource().getName() == relIn.getDestination().getName()) {
+            throw "Cannot have self-relationship of generalizations or realizations";
+        }
+    }
+    // Composition check for duplicate destinations
+    else if (relIn.getType() == composition) {
+        for(UMLRelationship relationship : getRelationships()) {
+            // Need to check for identical destination name and type
+            if (relationship.getDestination().getName() == relIn.getDestination().getName()
+                && relationship.getType() == composition) {
+                throw "Class can not be the destination for more than one composition";
+            }
+        }
+    }
+    relationships.push_back(relIn); 
 }
 
 json UMLData::getJson()

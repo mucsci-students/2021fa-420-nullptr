@@ -1,13 +1,9 @@
 /*
-  Filename   : CLI.hpp
-  Description: File which generates the command line interface
-  for the user to create UML diagrams
+  Filename   : CLI.cpp
+  Description: Implementation of the command line interface.
 */
 
 /************************************************************/
-// Macro guard
-#ifndef CLI_HPP
-#define CLI_HPP
 // Catch for functions to protect from invalid inputs
 #define ERR_CATCH(fun)                           \
     try {                                        \
@@ -21,63 +17,19 @@
 
 //--------------------------------------------------------------------
 // System includes
-#include <string>
-#include "UMLClass.hpp"
-#include "UMLAttribute.hpp"
-#include "UMLRelationship.hpp"
-#include "UMLData.hpp"
-#include "UMLFile.hpp"
-#include <vector>
-#include <iostream>
-#include <fstream>
+#include "include/CLI.hpp"
 //--------------------------------------------------------------------
-
-//--------------------------------------------------------------------
-// Using declarations
- using std::cin;
- using std::cout;
- using std::endl;
- using std::string;
- using std::vector;
- using std::invalid_argument;
-//--------------------------------------------------------------------
-
-class CLI
-{
-    private:
-        // Stores choice input by user, representing position within diagram
-        // When an invalid input is set, reverts to its previous position
-        string userChoice;
-        // Loop boolean that maintains CLI routine
-        bool mainLoop;
-        // Loop boolean that maintains CLI subrountines
-        bool subLoop;
-        // Error check to prevent 'success' print 
-        bool errorStatus;
-        // Main UML data object storing UML stuff
-        UMLData data;
-    public:
-        // Displays command line interface
-        void displayCLI();
-        // Displays information about classes within the diagram.
-        // Has conditional booleans to optionally display attributes and relationships.
-        void displayDiagram (bool displayAttribute, bool displayRelationship);
-        // Displays information about a single class with the name className.
-        void displayClass (string className);
-};
-
 
 // Displays CLI using a large loop routine.
 void CLI::displayCLI ()
 {
-    // Start default state of loops
-    mainLoop = true;
-    subLoop = false;
-
     cout << "Welcome to UML++!" << endl << endl;
-
     // Primary display routine
     while (mainLoop) {
+        // Error status reset when main loop begins
+        errorStatus = false;
+        // Subloop toggled to guarantee entry
+        subLoop = true;
         // Main prompt: prompts user for options.
         cout << "Choose an option:" << endl;
         cout << "[1] Class" << endl;
@@ -92,11 +44,10 @@ void CLI::displayCLI ()
         cout << endl << "Choice: ";
         cin >> userChoice;
         cout << endl;
-
         // Start subloop
-        subLoop = true;
-
-        while (subLoop) { 
+        while (subLoop) {
+            // Subloop toggled to break loop unless error occurs
+            subLoop = false;
             // Class subroutine
             if(userChoice == "1") {
                 // Lists operations for modifying classes
@@ -123,7 +74,6 @@ void CLI::displayCLI ()
                     // Prevent success message if error was caught
                     if(errorStatus == false) cout << endl << "Class named " << name << " added" << endl << endl;
                     else errorStatus = false;
-                    subLoop = false;
                 }
                 // Remove class
                 else if (userChoice == "2") {
@@ -138,7 +88,6 @@ void CLI::displayCLI ()
                     // Prevent success message if error was caught
                     if(errorStatus == false) cout << endl << "Class named " << name << " removed" << endl << endl;
                     else errorStatus = false;
-                    subLoop = false;
                 } 
                 // Rename class
                 else if (userChoice == "3") {
@@ -156,17 +105,16 @@ void CLI::displayCLI ()
                     // Prevent success message if error was caught
                     if(errorStatus == false) cout << endl << "Class named " << name << " renamed to " << name2 << endl << endl;
                     else errorStatus = false;
-                    subLoop = false;
                 }
                 // Go back
                 else if (userChoice == "4") {
                     // Exits subroutine to go back to main routine
-                    subLoop = false;
                 }
                 // Invalid choice
                 else {
                     cout << "Invalid choice!" << endl << endl;
                     userChoice = "1";
+                    subLoop = true;
                 }
             }
 
@@ -199,8 +147,6 @@ void CLI::displayCLI ()
                     ERR_CATCH(data.addClassAttribute(className, attributeName));
                     if (errorStatus == false) cout << endl << "Attribute " << attributeName << " added to " << className << endl << endl;
                     else errorStatus = false;
-                    subLoop = false;
-
                 }
                 // Remove attribute
                 else if (userChoice == "2") {
@@ -215,7 +161,6 @@ void CLI::displayCLI ()
                     ERR_CATCH(data.removeClassAttribute(className, attributeName));
                     if (errorStatus == false) cout << endl << "Attribute " << attributeName << " removed from " << className << endl << endl;
                     else errorStatus = false;
-                    subLoop = false;
                 } 
                 // Rename attribute
                 else if (userChoice == "3") {
@@ -232,17 +177,16 @@ void CLI::displayCLI ()
                     ERR_CATCH(data.changeAttributeName(className, attributeName, attributeName2));
                     if (errorStatus == false) cout << endl << "Attribute " << attributeName << " renamed to " << attributeName2 << endl << endl;
                     else errorStatus = false;
-                    subLoop = false;
                 }
                 // Go back
                 else if (userChoice == "4") {
                     // Exits subroutine to go back to main routine
-                    subLoop = false;
                 }
                 // Invalid choice
                 else {
                     cout << "Invalid choice" << endl << endl;
                     userChoice = "2";
+                    subLoop = true;
                 }
             }
 
@@ -252,14 +196,19 @@ void CLI::displayCLI ()
                 cout << "Choose an option:" << endl;
                 cout << "[1] Add" << endl;
                 cout << "[2] Remove" << endl;
-                cout << "[3] Back" << endl;
+                cout << "[3] Modify Type" << endl;
+                cout << "[4] Back" << endl;
 
                 cout << endl << "Choice: ";
                 cin >> userChoice;
                 cout << endl;
 
-                // Class name representing source and destination
-                string source, destination;
+                // String representing source, destination, type
+                string source, destination, stringType;
+                // Integer representing type 
+                int type;
+                // Boolean to control type loop
+                bool typeLoop = true;
 
                 // Add relationship
                 if (userChoice == "1") {
@@ -271,9 +220,29 @@ void CLI::displayCLI ()
                     cout << "Enter the name of the destination: " << endl;
                     cin >> destination;
 
-                    ERR_CATCH(data.addRelationship(source, destination));
-                    if (errorStatus == false) cout << endl <<"Relationship added between " << source << " and " << destination << endl << endl;
-                    else subLoop = false;
+                    // Loop to grab string of type and convert into integer
+                    while (typeLoop) {
+                        typeLoop = false;
+                        cout << "Choose the type of relationship:" << endl;
+                        cout << "[1] Aggregation" << endl;
+                        cout << "[2] Composition" << endl;
+                        cout << "[3] Generalization" << endl;
+                        cout << "[4] Realization" << endl;
+                        cin >> stringType;
+                        if (stringType == "1" || stringType == "2" || stringType == "3" || stringType == "4") {
+                            // Type is enum starting from 0, so subtract by 1
+                            type = std::stoi(stringType) - 1;
+                        }
+                        else {
+                            cout << "Invalid choice!" << endl << endl;
+                            typeLoop = true;
+                        }
+                    }
+
+                    ERR_CATCH(data.addRelationship(source, destination, type));
+                    if (errorStatus == false) cout << endl << "Relationship added between " << source << " and " << destination
+                        << " of type " << data.getRelationshipType(source, destination) << endl << endl;
+                    else errorStatus = false;
                 }
                 // Remove relationship
                 else if (userChoice == "2") {
@@ -288,17 +257,49 @@ void CLI::displayCLI ()
                     ERR_CATCH(data.deleteRelationship(source, destination));
                     if (errorStatus == false) cout << endl << "Relationship deleted between " << source << " and " << destination << endl << endl;
                     else errorStatus = false;
-                    subLoop = false;
                 } 
-                // Go back
                 else if (userChoice == "3") {
+                    // Display all classes and relationships for user clarity
+                    displayDiagram(false, true);
+
+                    cout << "Enter the name of the source: " << endl;
+                    cin >> source;
+                    cout << "Enter the name of the destination: " << endl;
+                    cin >> destination;
+                    
+                    // Loop to grab string of type and convert into integer
+                    while (typeLoop) {
+                        typeLoop = false;
+                        cout << "Enter the new type of relationship:" << endl;
+                        cout << "[1] Aggregation" << endl;
+                        cout << "[2] Composition" << endl;
+                        cout << "[3] Generalization" << endl;
+                        cout << "[4] Realization" << endl;
+                        cin >> stringType;
+                        if (stringType == "1" || stringType == "2" || stringType == "3" || stringType == "4") {
+                            // Type is enum starting from 0, so subtract by 1
+                            type = std::stoi(stringType) - 1;
+                        }
+                        else {
+                            cout << "Invalid choice!" << endl << endl;
+                            typeLoop = true;
+                        }
+                    }
+
+                    ERR_CATCH(data.changeRelationshipType(source, destination, type));
+                    if (errorStatus == false) cout << endl << "Relationship between " << source << " and " << destination
+                        << " changed to type " << data.getRelationshipType(source, destination) << endl << endl;
+                    else errorStatus = false;
+                }
+                // Go back
+                else if (userChoice == "4") {
                     // Exits subroutine to go back to main routine
-                    subLoop = false;
                 }
                 // Invalid choice
                 else {
                     cout << "Invalid choice!" << endl << endl;
                     userChoice = "3";
+                    subLoop = true;
                 }
             }
 
@@ -326,36 +327,34 @@ void CLI::displayCLI ()
                     cin >> name;
 
                     ERR_CATCH(displayClass(name));
-                    if (errorStatus == false) cout << endl << "Class named " << name << " listed" << endl << endl;
+                    if (errorStatus == false) cout << endl << "Class named " << name << " listed" << endl;
                     else errorStatus = false;
+                    
                     subLoop = false;
                     cout << endl << "Enter anything to continue..." << endl;
                     cin >> name; // Pause for input
                     cout << endl; 
-                    subLoop = false;
                 }
                 // Display all information
                 else if (userChoice == "2") {
                     ERR_CATCH(displayDiagram (true, true));
-                    if (errorStatus == false) cout << endl << "Diagram displayed" << endl << endl;
+                    if (errorStatus == false) cout << endl << "Diagram displayed" << endl;
                     else errorStatus = false;
-                    subLoop = false;
-                     
                     
+                    subLoop = false;
                     cout << "Enter anything to continue..." << endl;
                     cin >> name; // Pause for input
                     cout << endl;                  
-                    subLoop = false;
                 } 
                 // Go back
                 else if (userChoice == "3") {
                     // Exits subroutine to go back to main routine
-                    subLoop = false;
                 }
                 // Invalid choice
                 else {
                     cout << "Invalid choice!" << endl << endl;
                     userChoice = "4";
+                    subLoop = true;
                 }
             }
 
@@ -369,7 +368,6 @@ void CLI::displayCLI ()
                 UMLFile file(fileName + ".json");
                 file.save(data);
                 cout << "Your file has been saved" << endl;
-                subLoop = false;
             }
 
             // Load UML subroutine
@@ -380,16 +378,16 @@ void CLI::displayCLI ()
                 cin >> fileName;
 
                 UMLFile file(fileName + ".json");
+                // Requires unique try catch in order to handle file loading error
                 try {
                     data = file.load();
                 } catch (const std::exception& ex)
                 {
                     cout << endl << "Error loading file" << endl << endl;
-                    bool errorStatus = true;
+                    errorStatus = true;
                 }
                 if (errorStatus == false) cout << "Your file has been loaded" << endl;
                 else errorStatus = false;
-                subLoop = false;
             }
 
             // Help subroutine
@@ -408,13 +406,11 @@ void CLI::displayCLI ()
                 cout << endl << "Enter anything to continue..." << endl;
                 cin >> line; // Pause for input
                 cout << endl; 
-                subLoop = false;
             }
 
             // Exits the program
             else if (userChoice == "8") {
                 cout << "Exiting program..." << endl << endl;
-                subLoop = false;
                 mainLoop = false;
             }
 
@@ -422,12 +418,13 @@ void CLI::displayCLI ()
             else {
                 cout << "Invalid choice!" << endl << endl;
                 userChoice = "";
-                subLoop = false;
             }
         }  
     } 
 }
 
+// Displays information about classes within the diagram.
+// Has conditional booleans to optionally display attributes and relationships.
 void CLI::displayDiagram (bool displayAttribute, bool displayRelationship) 
 {
     vector<UMLClass> classes = data.getClasses();
@@ -446,6 +443,7 @@ void CLI::displayDiagram (bool displayAttribute, bool displayRelationship)
             for (UMLRelationship rel : data.getRelationshipsByClass(umlclass.getName()))
             {
                 cout << rel.getSource().getName() << " => " << rel.getDestination().getName() << endl;
+                cout << "Type: " << data.getRelationshipType(rel.getSource().getName(), rel.getDestination().getName()) << endl;
             }
         }
         // Don't cause spacing within loop if only showing classes
@@ -455,6 +453,7 @@ void CLI::displayDiagram (bool displayAttribute, bool displayRelationship)
     if (!displayAttribute && !displayRelationship && data.getClasses().size() > 0) cout << endl;
 }
 
+// Displays information about a single class with the name className.
 void CLI::displayClass (string className) 
 {
     // Grab copy of class in order to display attributes
@@ -469,12 +468,9 @@ void CLI::displayClass (string className)
     // Find relationships based on name of the class
     cout << "Relationships:" << endl;
     vector<UMLRelationship> relationshipList = data.getRelationshipsByClass(className);
-    for(UMLRelationship relationship : relationshipList)
+    for(UMLRelationship rel : relationshipList)
     {
-        cout << relationship.getSource().getName() << " => " << relationship.getDestination().getName() << endl;
+        cout << rel.getSource().getName() << " => " << rel.getDestination().getName() << endl;
+        cout << "Type: " << data.getRelationshipType(rel.getSource().getName(), rel.getDestination().getName()) << endl;
     }
 }
-
-/************************************************************/
-#endif
-/************************************************************/
