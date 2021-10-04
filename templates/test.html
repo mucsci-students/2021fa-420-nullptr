@@ -1,0 +1,63 @@
+<html>
+    <head>
+    </head>
+    <body>
+        {% for error in errors %}
+            <p style="color:red;">{{ error }}</p>
+        {% endfor %}
+        <h1>Classes:</h1>
+        <form action="/add/class" method="GET">
+            <label for="cname">Class name:</label>
+            <input type="text" id="cname" name="cname">
+            <input type="submit" value="add class">
+        </form>
+        {% for class in classes %}
+            <h2 id="{{ class.name }}"><span>{{ class.name }}</span> <button id="{{ class.name }}edit">edit</button> <a href="/delete/class/{{ class.name }}">delete</a></h2>
+            <p>Attributes:</p>
+            {% for attribute in class.attributes %}
+                <p id="{{ attribute.name }}">{{ attribute.name }} <button id="{{ attribute.name }}edit">edit</button> <a href="/delete/attribute/{{ class.name }}/{{ attribute.name }}">delete</a></p>
+            {% endfor %}
+            <form action="/add/attribute/{{ class.name }}" method="GET">
+                <label for="aname">Attribute name:</label>
+                <input type="text" id="aname" name="aname">
+                <input type="submit" value="add attribute">
+            </form>
+        {% endfor %}
+        <h1>Relationships:</h1>
+        <form action="/add/relationship" method="GET">
+            <label for="cname">Source:</label>
+            <input type="text" id="source" name="source">
+            <label for="cname">Destination:</label>
+            <input type="text" id="dest" name="dest">
+            <input type="submit" value="add relationship">
+        </form>
+        {% for relationship in relationships %}
+            <p>{{relationship.source}} -> {{relationship.destination}} 
+                <a href="/delete/relationship/{{relationship.source}}/{{relationship.destination}}">delete</a></p>
+        {% endfor %}
+        <h1>File:</h1>
+        <button>Save</button><button>Load</button>
+    </body>
+    <script>
+        {% for class in classes %}
+            element = document.getElementById('{{ class.name }}edit');
+            element.addEventListener("click", () => {
+                document.getElementById("{{class.name}}").innerHTML =
+                    "<form action='/edit/class/{{ class.name }}' method='GET'>" + 
+                        "<input type='text' id='cname' name='cname' value='{{ class.name }}'>" +
+                        "<input type='submit' value='edit class'>"
+                    "</form>";
+            });
+            {% for attribute in class.attributes %}
+            element = document.getElementById('{{ attribute.name }}edit');
+            element.addEventListener("click", () => {
+                document.getElementById("{{attribute.name}}").innerHTML =
+                    "<form action='/edit/attribute/{{ class.name }}/{{ attribute.name }}' method='GET'>" + 
+                        "<input type='text' id='aname' name='aname' value='{{ attribute.name }}'>" +
+                        "<input type='submit' value='edit attribute'>"
+                    "</form>";
+            });
+            {% endfor %}
+        {% endfor %}
+    </script>
+</html>

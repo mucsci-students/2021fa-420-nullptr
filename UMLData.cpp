@@ -325,3 +325,27 @@ void UMLData::addRelationship(const UMLRelationship& relIn)
     }
     relationships.push_back(relIn); 
 }
+
+json UMLData::getJson()
+{
+    json j;
+    j["classes"] = json::array();
+    for (UMLClass uclass : classes)
+    {
+        json jsonattr;
+        jsonattr = json::array();
+        for (UMLAttribute uattr : uclass.getAttributes())
+        {
+            jsonattr += { {"name", uattr.getAttributeName()} };
+        } 
+          j["classes"] += { {"name", uclass.getName()}, {"attributes", jsonattr} };
+    }
+
+    j["relationships"] = json::array();
+    for (UMLRelationship urelationship : relationships)
+    {
+        j["relationships"] += { {"source", urelationship.getSource().getName()}, {"destination", urelationship.getDestination().getName()} };
+    }
+    
+    return j;
+}

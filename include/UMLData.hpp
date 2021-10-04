@@ -12,12 +12,14 @@
 #include "UMLRelationship.hpp"
 #include <vector>
 #include <iostream>
+#include "json/json.hpp"
 //--------------------------------------------------------------------
 
 //--------------------------------------------------------------------
 // Using declarations
 using std::string;
 using std::vector;
+using json = nlohmann::json;
 //--------------------------------------------------------------------
 
 class UMLData
@@ -90,6 +92,8 @@ class UMLData
 
         // Checks if class/attribute name is valid
         bool isValidName(string name);
+
+        json getJson();
 
     private:
         // Finds class by name and returns index within member classes vector, returns -1 if not found
