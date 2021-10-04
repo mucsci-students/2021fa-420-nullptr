@@ -29,12 +29,16 @@ UML++ has the following hierarchy for its command-line interface:
     - [4] Back: Returns back to the main set of commands.
     
 - [3] Relationship: Lists operations for modifying relationships.
-    - [1] Add: Prompts for a source class and a destination class. If both 
-               classes exist and the relationship doesn't already exist, a new
-               relationship is made.
+    - [1] Add: Prompts for a source class and a destination class, alongside a
+               type. If there is not already a relationship with this source
+               destination combination and no relationship type rules are being
+               broken, a new relationship will be made.
     - [2] Remove: Prompts for a source class and a destination class. If the 
-                  relationship exists, it will be removed.
-    - [3] Back: Returns back to the main set of commands.
+                relationship exists, it will be removed.
+    - [3] Modify Type: Prompts for a source class and a destination class,
+                       alongside a new type. Changes the relationship to have 
+                       the new type, given that this does not cause any errors.
+    - [4] Back: Returns back to the main set of commands.
     
 - [4] List: Lists operations for viewing information within the diagram.
     - [1] Class: Prompts for a class name. If the class exists, information 

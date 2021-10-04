@@ -1,7 +1,8 @@
 #pragma once
 /*
   Filename   : UMLData.hpp
-  Description: Stores the Relationship and Class information of the current state 
+  Description: Stores the relationship and class information, serving as
+  the primary model for the UML class diagram.
 */
 
 //--------------------------------------------------------------------
@@ -51,14 +52,23 @@ class UMLData
         // Takes in name and vector of attributes and creates class and adds to vector of classes
         void addClass(string name, vector<UMLAttribute> attributes);
 
-        // Takes in src string and dest string, creates relationship and adds to relationships vector
-        void addRelationship(string srcName, string destName);
+        // Takes in src string, dest string, and type int creates relationship and adds to relationships vector
+        void addRelationship(string srcName, string destName, int type);
         
-        // Takes in className string and returns a vector of all the relationshps associated with that class
+        // Takes in className string and returns a vector of all the relationships associated with that class
         vector<UMLRelationship> getRelationshipsByClass(string className);
 
         // Deletes relationshp based on two strings
         void deleteRelationship(string srcName, string destName);
+
+        // Returns string representation of relationship type
+        string getRelationshipType(const string& srcName, const string& destName);
+
+        // Modifies relationship type given a new relationship type 
+        void changeRelationshipType(const string& srcName, const string& destName, int newType);
+
+        // Gets relationship reference for the given string class names
+        UMLRelationship& getRelationship(string srcName, string destName);
 
         // Deletes a class by string in the classes vector
         void deleteClass(string name);
@@ -94,12 +104,6 @@ class UMLData
         // Gets class reference for the given name
         UMLClass& getClass(string name);
 
-        // Gets relationship reference for the given string class names
-        UMLRelationship& getRelationship(string srcName, string destName);
-
         // Takes in relationship object and adds it to relationship vector
         void addRelationship(const UMLRelationship& relationshipIn);
-
-        // Creates relationship from two classes and adds to relationshp vector
-        void addRelationship(const UMLClass& sourceClass, const UMLClass& destClass);
 };
