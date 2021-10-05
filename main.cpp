@@ -7,28 +7,21 @@
 //--------------------------------------------------------------------
 // System includes
 #include "include/CLI.hpp"
-#include "include/httplib/httplib.h"
+#include "include/UMLAttribute.hpp"
+#include "include/UMLData.hpp"
+#include "server.hpp"
 //--------------------------------------------------------------------
 
-int main()
-{
-   /*
-    httplib::Server svr;
-    svr.Get("/", [](const httplib::Request&, httplib::Response& res) {
-      res.set_redirect("/hi");
-    });
-    svr.Get("/hi", [](const httplib::Request&, httplib::Response& res) {
-      res.set_content("<h1>hello there!</h1>", "text/html");
-    });
-
-    std::cout << "running at http:://localhost:8080/" << std::endl;
-
-
-    svr.listen("localhost", 8080);
-
-    
-*/
-    CLI newInterface;
-    newInterface.displayCLI();
+int main(int argc, char** argv)
+{ 
+    // Parameter check to see if user wants CLI or GUI
+    if (argc > 1) {
+        if (string(argv[1]) == "--cli") {
+          CLI newInterface;
+          newInterface.displayCLI();
+      }
+    } else {
+      umlserver::start(8080);
+    }    
     return 0;
 };

@@ -23,7 +23,6 @@
 // Displays CLI using a large loop routine.
 void CLI::displayCLI ()
 {
-
     cout << "Welcome to UML++!" << endl << endl;
     // Primary display routine
     while (mainLoop) {
@@ -148,7 +147,6 @@ void CLI::displayCLI ()
                     ERR_CATCH(data.addClassAttribute(className, attributeName));
                     if (errorStatus == false) cout << endl << "Attribute " << attributeName << " added to " << className << endl << endl;
                     else errorStatus = false;
-
                 }
                 // Remove attribute
                 else if (userChoice == "2") {
@@ -198,14 +196,19 @@ void CLI::displayCLI ()
                 cout << "Choose an option:" << endl;
                 cout << "[1] Add" << endl;
                 cout << "[2] Remove" << endl;
-                cout << "[3] Back" << endl;
+                cout << "[3] Modify Type" << endl;
+                cout << "[4] Back" << endl;
 
                 cout << endl << "Choice: ";
                 cin >> userChoice;
                 cout << endl;
 
-                // Class name representing source and destination
-                string source, destination;
+                // String representing source, destination, type
+                string source, destination, stringType;
+                // Integer representing type 
+                int type;
+                // Boolean to control type loop
+                bool typeLoop = true;
 
                 // Add relationship
                 if (userChoice == "1") {
@@ -217,8 +220,29 @@ void CLI::displayCLI ()
                     cout << "Enter the name of the destination: " << endl;
                     cin >> destination;
 
-                    ERR_CATCH(data.addRelationship(source, destination));
-                    if (errorStatus == false) cout << endl <<"Relationship added between " << source << " and " << destination << endl << endl;
+                    // Loop to grab string of type and convert into integer
+                    while (typeLoop) {
+                        typeLoop = false;
+                        cout << "Choose the type of relationship:" << endl;
+                        cout << "[1] Aggregation" << endl;
+                        cout << "[2] Composition" << endl;
+                        cout << "[3] Generalization" << endl;
+                        cout << "[4] Realization" << endl;
+                        cin >> stringType;
+                        if (stringType == "1" || stringType == "2" || stringType == "3" || stringType == "4") {
+                            // Type is enum starting from 0, so subtract by 1
+                            type = std::stoi(stringType) - 1;
+                        }
+                        else {
+                            cout << "Invalid choice!" << endl << endl;
+                            typeLoop = true;
+                        }
+                    }
+
+                    ERR_CATCH(data.addRelationship(source, destination, type));
+                    if (errorStatus == false) cout << endl << "Relationship added between " << source << " and " << destination
+                        << " of type " << data.getRelationshipType(source, destination) << endl << endl;
+                    else errorStatus = false;
                 }
                 // Remove relationship
                 else if (userChoice == "2") {
@@ -234,8 +258,41 @@ void CLI::displayCLI ()
                     if (errorStatus == false) cout << endl << "Relationship deleted between " << source << " and " << destination << endl << endl;
                     else errorStatus = false;
                 } 
-                // Go back
                 else if (userChoice == "3") {
+                    // Display all classes and relationships for user clarity
+                    displayDiagram(false, true);
+
+                    cout << "Enter the name of the source: " << endl;
+                    cin >> source;
+                    cout << "Enter the name of the destination: " << endl;
+                    cin >> destination;
+                    
+                    // Loop to grab string of type and convert into integer
+                    while (typeLoop) {
+                        typeLoop = false;
+                        cout << "Enter the new type of relationship:" << endl;
+                        cout << "[1] Aggregation" << endl;
+                        cout << "[2] Composition" << endl;
+                        cout << "[3] Generalization" << endl;
+                        cout << "[4] Realization" << endl;
+                        cin >> stringType;
+                        if (stringType == "1" || stringType == "2" || stringType == "3" || stringType == "4") {
+                            // Type is enum starting from 0, so subtract by 1
+                            type = std::stoi(stringType) - 1;
+                        }
+                        else {
+                            cout << "Invalid choice!" << endl << endl;
+                            typeLoop = true;
+                        }
+                    }
+
+                    ERR_CATCH(data.changeRelationshipType(source, destination, type));
+                    if (errorStatus == false) cout << endl << "Relationship between " << source << " and " << destination
+                        << " changed to type " << data.getRelationshipType(source, destination) << endl << endl;
+                    else errorStatus = false;
+                }
+                // Go back
+                else if (userChoice == "4") {
                     // Exits subroutine to go back to main routine
                 }
                 // Invalid choice
@@ -366,6 +423,8 @@ void CLI::displayCLI ()
     } 
 }
 
+// Displays information about classes within the diagram.
+// Has conditional booleans to optionally display attributes and relationships.
 void CLI::displayDiagram (bool displayAttribute, bool displayRelationship) 
 {
     vector<UMLClass> classes = data.getClasses();
@@ -384,6 +443,7 @@ void CLI::displayDiagram (bool displayAttribute, bool displayRelationship)
             for (UMLRelationship rel : data.getRelationshipsByClass(umlclass.getName()))
             {
                 cout << rel.getSource().getName() << " => " << rel.getDestination().getName() << endl;
+                cout << "Type: " << data.getRelationshipType(rel.getSource().getName(), rel.getDestination().getName()) << endl;
             }
         }
         // Don't cause spacing within loop if only showing classes
@@ -393,6 +453,7 @@ void CLI::displayDiagram (bool displayAttribute, bool displayRelationship)
     if (!displayAttribute && !displayRelationship && data.getClasses().size() > 0) cout << endl;
 }
 
+// Displays information about a single class with the name className.
 void CLI::displayClass (string className) 
 {
     // Grab copy of class in order to display attributes
@@ -407,8 +468,9 @@ void CLI::displayClass (string className)
     // Find relationships based on name of the class
     cout << "Relationships:" << endl;
     vector<UMLRelationship> relationshipList = data.getRelationshipsByClass(className);
-    for(UMLRelationship relationship : relationshipList)
+    for(UMLRelationship rel : relationshipList)
     {
-        cout << relationship.getSource().getName() << " => " << relationship.getDestination().getName() << endl;
+        cout << rel.getSource().getName() << " => " << rel.getDestination().getName() << endl;
+        cout << "Type: " << data.getRelationshipType(rel.getSource().getName(), rel.getDestination().getName()) << endl;
     }
 }
