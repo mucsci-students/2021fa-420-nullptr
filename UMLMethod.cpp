@@ -16,45 +16,39 @@ using std::string;
 using std::vector;
 //--------------------------------------------------------------------
 
-UMLMethod::UMLMethod(string newName, string newReturnType, vector<UMLParameter> newParam)
+UMLMethod::UMLMethod(string newName, string newReturnType, vector<string> newParam)
 :name(newName)
 ,returnType(newReturnType)
 ,param(newParam)
 {
 }
 
-string 
-UMLMethod::getName()
+string UMLMethod::getName()
 {
 	return name;
 }
 
-string
-UMLMethod::getReturnType()
+string UMLMethod::getReturnType()
 {
 	return returnType;
 }
 
-vector<UMLParameter>
-UMLMethod::getParam()
+vector<string> UMLMethod::getParam()
 {
 	return param;
 }
 
-void
-UMLMethod::setName(string newName)
+void UMLMethod::setName(string newName)
 {
 	name = newName;
 }
 
-void
-UMLMethod::setReturnType(string newReturnType)
+void UMLMethod::setReturnType(string newReturnType)
 {
 	returnType = newReturnType;
 }
 
-void
-UMLMethod::setParam(vector<UMLParameter> newParam)
+void UMLMethod::setParam(vector<string> newParam)
 {
 	param = newParam;
 }
