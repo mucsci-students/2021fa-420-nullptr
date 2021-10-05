@@ -18,7 +18,7 @@
 [2] Generalization: inheritance relationship
 [3] Realization: interface implementation relationship */
 //--------------------------------------------------------------------
-enum Type {aggregation, composition, generalization, realization};
+enum Type {aggregation, composition, generalization, realization, none};
 
 class UMLRelationship
 {
@@ -41,6 +41,8 @@ class UMLRelationship
 
 		// Grab type of relationship
 		Type getType() const;
+
+		static Type string_to_type(const std::string&);
 
 		// Set type of relationship
 		void setType(int newType);

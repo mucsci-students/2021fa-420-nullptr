@@ -103,7 +103,7 @@ void UMLData::deleteRelationship(string srcName, string destName)
 }
 
 // Returns string representation of relationship type
-string UMLData::getRelationshipType(const string& srcName, const string& destName) 
+string UMLData::getRelationshipType(const string& srcName, const string& destName)
 {
     Type type = getRelationship(srcName, destName).getType();
     switch (type) {
@@ -334,6 +334,7 @@ json UMLData::getJson()
     {
         json jsonattr;
         jsonattr = json::array();
+        //add methods and fields here
         for (UMLAttribute uattr : uclass.getAttributes())
         {
             jsonattr += { {"name", uattr.getAttributeName()} };
@@ -344,7 +345,11 @@ json UMLData::getJson()
     j["relationships"] = json::array();
     for (UMLRelationship urelationship : relationships)
     {
-        j["relationships"] += { {"source", urelationship.getSource().getName()}, {"destination", urelationship.getDestination().getName()} };
+        j["relationships"] += { 
+            {"source", urelationship.getSource().getName()}, 
+            {"destination", urelationship.getDestination().getName()},
+            {"type", getRelationshipType(urelationship.getSource().getName(), urelationship.getDestination().getName())}
+            };
     }
     
     return j;
