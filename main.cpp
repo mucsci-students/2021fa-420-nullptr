@@ -10,13 +10,17 @@
 #include "include/UMLAttribute.hpp"
 #include "include/UMLData.hpp"
 #include "server.hpp"
-#include "include/CLI.hpp"
 //--------------------------------------------------------------------
 
-int main()
+int main(int argc, char** argv)
 { 
-    umlserver::start(8080);
-    CLI newInterface;
-    newInterface.displayCLI();
+    // Parameter check to see if user wants CLI or GUI
+    if (string(argv[1]) == "--cli") {
+      CLI newInterface;
+      newInterface.displayCLI();
+    }
+    else {
+      umlserver::start(8080);
+    }
     return 0;
 };
