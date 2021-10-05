@@ -31,29 +31,23 @@ class UMLField
 	public:
 
 		// Creates a UMLField object with the constructor's parameters as its fields
-	  UMLField(string newName, string newScope, string newType);
+	        UMLField(string newName, string newScope, string newType);
 
 		// Returns the field's name
-		string 
-		getName();
+		string getName();
 
 		// Returns the field's scope
-		string 
-		getScope();
+		string getScope();
 
 		// Returns the field's type
-		string 
-		getType();
+		string getType();
 
 		// Changes the field's name to match the parameter
-		void 
-		setName(string newName);
+		void setName(string newName);
 
 		// Changes the field's scope to match the parameter
-		void 
-		setScope(string newScope);
+		void setScope(string newScope);
 
 		// Changes the field's type to match the parameter
-		void 
-		setType(string newType);
+		void setType(string newType);
 };
