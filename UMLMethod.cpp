@@ -16,7 +16,7 @@ using std::string;
 using std::vector;
 //--------------------------------------------------------------------
 
-UMLMethod::UMLMethod(string newName, string newReturnType, vector<string> newParam)
+UMLMethod::UMLMethod(string newName, string newReturnType, vector<UMLParameter> newParam)
 :name(newName)
 ,returnType(newReturnType)
 ,param(newParam)
@@ -35,7 +35,7 @@ UMLMethod::getReturnType()
 	return returnType;
 }
 
-vector<string>
+vector<UMLParameter>
 UMLMethod::getParam()
 {
 	return param;
@@ -54,7 +54,7 @@ UMLMethod::setReturnType(string newReturnType)
 }
 
 void
-UMLMethod::setParam(vector<string> newParam)
+UMLMethod::setParam(vector<UMLParameter> newParam)
 {
 	param = newParam;
 }
