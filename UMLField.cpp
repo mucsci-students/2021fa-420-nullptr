@@ -21,38 +21,32 @@ UMLField::UMLField(string newName, string newScope, string newType)
 {
 }
 
-string 
-UMLField::getName()
+string UMLField::getName()
 {
 	return name;
 }
 
-string 
-UMLField::getScope()
+string UMLField::getScope()
 {
 	return scope;
 }
 
-string 
-UMLField::getType()
+string UMLField::getType()
 {
 	return type;
 }
 
-void 
-UMLField::setName(string newName)
+void UMLField::setName(string newName)
 {
 	name = newName;
 }
 
-void 
-UMLField::setScope(string newScope)
+void UMLField::setScope(string newScope)
 {
 	scope = newScope;
 }
 
-void 
-UMLField::setType(string newType)
+void UMLField::setType(string newType)
 {
 	type = newType;
 }
