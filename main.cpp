@@ -15,12 +15,13 @@
 int main(int argc, char** argv)
 { 
     // Parameter check to see if user wants CLI or GUI
-    if (string(argv[1]) == "--cli") {
-      CLI newInterface;
-      newInterface.displayCLI();
-    }
-    else {
+    if (argc > 1) {
+        if (string(argv[1]) == "--cli") {
+          CLI newInterface;
+          newInterface.displayCLI();
+      }
+    } else {
       umlserver::start(8080);
-    }
+    }    
     return 0;
 };
