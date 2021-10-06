@@ -37,7 +37,7 @@ void UMLMethod::addParam(UMLParameter newParam)
 	param.push_back(newParam);
 }
 
-string UMLAttribute::identifier()
+string UMLMethod::identifier()
 {
 	return "method";
 }

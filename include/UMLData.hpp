@@ -90,6 +90,9 @@ class UMLData
         // Removes className class attribute by the name
         void removeClassAttribute(string className, string attributeName);
 
+        // TEMP remove from pointer
+        void removeClassAttributeP(string className, string attributeName);
+
         // Changes className class attribute by the new attribute name
         void changeAttributeName(string className, string oldAttributeName, string newAttributeName);
 

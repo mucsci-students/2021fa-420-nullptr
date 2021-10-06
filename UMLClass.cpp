@@ -47,7 +47,7 @@ void UMLClass::addAttribute(UMLAttribute newAttribute)
 	}
 	classAttributes.push_back(newAttribute); //OLD
 }
-// uh
+// TEMP
 void UMLClass::addAttributeP(UMLAttribute* newAttribute) 
 {
 	//
@@ -73,6 +73,19 @@ vector<UMLAttribute>::iterator UMLClass::deleteAttribute(string attributeName)
 	return attribute;
 }
 
+// TEMP remove attribute from pointer vector
+vector<UMLAttribute*>::iterator UMLClass::deleteAttributeP(string attributeName) 
+{
+	auto attribute = findAttributeP(attributeName);
+	// attribute not found 
+	if (attribute == classAttributesP.end()) {
+		// return empty if attribute not found
+		return classAttributesP.end();
+	}
+	classAttributesP.erase(attribute);
+	return attribute;
+}
+
 // Finds attribute within attribute vector
 vector<UMLAttribute>::iterator UMLClass::findAttribute(string attributeName) 
 {
@@ -83,6 +96,18 @@ vector<UMLAttribute>::iterator UMLClass::findAttribute(string attributeName)
 	}
 	// return empty if attribute not found
 	return classAttributes.end();
+}
+
+// TEMP finds attribute within pointer vector
+vector<UMLAttribute*>::iterator UMLClass::findAttributeP(string attributeName) 
+{
+	for (vector<UMLAttribute*>::iterator ptr = classAttributesP.begin(); ptr != classAttributesP.end(); ++ptr) {
+		if ((*ptr)->getAttributeName() == attributeName){
+			return ptr;
+		}
+	}
+	// return empty if attribute not found
+	return classAttributesP.end();
 }
 
 // OLD Returns vector of attributes 

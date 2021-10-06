@@ -14,6 +14,8 @@
 #include "UMLData.hpp"
 #include "UMLFile.hpp"
 #include "UMLMethod.hpp"
+#include "UMLField.hpp"
+#include "UMLParameter.hpp"
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -35,14 +37,22 @@ class CLI
         // Stores choice input by user, representing position within diagram
         // When an invalid input is set, reverts to its previous position
         string userChoice;
+
         // Loop boolean that maintains CLI routine
         bool mainLoop;
+
         // Loop boolean that maintains CLI subroutines
         bool subLoop;
+
         // Error check to prevent 'success' print 
         bool errorStatus;
+
         // Main UML data object storing UML stuff
         UMLData data;
+
+        //Displays fields and methods to command line
+        void listAttributes(UMLClass& c);        
+        
     public:
         // Displays command line interface
         void displayCLI();

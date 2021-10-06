@@ -53,8 +53,14 @@ class UMLClass
 		// Removes attribute from attribute vector
 		vector<UMLAttribute>::iterator deleteAttribute(string attributeName);
 
+		// TEMP remove from pointer vector
+		vector<UMLAttribute*>::iterator deleteAttributeP(string attributeName);
+
 		// Finds attribute within attribute vector
 		vector<UMLAttribute>::iterator findAttribute(string attributeName);
+
+		// TEMP find attribute within pointer vector
+		vector<UMLAttribute*>::iterator findAttributeP(string attributeName);
 
 		// OLD Returns vector of attributes 
 		vector<UMLAttribute> getAttributes() const;

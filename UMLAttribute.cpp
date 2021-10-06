@@ -44,3 +44,9 @@ void UMLAttribute::changeType(string newType)
 {
 	type = newType;
 }
+
+//
+string UMLAttribute::identifier()
+{
+	return "attribute";
+}

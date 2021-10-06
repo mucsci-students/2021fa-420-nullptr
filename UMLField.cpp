@@ -14,39 +14,12 @@
 using std::string;
 //--------------------------------------------------------------------
 
-UMLField::UMLField(string newName, string newScope, string newType)
-:name(newName)
-,scope(newScope)
-,type(newType)
+UMLField::UMLField(string newName, string newType)
+:UMLAttribute(newName, newType)
 {
 }
 
-string UMLField::getName()
+string UMLField::identifier()
 {
-	return name;
-}
-
-string UMLField::getScope()
-{
-	return scope;
-}
-
-string UMLField::getType()
-{
-	return type;
-}
-
-void UMLField::setName(string newName)
-{
-	name = newName;
-}
-
-void UMLField::setScope(string newScope)
-{
-	scope = newScope;
-}
-
-void UMLField::setType(string newType)
-{
-	type = newType;
+	return "field";
 }

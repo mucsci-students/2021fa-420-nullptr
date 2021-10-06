@@ -226,6 +226,18 @@ void UMLData::removeClassAttribute(string className, string attributeName)
         throw "Attribute does not exist";
 }
 
+// TEMP remove from pointer
+void UMLData::removeClassAttributeP(string className, string attributeName)
+{
+      for (UMLAttribute* attr : getClass(className).getAttributesP()) {
+           if (attr->getAttributeName() == attributeName){
+                getClass(className).deleteAttributeP(attributeName);
+                return;
+           }
+       }
+        throw "Attribute does not exist";
+}
+
 // Changes className class attribute by the new attribute name
 void UMLData::changeAttributeName(string className, string oldAttributeName, string newAttributeName)
 {

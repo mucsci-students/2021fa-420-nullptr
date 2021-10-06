@@ -43,6 +43,6 @@ class UMLAttribute
 		// Change type of the given attribute
 		void changeType(string newType);
         
-		// 
-		string identifier();
+		// Placeholder to identifiy what type an attribute is
+		virtual string identifier();
 };
