@@ -9,7 +9,6 @@
 #include "include/UMLData.hpp"
 #include "include/UMLClass.hpp"
 #include "include/UMLRelationship.hpp"
-#include "include/UMLAttribute.hpp"
 #include "include/UMLParameter.hpp"
 #include "include/CLI.hpp"
 
@@ -426,24 +425,6 @@ TEST(UMLRelationshipTest, GetAllTypeTest)
 
 // ****************************************************
 
-// Tests for UMLAttribute.hpp
-// **************************
-
-TEST(UMLAttributeTest, GetAttributeNameTest) 
-{
-    UMLAttribute attribute("test");
-    ASSERT_EQ(attribute.getAttributeName(), "test");
-}
-
-TEST(UMLAttributeTest, RenameAttributeNameTest) 
-{
-    UMLAttribute attribute("test");
-    attribute.changeName("test2");
-    ASSERT_EQ(attribute.getAttributeName(), "test2");
-}
-
-// ****************************************************
-
 // Tests for UMLClass.hpp
 // **************************
 
@@ -584,6 +565,25 @@ TEST(UMLParameterTest, ChangeParameterTypeTest)
     UMLParameter parameter("name","type");
     parameter.changeType("type2");
     ASSERT_EQ(parameter.getType(), "type2");
+}
+
+// ****************************************************
+
+// Tests for UMLMethod.hpp TODO and OLD
+// **************************
+
+
+TEST(UMLAttributeTest, GetAttributeNameTest) 
+{
+    UMLAttribute attribute("test");
+    ASSERT_EQ(attribute.getAttributeName(), "test");
+}
+
+TEST(UMLAttributeTest, RenameAttributeNameTest) 
+{
+    UMLAttribute attribute("test");
+    attribute.changeName("test2");
+    ASSERT_EQ(attribute.getAttributeName(), "test2");
 }
 
 // ****************************************************

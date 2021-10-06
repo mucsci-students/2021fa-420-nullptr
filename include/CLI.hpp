@@ -13,6 +13,7 @@
 #include "UMLRelationship.hpp"
 #include "UMLData.hpp"
 #include "UMLFile.hpp"
+#include "UMLMethod.hpp"
 #include <vector>
 #include <iostream>
 #include <fstream>

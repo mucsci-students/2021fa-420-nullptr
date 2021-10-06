@@ -206,6 +206,14 @@ void UMLData::addClassAttribute(string className, UMLAttribute attribute)
     getClass(className).addAttribute(attribute);
 }
 
+// X_X
+void UMLData::addClassAttributeP(string className, UMLAttribute* attribute)
+{
+  //  if (!isValidName(attribute.getAttributeName()))
+   //     throw "Attribute name is not valid";
+    getClass(className).addAttributeP(attribute);
+}
+
 // Removes className class attribute by the name
 void UMLData::removeClassAttribute(string className, string attributeName)
 {

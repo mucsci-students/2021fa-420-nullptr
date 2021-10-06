@@ -129,7 +129,7 @@ void CLI::displayCLI ()
 
                 cout << endl << "Choice: ";
                 cin >> userChoice;
-                cout << endl;
+                cout << endl << endl;
 
                 // Class and attribute name input storage
                 string className, attributeName, attributeName2;
@@ -141,12 +141,41 @@ void CLI::displayCLI ()
                    
                     cout << "Enter the name of the class: ";
                     cin >> className;
-                    cout << "Enter the name of the attribute: ";
-                    cin >> attributeName;
+                    cout << endl;
+                    
+                    bool attributeLoop = true;
+                    while (attributeLoop)
+                    {
+                        cout << "Add Method or Field:" << endl << "[1] Method" << endl << "[2] Field" << endl << endl << "Choice: ";
+                        cin >> userChoice;
+                        cout << endl;
+                        if (userChoice == "1")
+                        {
+                            cout << "Enter the name of the method: ";
+                            cin >> attributeName;
+                            cout << endl << "Enter return type: ";
+                            string returnType;
+                            cin >> returnType;
+                            ERR_CATCH(data.addClassAttributeP(className, new UMLMethod(attributeName, returnType,{}) )); //REMEMBER TO DEALLOCATE
+                            if (errorStatus == false) cout << endl << "Method " << attributeName << " added to " << className << endl << endl;
+                            else errorStatus = false;
+                            attributeLoop = false;
+                        }                       
+                        else if (userChoice == "2")
+                        {
+                            cout << "Enter the name of the attribute: ";
+                            cin >> attributeName;
+                            ERR_CATCH(data.addClassAttribute(className, attributeName)); //TODO: A FIELD ********************************************
+                            if (errorStatus == false) cout << endl << "Attribute " << attributeName << " added to " << className << endl << endl;
+                            else errorStatus = false;
+                            attributeLoop = false;
+                        }
+                        else
+                        {
+                            cout << "Invalid choice!" << endl << endl;
+                        }
+                    }
 
-                    ERR_CATCH(data.addClassAttribute(className, attributeName));
-                    if (errorStatus == false) cout << endl << "Attribute " << attributeName << " added to " << className << endl << endl;
-                    else errorStatus = false;
                 }
                 // Remove attribute
                 else if (userChoice == "2") {
@@ -456,13 +485,16 @@ void CLI::displayDiagram (bool displayAttribute, bool displayRelationship)
 // Displays information about a single class with the name className.
 void CLI::displayClass (string className) 
 {
+    //list fields first probably
+    //todo
     // Grab copy of class in order to display attributes
-    cout << "Attributes:" << endl;
+    cout << "Methods:" << endl;
     UMLClass c = data.getClassCopy(className);
-    vector<UMLAttribute> attributeList = c.getAttributes();
-    for(UMLAttribute attribute : attributeList)
+    vector<UMLAttribute*> attributeList = c.getAttributesP();
+    for(UMLAttribute* attribute : attributeList)
     {
-        cout << attribute.getAttributeName() << endl;
+        cout << attribute->getType() << " " << attribute->getAttributeName() << endl;
+        //TO ADD: print parameters
     }
 
     // Find relationships based on name of the class

@@ -45,7 +45,13 @@ void UMLClass::addAttribute(UMLAttribute newAttribute)
 		if(attribute.getAttributeName() == newAttribute.getAttributeName())
 			throw "No duplicate attributes";
 	}
-	classAttributes.push_back(newAttribute);
+	classAttributes.push_back(newAttribute); //OLD
+}
+// uh
+void UMLClass::addAttributeP(UMLAttribute* newAttribute) 
+{
+	//
+	classAttributesP.push_back(newAttribute); //NEW POINTER VECTOR
 }
 
 // Changes name of attribute within class
@@ -79,8 +85,14 @@ vector<UMLAttribute>::iterator UMLClass::findAttribute(string attributeName)
 	return classAttributes.end();
 }
 
-// Returns vector of attributes 
+// OLD Returns vector of attributes 
 vector<UMLAttribute> UMLClass::getAttributes() const
 {
 	return classAttributes;
+}
+
+// Returns vector pointer of attributes 
+vector<UMLAttribute*> UMLClass::getAttributesP() const
+{
+	return classAttributesP;
 }

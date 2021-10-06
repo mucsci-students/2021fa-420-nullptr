@@ -20,16 +20,29 @@ class UMLAttribute
 {
 	private:
 		// Name of attribute
-		string attributeName;
+		string name;
+
+		// Type of attribute
+		string type;
 
 	public:
 		// Constructor for attribute objects
-		UMLAttribute(string newAttribute);
+		UMLAttribute(string newName);
+
+		UMLAttribute(string newName, string newType);
 
 		// Grab name of the given attribute
 		string getAttributeName() const;
 
 		// Change name of the given attribute
-		void changeName(string newAttributeName);
+		void changeName(string newName);
 
+		// Grab type of the given attribute
+		string getType() const;
+
+		// Change type of the given attribute
+		void changeType(string newType);
+        
+		// 
+		string identifier();
 };
