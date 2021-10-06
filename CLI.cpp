@@ -588,6 +588,7 @@ void CLI::listAttributes(UMLClass& c)
                 if(i++ != test->getParam().end())
                     cout << ", ";
             }*/
+            
         }
     }
     cout << endl;
