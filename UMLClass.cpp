@@ -12,6 +12,7 @@
 UMLClass::UMLClass(string newClass) 
 :className(newClass)
 {
+	std::cout << "creating"  << newClass << std::endl;
 }
 
 // Constructor for class object with attributes
@@ -48,7 +49,7 @@ void UMLClass::addAttribute(UMLAttribute newAttribute)
 	classAttributes.push_back(newAttribute); //OLD
 }
 // TEMP
-void UMLClass::addAttributeP(UMLAttribute* newAttribute) 
+void UMLClass::addAttributeP(std::shared_ptr<UMLAttribute> newAttribute) 
 {
 	//
 	classAttributesP.push_back(newAttribute); //NEW POINTER VECTOR
@@ -74,16 +75,16 @@ vector<UMLAttribute>::iterator UMLClass::deleteAttribute(string attributeName)
 }
 
 // TEMP remove attribute from pointer vector
-vector<UMLAttribute*>::iterator UMLClass::deleteAttributeP(string attributeName) 
+void UMLClass::deleteAttributeP(string attributeName) 
 {
-	auto attribute = findAttributeP(attributeName);
-	// attribute not found 
-	if (attribute == classAttributesP.end()) {
-		// return empty if attribute not found
-		return classAttributesP.end();
+	int loc = findAttributeP(attributeName);
+	if (loc < 0)
+	{
+		throw "attriubte not found";
 	}
-	classAttributesP.erase(attribute);
-	return attribute;
+
+	classAttributesP.erase(classAttributesP.begin() + loc);
+
 }
 
 // Finds attribute within attribute vector
@@ -99,15 +100,27 @@ vector<UMLAttribute>::iterator UMLClass::findAttribute(string attributeName)
 }
 
 // TEMP finds attribute within pointer vector
-vector<UMLAttribute*>::iterator UMLClass::findAttributeP(string attributeName) 
+int UMLClass::findAttributeP(string attributeName) 
 {
-	for (vector<UMLAttribute*>::iterator ptr = classAttributesP.begin(); ptr != classAttributesP.end(); ++ptr) {
-		if ((*ptr)->getAttributeName() == attributeName){
-			return ptr;
+	for (int i = 0; i < classAttributesP.size(); ++i) {
+		if (classAttributesP[i]->getAttributeName() == attributeName){
+			return i;
 		}
 	}
 	// return empty if attribute not found
-	return classAttributesP.end();
+	return -1;
+}
+
+std::shared_ptr<UMLAttribute> UMLClass::getAttribute(string attributeName)
+{
+	int loc = findAttributeP(attributeName);
+	if (loc < 0)
+	{
+		throw "attribute not found";
+	}
+
+	return classAttributesP[loc];
+	
 }
 
 // OLD Returns vector of attributes 
@@ -117,7 +130,7 @@ vector<UMLAttribute> UMLClass::getAttributes() const
 }
 
 // Returns vector pointer of attributes 
-vector<UMLAttribute*> UMLClass::getAttributesP() const
+vector<std::shared_ptr<UMLAttribute>> UMLClass::getAttributesP() const
 {
 	return classAttributesP;
 }

@@ -52,7 +52,7 @@ namespace umlserver
         svr.Get("/add/relationship", [&](const httplib::Request& req, httplib::Response& res) {
             std::string source = req.params.find("source")->second;
             std::string dest = req.params.find("dest")->second;
-            std::string type = req.params.find("type")->second;
+            std::string type = req.params.find("reltype")->second;
             ERR_ADD(data.addRelationship(source, dest, std::stoi(type)));
             res.set_redirect("/");
          });

@@ -207,7 +207,7 @@ void UMLData::addClassAttribute(string className, UMLAttribute attribute)
 }
 
 // X_X
-void UMLData::addClassAttributeP(string className, UMLAttribute* attribute)
+void UMLData::addClassAttributeP(string className, std::shared_ptr<UMLAttribute> attribute)
 {
   //  if (!isValidName(attribute.getAttributeName()))
    //     throw "Attribute name is not valid";
@@ -229,7 +229,7 @@ void UMLData::removeClassAttribute(string className, string attributeName)
 // TEMP remove from pointer
 void UMLData::removeClassAttributeP(string className, string attributeName)
 {
-      for (UMLAttribute* attr : getClass(className).getAttributesP()) {
+      for (std::shared_ptr<UMLAttribute> attr : getClass(className).getAttributesP()) {
            if (attr->getAttributeName() == attributeName){
                 getClass(className).deleteAttributeP(attributeName);
                 return;
@@ -350,6 +350,7 @@ json UMLData::getJson()
 {
     json j;
     j["classes"] = json::array();
+    std::cout << "adding classes" << std::endl;
     for (UMLClass uclass : classes)
     {
         json jsonattr;
@@ -361,16 +362,20 @@ json UMLData::getJson()
         } 
           j["classes"] += { {"name", uclass.getName()}, {"attributes", jsonattr} };
     }
-
+    std::cout << "adding relationships" << std::endl;
     j["relationships"] = json::array();
     for (UMLRelationship urelationship : relationships)
     {
+        std::cout << "size: " << relationships.size() << std::endl;
+        std::cout << "adding" << urelationship.getSource().getName() << " <-> " << std::endl;
         j["relationships"] += { 
             {"source", urelationship.getSource().getName()}, 
             {"destination", urelationship.getDestination().getName()},
             {"type", getRelationshipType(urelationship.getSource().getName(), urelationship.getDestination().getName())}
             };
     }
+
+    std::cout << "done adding ships" << std::endl;
     
     return j;
 }

@@ -5,6 +5,7 @@
 
 /************************************************************/
 // Catch for functions to protect from invalid inputs
+#include <memory>
 #define ERR_CATCH(fun)                           \
     try {                                        \
         fun;                                     \
@@ -158,7 +159,7 @@ void CLI::displayCLI ()
                             cout << endl << "Enter type: ";
                             string type;
                             cin >> type;
-                            ERR_CATCH(data.addClassAttributeP(className, new UMLField(attributeName, type) ));
+                            ERR_CATCH(data.addClassAttributeP(className, std::make_shared<UMLField>(attributeName, type)));
                             if (errorStatus == false) cout << endl << "Field " << attributeName << " added to " << className << endl << endl;
                             else errorStatus = false;
                             attributeLoop = false;
@@ -223,7 +224,7 @@ void CLI::displayCLI ()
                                     cout << endl << "Invalid choice!" << endl;
                             }
                             
-                            ERR_CATCH(data.addClassAttributeP(className, new UMLMethod(attributeName, returnType, paramList) )); //REMEMBER TO DEALLOCATE
+                            ERR_CATCH(data.addClassAttributeP(className, std::make_shared<UMLMethod>(attributeName, returnType, paramList) )); //REMEMBER TO DEALLOCATE
                             if (errorStatus == false) cout << endl << "Method " << attributeName << " added to " << className << endl << endl;
                             else errorStatus = false;
                             attributeLoop = false;
@@ -560,10 +561,9 @@ void CLI::displayClass (string className)
 // Private method to display fields and methods to command line
 void CLI::listAttributes(UMLClass& c)
 {
-    vector<UMLAttribute*> attributeList = c.getAttributesP();
     //list Fields first
     cout <<  "Fields:" << endl;
-    for(UMLAttribute* attribute : attributeList)
+    for(auto attribute : c.getAttributesP())
     {
         if(attribute->identifier() == "field")
             cout << attribute->getType() << " " << attribute->getAttributeName() << endl;
@@ -573,7 +573,7 @@ void CLI::listAttributes(UMLClass& c)
     // List methods
     cout << "Methods:" << endl;
     
-    for(UMLAttribute* attribute : attributeList)
+    for(auto attribute : c.getAttributesP())
     {
         if(attribute->identifier() == "method")
         {

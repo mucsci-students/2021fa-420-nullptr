@@ -11,6 +11,7 @@
 #include <iostream>
 #include <vector>
 #include <stdexcept>
+#include <memory>
 #include "UMLAttribute.hpp"
 //--------------------------------------------------------------------
 
@@ -26,7 +27,7 @@ class UMLClass
 		// Name of class and a vector of all of its attributes as objects
 		string className;
 		vector<UMLAttribute> classAttributes; //OLD
-		vector<UMLAttribute*> classAttributesP;
+		vector<std::shared_ptr<UMLAttribute>> classAttributesP;
 
 	public:
 		// Constructor for class object without attributes
@@ -45,7 +46,7 @@ class UMLClass
 		void addAttribute(UMLAttribute newAttribute);
 
 		// temp
-        void addAttributeP(UMLAttribute* newAttribute);
+        void addAttributeP(std::shared_ptr<UMLAttribute> newAttribute);
 
 		// Changes name of attribute within class
 		void changeAttributeName(string oldAttributeName, string newAttributeName);
@@ -54,17 +55,19 @@ class UMLClass
 		vector<UMLAttribute>::iterator deleteAttribute(string attributeName);
 
 		// TEMP remove from pointer vector
-		vector<UMLAttribute*>::iterator deleteAttributeP(string attributeName);
+		void deleteAttributeP(string attributeName);
 
 		// Finds attribute within attribute vector
 		vector<UMLAttribute>::iterator findAttribute(string attributeName);
 
 		// TEMP find attribute within pointer vector
-		vector<UMLAttribute*>::iterator findAttributeP(string attributeName);
+		int findAttributeP(string attributeName);
+
+		std::shared_ptr<UMLAttribute> getAttribute(string attributeName); 
 
 		// OLD Returns vector of attributes 
 		vector<UMLAttribute> getAttributes() const;
 
 		// Returns vector pointer of attributes 
-		vector<UMLAttribute*> getAttributesP() const;
+		vector<std::shared_ptr<UMLAttribute>> getAttributesP() const;
 };
