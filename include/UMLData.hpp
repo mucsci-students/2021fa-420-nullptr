@@ -84,8 +84,14 @@ class UMLData
         // Adds class attribute to specified className
         void addClassAttribute(string className, UMLAttribute attribute);
 
+        // temp
+        void addClassAttributeP(string className, UMLAttribute* attribute);
+
         // Removes className class attribute by the name
         void removeClassAttribute(string className, string attributeName);
+
+        // TEMP remove from pointer
+        void removeClassAttributeP(string className, string attributeName);
 
         // Changes className class attribute by the new attribute name
         void changeAttributeName(string className, string oldAttributeName, string newAttributeName);

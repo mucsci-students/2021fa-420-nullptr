@@ -94,6 +94,17 @@ namespace umlserver
             res.set_redirect("/");
         });
 
+
+         svr.Get("/index", [&](const httplib::Request& req, httplib::Response& res) {
+            inja::Environment env;
+            inja::Template temp = env.parse_template("../templates/index.html");
+            json j = data.getJson();
+            j["errors"] = errors;
+            errors.clear();
+            res.set_content(env.render(temp, j), "text/html");
+        });
+
+
         std::cout << "running at http:://localhost:8080/" << std::endl;
 
         svr.listen("localhost", port);

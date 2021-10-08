@@ -45,7 +45,13 @@ void UMLClass::addAttribute(UMLAttribute newAttribute)
 		if(attribute.getAttributeName() == newAttribute.getAttributeName())
 			throw "No duplicate attributes";
 	}
-	classAttributes.push_back(newAttribute);
+	classAttributes.push_back(newAttribute); //OLD
+}
+// TEMP
+void UMLClass::addAttributeP(UMLAttribute* newAttribute) 
+{
+	//
+	classAttributesP.push_back(newAttribute); //NEW POINTER VECTOR
 }
 
 // Changes name of attribute within class
@@ -67,6 +73,19 @@ vector<UMLAttribute>::iterator UMLClass::deleteAttribute(string attributeName)
 	return attribute;
 }
 
+// TEMP remove attribute from pointer vector
+vector<UMLAttribute*>::iterator UMLClass::deleteAttributeP(string attributeName) 
+{
+	auto attribute = findAttributeP(attributeName);
+	// attribute not found 
+	if (attribute == classAttributesP.end()) {
+		// return empty if attribute not found
+		return classAttributesP.end();
+	}
+	classAttributesP.erase(attribute);
+	return attribute;
+}
+
 // Finds attribute within attribute vector
 vector<UMLAttribute>::iterator UMLClass::findAttribute(string attributeName) 
 {
@@ -79,8 +98,26 @@ vector<UMLAttribute>::iterator UMLClass::findAttribute(string attributeName)
 	return classAttributes.end();
 }
 
-// Returns vector of attributes 
+// TEMP finds attribute within pointer vector
+vector<UMLAttribute*>::iterator UMLClass::findAttributeP(string attributeName) 
+{
+	for (vector<UMLAttribute*>::iterator ptr = classAttributesP.begin(); ptr != classAttributesP.end(); ++ptr) {
+		if ((*ptr)->getAttributeName() == attributeName){
+			return ptr;
+		}
+	}
+	// return empty if attribute not found
+	return classAttributesP.end();
+}
+
+// OLD Returns vector of attributes 
 vector<UMLAttribute> UMLClass::getAttributes() const
 {
 	return classAttributes;
+}
+
+// Returns vector pointer of attributes 
+vector<UMLAttribute*> UMLClass::getAttributesP() const
+{
+	return classAttributesP;
 }

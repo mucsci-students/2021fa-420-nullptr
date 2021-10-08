@@ -206,12 +206,32 @@ void UMLData::addClassAttribute(string className, UMLAttribute attribute)
     getClass(className).addAttribute(attribute);
 }
 
+// X_X
+void UMLData::addClassAttributeP(string className, UMLAttribute* attribute)
+{
+  //  if (!isValidName(attribute.getAttributeName()))
+   //     throw "Attribute name is not valid";
+    getClass(className).addAttributeP(attribute);
+}
+
 // Removes className class attribute by the name
 void UMLData::removeClassAttribute(string className, string attributeName)
 {
       for (UMLAttribute attr : getClass(className).getAttributes()) {
            if (attr.getAttributeName() == attributeName){
                 getClass(className).deleteAttribute(attributeName);
+                return;
+           }
+       }
+        throw "Attribute does not exist";
+}
+
+// TEMP remove from pointer
+void UMLData::removeClassAttributeP(string className, string attributeName)
+{
+      for (UMLAttribute* attr : getClass(className).getAttributesP()) {
+           if (attr->getAttributeName() == attributeName){
+                getClass(className).deleteAttributeP(attributeName);
                 return;
            }
        }

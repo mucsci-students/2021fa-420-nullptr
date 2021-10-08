@@ -25,7 +25,8 @@ class UMLClass
 	private:
 		// Name of class and a vector of all of its attributes as objects
 		string className;
-		vector<UMLAttribute> classAttributes;
+		vector<UMLAttribute> classAttributes; //OLD
+		vector<UMLAttribute*> classAttributesP;
 
 	public:
 		// Constructor for class object without attributes
@@ -43,15 +44,27 @@ class UMLClass
 		// Adds attribute to attribute vector
 		void addAttribute(UMLAttribute newAttribute);
 
+		// temp
+        void addAttributeP(UMLAttribute* newAttribute);
+
 		// Changes name of attribute within class
 		void changeAttributeName(string oldAttributeName, string newAttributeName);
 
 		// Removes attribute from attribute vector
 		vector<UMLAttribute>::iterator deleteAttribute(string attributeName);
 
+		// TEMP remove from pointer vector
+		vector<UMLAttribute*>::iterator deleteAttributeP(string attributeName);
+
 		// Finds attribute within attribute vector
 		vector<UMLAttribute>::iterator findAttribute(string attributeName);
 
-		// Returns vector of attributes 
+		// TEMP find attribute within pointer vector
+		vector<UMLAttribute*>::iterator findAttributeP(string attributeName);
+
+		// OLD Returns vector of attributes 
 		vector<UMLAttribute> getAttributes() const;
+
+		// Returns vector pointer of attributes 
+		vector<UMLAttribute*> getAttributesP() const;
 };

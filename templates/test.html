@@ -32,7 +32,7 @@
             <input type="submit" value="add relationship">
         </form>
         {% for relationship in relationships %}
-            <p>{{relationship.source}} -> {{relationship.destination}} 
+            <p>{{relationship.source}} -> {{relationship.destination}} type: {{relationship.type}}
                 <a href="/delete/relationship/{{relationship.source}}/{{relationship.destination}}">delete</a></p>
         {% endfor %}
         <h1>File:</h1>

@@ -124,12 +124,12 @@ void CLI::displayCLI ()
                 cout << "Choose an option:" << endl;
                 cout << "[1] Add" << endl;
                 cout << "[2] Remove" << endl;
-                cout << "[3] Rename" << endl;
+                cout << "[3] Change" << endl;
                 cout << "[4] Back" << endl;
 
                 cout << endl << "Choice: ";
                 cin >> userChoice;
-                cout << endl;
+                cout << endl << endl;
 
                 // Class and attribute name input storage
                 string className, attributeName, attributeName2;
@@ -141,12 +141,101 @@ void CLI::displayCLI ()
                    
                     cout << "Enter the name of the class: ";
                     cin >> className;
-                    cout << "Enter the name of the attribute: ";
-                    cin >> attributeName;
+                    cout << endl;
+                    
+                    // Allow user to choose between a Method or a Field
+                    bool attributeLoop = true;
+                    while (attributeLoop)
+                    {
+                        cout << "Add Method or Field:" << endl << "[1] Field" << endl << "[2] Method" << endl << endl << "Choice: ";
+                        cin >> userChoice;
+                        cout << endl;
+                        // User chooses to add a field                     
+                        if (userChoice == "1")
+                        {
+                            cout << "Enter the name of the field: ";
+                            cin >> attributeName;
+                            cout << endl << "Enter type: ";
+                            string type;
+                            cin >> type;
+                            ERR_CATCH(data.addClassAttributeP(className, new UMLField(attributeName, type) ));
+                            if (errorStatus == false) cout << endl << "Field " << attributeName << " added to " << className << endl << endl;
+                            else errorStatus = false;
+                            attributeLoop = false;
+                        }
 
-                    ERR_CATCH(data.addClassAttribute(className, attributeName));
-                    if (errorStatus == false) cout << endl << "Attribute " << attributeName << " added to " << className << endl << endl;
-                    else errorStatus = false;
+                        //User chooses to add a method
+                        else if (userChoice == "2")
+                        {
+                            cout << "Enter the name of the method: ";
+                            cin >> attributeName;
+                            cout << endl << "Enter return type: ";
+                            string returnType;
+                            cin >> returnType;
+                            // Promt user to enter as many parameters as they want
+                            bool paramLoop = true;
+                            vector<UMLParameter> paramList = {};
+                            string userChoice2;
+                            // First loop to check for correct input
+                            while(paramLoop)
+                            {
+                                cout << endl << "Add parameter? (y/n): ";
+                                cin >> userChoice2;
+                                // Add the parameters
+                                if(userChoice2 == "y" || userChoice2 == "Y")
+                                {
+                                    string paramName;
+                                    string paramType;
+                                    // Second loop to allow for unlimited parameters
+                                    while(paramLoop)
+                                    {
+                                        cout << endl << "Enter parameter name: ";
+                                        cin >> paramName;
+                                        cout << endl << "Enter parameter type: ";
+                                        cin >> paramType;
+                                        paramList.push_back( UMLParameter(paramName, paramType) );
+                                        // Loop to check user input
+                                        bool paramLoop2 = true;
+                                        while(paramLoop2)
+                                        {
+                                            cout << endl << "Add more? (y/n): ";
+                                            cin >> userChoice2;
+                                            // Add parameter again
+                                            if(userChoice2 == "y" || userChoice2 == "Y")
+                                                paramLoop2 = false;
+                                            // Exit add parameter loop
+                                            else if(userChoice2 == "n" || userChoice2 == "N")
+                                            {
+                                                paramLoop = false;
+                                                paramLoop2 = false;
+                                            }
+                                            // Invalid input, enter again
+                                            else
+                                                cout << endl << "Invalid choice!" << endl;
+                                        }
+                                    }
+                                }
+                                // Do not add the parameters
+                                else if(userChoice2 == "n" || userChoice2 == "N")
+                                    paramLoop = false;
+                                // Enter input again
+                                else
+                                    cout << endl << "Invalid choice!" << endl;
+                            }
+                            
+                            ERR_CATCH(data.addClassAttributeP(className, new UMLMethod(attributeName, returnType, paramList) )); //REMEMBER TO DEALLOCATE
+                            if (errorStatus == false) cout << endl << "Method " << attributeName << " added to " << className << endl << endl;
+                            else errorStatus = false;
+                            attributeLoop = false;
+                        }  
+
+                        //Redo loop if invalid option entered
+                        else
+                        {
+                            cout << "Invalid choice!" << endl << endl;
+                        }
+                    }
+
                 }
                 // Remove attribute
                 else if (userChoice == "2") {
@@ -158,11 +247,11 @@ void CLI::displayCLI ()
                     cout << "Enter the name of the attribute: ";
                     cin >> attributeName;
 
-                    ERR_CATCH(data.removeClassAttribute(className, attributeName));
+                    ERR_CATCH(data.removeClassAttributeP(className, attributeName));
                     if (errorStatus == false) cout << endl << "Attribute " << attributeName << " removed from " << className << endl << endl;
                     else errorStatus = false;
                 } 
-                // Rename attribute
+                // Change attribute type and name or parameter
                 else if (userChoice == "3") {
                     // Display all classes and attributes for user clarity
                     displayDiagram(true, false);
@@ -432,11 +521,7 @@ void CLI::displayDiagram (bool displayAttribute, bool displayRelationship)
     for (UMLClass umlclass : classes) {
         cout << umlclass.getName() << endl;
         if (displayAttribute) {
-            cout << "Attributes:" << endl;
-            for (UMLAttribute attr : data.getClassAttributes(umlclass.getName()))
-            {
-                cout << attr.getAttributeName() << endl;
-            }
+            listAttributes(umlclass);
         }
         if (displayRelationship) {
             cout << "Relationships:" << endl;
@@ -457,13 +542,9 @@ void CLI::displayDiagram (bool displayAttribute, bool displayRelationship)
 void CLI::displayClass (string className) 
 {
     // Grab copy of class in order to display attributes
-    cout << "Attributes:" << endl;
     UMLClass c = data.getClassCopy(className);
-    vector<UMLAttribute> attributeList = c.getAttributes();
-    for(UMLAttribute attribute : attributeList)
-    {
-        cout << attribute.getAttributeName() << endl;
-    }
+    
+    listAttributes(c);
 
     // Find relationships based on name of the class
     cout << "Relationships:" << endl;
@@ -473,4 +554,42 @@ void CLI::displayClass (string className)
         cout << rel.getSource().getName() << " => " << rel.getDestination().getName() << endl;
         cout << "Type: " << data.getRelationshipType(rel.getSource().getName(), rel.getDestination().getName()) << endl;
     }
+}
+
+// *********PRIVATE METHODS*********
+// Private method to display fields and methods to command line
+void CLI::listAttributes(UMLClass& c)
+{
+    vector<UMLAttribute*> attributeList = c.getAttributesP();
+    //list Fields first
+    cout <<  "Fields:" << endl;
+    for(UMLAttribute* attribute : attributeList)
+    {
+        if(attribute->identifier() == "field")
+            cout << attribute->getType() << " " << attribute->getAttributeName() << endl;
+    }
+    cout << endl;
+    
+    // List methods
+    cout << "Methods:" << endl;
+    
+    for(UMLAttribute* attribute : attributeList)
+    {
+        if(attribute->identifier() == "method")
+        {
+            cout << attribute->getType() << " " << attribute->getAttributeName() << endl;
+            cout << "Param: ";
+            // Get and print parameters TODO
+            /*
+            if(UMLMethod* test = dynamic_cast<UMLMethod*>(attribute))
+            for(vector<UMLParameter>::iterator i = test->getParam().begin(); i != test->getParam().end(); ++i)
+            {
+                cout << i->getType() << " " << i->getName();
+                if(i++ != test->getParam().end())
+                    cout << ", ";
+            }*/
+            
+        }
+    }
+    cout << endl;
 }
