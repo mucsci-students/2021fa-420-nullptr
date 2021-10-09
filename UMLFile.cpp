@@ -7,7 +7,12 @@
 // System includes
 #include "include/UMLFile.hpp"
 #include "include/UMLAttribute.hpp"
+#include "include/UMLMethod.hpp"
+#include "include/UMLParameter.hpp"
 #include "include/UMLRelationship.hpp"
+#include "include/UMLField.hpp"
+
+#include <memory>
 //--------------------------------------------------------------------
 
 // constructor: takes in the name of the file to save
@@ -49,11 +54,18 @@ void UMLFile::addClasses(UMLData& data, const json& j)
     {
         std::string className = umlclass["name"];
         data.addClass(className);
-        //change for fields and methods
-        for (auto attribute : umlclass["attributes"])
+
+        for (auto field : umlclass["fields"])
         {
-            UMLAttribute attr(attribute["name"]);
-            data.addClassAttribute(className, attr);
+            data.addClassAttribute(className, std::make_shared<UMLField>(field["name"], field["type"]));
+        }
+        for (auto method : umlclass["methods"])
+        {
+            std::vector<UMLParameter> params;
+            for (auto param : method["params"])
+                params.push_back(UMLParameter(param["name"], param["type"]));
+
+            data.addClassAttribute(className, std::make_shared<UMLMethod>(method["name"], method["return_type"], params));
         }
     }
 }
@@ -67,3 +79,4 @@ void UMLFile::addRelationships(UMLData& data, const json& j)
         UMLRelationship::string_to_type(relationship["type"]));
     }
 }
+
