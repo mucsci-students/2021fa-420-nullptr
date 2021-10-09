@@ -23,7 +23,7 @@ void UMLFile::save(UMLData& data)
 
     std::ofstream file;
     file.open(path);
-    file << j;
+    file << j.dump(2);
     file.close();
 }
 
