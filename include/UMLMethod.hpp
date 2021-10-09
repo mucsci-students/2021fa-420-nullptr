@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include "UMLParameter.hpp"
+#include "UMLAttribute.hpp"
 // --------------------------------------------------------------------
 
 // --------------------------------------------------------------------
@@ -18,15 +19,9 @@ using std::string;
 using std::vector;
 // --------------------------------------------------------------------
 
-class UMLMethod
+class UMLMethod : public UMLAttribute
 {
 	private:
-
-		// Name of method
-		string name;
-
-		// Type of the returned value
-		string returnType;
 
 		// List of parameters for the method
 		vector<UMLParameter> param;
@@ -34,29 +29,17 @@ class UMLMethod
 	public:
 
 		// Creates a UMLMethod object with the constructor's parameters as its fields
-		UMLMethod(string newName, string newReturnType, vector<UMLParameter> newParam);
-
-		// Returns the method's name
-		string 
-		getName();
-
-		// Returns the method's return type
-		string
-		getReturnType();
+		UMLMethod(string newName, string newType, vector<UMLParameter> newParam);
 
 		// Returns a list of all of the method's parameters
-		vector<UMLParameter>
-		getParam();
-
-		// Changes the method's name to match the parameter
-		void
-		setName(string newName);
-
-		// Changes the method's return type to match the parameter
-		void
-		setReturnType(string newReturnType);
+		vector<UMLParameter> getParam();
 
 		// Changes the list of the method's parameters to match the parameter
-		void
-		setParam(vector<UMLParameter> newParam);
+		void setParam(vector<UMLParameter> newParam);
+
+		// Adds a parameter to the list of parameters
+		void addParam(UMLParameter newParam);
+
+		// Identifies this attribute as a method
+		string identifier();
 };

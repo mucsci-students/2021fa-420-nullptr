@@ -29,10 +29,16 @@
             <input type="text" id="source" name="source">
             <label for="cname">Destination:</label>
             <input type="text" id="dest" name="dest">
+            <select name="reltype" id="reltype">
+                <option value="0">aggregation</option>
+                <option value="1">composition</option>
+                <option value="2">generalization</option>
+                <option value="3">realization</option>
+            </select>
             <input type="submit" value="add relationship">
         </form>
         {% for relationship in relationships %}
-            <p>{{relationship.source}} -> {{relationship.destination}} 
+            <p>{{relationship.source}} -> {{relationship.destination}} type: {{relationship.type}}
                 <a href="/delete/relationship/{{relationship.source}}/{{relationship.destination}}">delete</a></p>
         {% endfor %}
         <h1>File:</h1>

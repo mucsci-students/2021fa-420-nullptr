@@ -35,21 +35,18 @@ class UMLFile
         UMLFile(const string&);
 
         // saving file
-        void save(const UMLData& data);
+        void save(UMLData& data);
 
         // loads a system file and returns a UML data object
         UMLData load();  
 
     private:
-        // takes in vector of classes and adds a json string to the jsonFile
-        void addUMLClassVec(const vector<UMLClass>& umlclasses);
-
-        // takes in vector of relationships and adds them to the jsonFile
-        void addUMLRelationshipVec(const vector<UMLRelationship>& relationships);
-
-        // gets the classes from the json file and returns classes vector
+         // gets the classes from the json file and adds them to the UMLData object
         vector<UMLClass> getUMLClassVec();
+        void addClasses(UMLData& data, const json& j);
+         // gets the relationships from the json file and adds them to the UMLData object
+        void addRelationships(UMLData& data, const json& j);
         
-        // gets the relationships from the json file and adds them to the UMLData object
-        void getUMLRelationshipVec(UMLData& data);
+        
+       
 };

@@ -16,39 +16,33 @@ using std::string;
 using std::vector;
 //--------------------------------------------------------------------
 
-UMLMethod::UMLMethod(string newName, string newReturnType, vector<UMLParameter> newParam)
-:name(newName)
-,returnType(newReturnType)
+// Creates a UMLMethod object with the constructor's parameters as its fields
+UMLMethod::UMLMethod(string newName, string newType, vector<UMLParameter> newParam)
+:UMLAttribute(newName, newType)
 ,param(newParam)
 {
 }
 
-string UMLMethod::getName()
-{
-	return name;
-}
-
-string UMLMethod::getReturnType()
-{
-	return returnType;
-}
-
+// Returns a list of all of the method's parameters
 vector<UMLParameter> UMLMethod::getParam()
 {
 	return param;
 }
 
-void UMLMethod::setName(string newName)
-{
-	name = newName;
-}
-
-void UMLMethod::setReturnType(string newReturnType)
-{
-	returnType = newReturnType;
-}
-
+// Changes the list of the method's parameters to match the parameter
 void UMLMethod::setParam(vector<UMLParameter> newParam)
 {
 	param = newParam;
+}
+
+// Adds a parameter to the list of parameters
+void UMLMethod::addParam(UMLParameter newParam)
+{
+	param.push_back(newParam);
+}
+
+// Identifies this attribute as a method
+string UMLMethod::identifier()
+{
+	return "method";
 }

@@ -8,6 +8,7 @@
 // --------------------------------------------------------------------
 //  System includes
 #include <string>
+#include "UMLAttribute.hpp"
 // --------------------------------------------------------------------
 
 // --------------------------------------------------------------------
@@ -15,39 +16,17 @@
 using std::string;
 // --------------------------------------------------------------------
 
-class UMLField
+class UMLField : public UMLAttribute
 {
-  private:
-    
-		// Name of field
-		string name;
+	private:
+		
+		// No private methods
 
-		// Scope of field
-		string scope;
-
-		// Type of field
-		string type;
-		  
 	public:
 
 		// Creates a UMLField object with the constructor's parameters as its fields
-	        UMLField(string newName, string newScope, string newType);
+		UMLField(string newName, string newType);
 
-		// Returns the field's name
-		string getName();
-
-		// Returns the field's scope
-		string getScope();
-
-		// Returns the field's type
-		string getType();
-
-		// Changes the field's name to match the parameter
-		void setName(string newName);
-
-		// Changes the field's scope to match the parameter
-		void setScope(string newScope);
-
-		// Changes the field's type to match the parameter
-		void setType(string newType);
+		// Identifies this attribute as a field
+		string identifier();
 };

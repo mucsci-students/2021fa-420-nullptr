@@ -7,6 +7,8 @@
 // System includes
 #include "include/UMLFile.hpp"
 #include "include/UMLRelationship.hpp"
+#include <algorithm>
+#include <list>
 //--------------------------------------------------------------------
 
 // Empty constructor
@@ -17,14 +19,14 @@ UMLData::UMLData()
 // Constructor that takes in vector of classes 
 UMLData::UMLData(const vector<UMLClass>& vclass)
 {
-    for (UMLClass uclass : vclass )
+    for (UMLClass uclass : vclass)
     {
         addClass(uclass);
     }
 }
 
 // Returns vector of all classes
-vector<UMLClass> UMLData::getClasses() const
+std::list<UMLClass> UMLData::getClasses() const
 {
     return classes;
 }
@@ -45,8 +47,7 @@ vector<UMLRelationship> UMLData::getRelationships() const
 void UMLData::addClass(const UMLClass& classIn)
 {
     //check if already exists
-    int loc = findClass(classIn.getName());
-    if (loc >= 0)
+    if (doesClassExist(classIn))
         throw "Class name already exists";
     if (!isValidName(classIn.getName()))
         throw "Class name not valid";
@@ -103,7 +104,7 @@ void UMLData::deleteRelationship(string srcName, string destName)
 }
 
 // Returns string representation of relationship type
-string UMLData::getRelationshipType(const string& srcName, const string& destName) 
+string UMLData::getRelationshipType(const string& srcName, const string& destName)
 {
     Type type = getRelationship(srcName, destName).getType();
     switch (type) {
@@ -166,8 +167,7 @@ UMLRelationship& UMLData::getRelationship(string srcName, string destName)
 // Deletes a class by string in the classes vector
 void UMLData::deleteClass(string name)
 {
-    int loc = findClass(name);
-    if (loc < 0)
+    if (!doesClassExist(name))
         throw "Class not found";
     
     //delete relationships associated with class
@@ -179,21 +179,23 @@ void UMLData::deleteClass(string name)
     }
 
     //remove class
-    classes.erase(classes.begin() + loc);
+    classes.erase(findClass(name));
 }
 
 // Changes class name from old name and new name
 void UMLData::changeClassName(string oldName, string newName)
 {
-    if (findClass(newName) >= 0)
+    //change class name
+    if (doesClassExist(newName))
         throw "Class name already exists";
     if (!isValidName(newName))
         throw "New class name is not valid";
     getClass(oldName).changeName(newName);
+    //change name in relationship
 }
 
 // Gets class attributes for a className class and returns them in a vector
-vector<UMLAttribute> UMLData::getClassAttributes(string className)
+vector<std::shared_ptr<UMLAttribute>> UMLData::getClassAttributes(string className)
 {
     return getClass(className).getAttributes();
 }
@@ -206,16 +208,24 @@ void UMLData::addClassAttribute(string className, UMLAttribute attribute)
     getClass(className).addAttribute(attribute);
 }
 
+// Adds class attribute to specified className using a smart pointer
+void UMLData::addClassAttribute(string className, std::shared_ptr<UMLAttribute> attribute)
+{
+    if (!isValidName(attribute->getAttributeName()))
+        throw "Attribute name is not valid";
+    getClass(className).addAttribute(attribute);
+}
+
 // Removes className class attribute by the name
 void UMLData::removeClassAttribute(string className, string attributeName)
 {
-      for (UMLAttribute attr : getClass(className).getAttributes()) {
-           if (attr.getAttributeName() == attributeName){
-                getClass(className).deleteAttribute(attributeName);
-                return;
-           }
-       }
-        throw "Attribute does not exist";
+    for (std::shared_ptr<UMLAttribute> attr : getClass(className).getAttributes()) {
+        if (attr->getAttributeName() == attributeName){
+            getClass(className).deleteAttribute(attributeName);
+            return;
+        }
+    }
+    throw "Attribute does not exist";
 }
 
 // Changes className class attribute by the new attribute name
@@ -248,25 +258,26 @@ bool UMLData::isValidName(string name)
     return true;
 }
 
-// Finds class by name and returns index within member classes vector, returns -1 if not found
-int UMLData::findClass(string name)
+// Finds class in classes list returns first matching iterator or returns end() if no matches
+std::list<UMLClass>::iterator UMLData::findClass(string name)
 {
-    for (int i = 0; i < classes.size(); ++i)
-    {
-        if (classes[i].getName() == name)
-        {
-            return i;
-        }
-    }
-    return -1;
+    std::list<UMLClass>::iterator findIter = std::find(classes.begin(), classes.end(), UMLClass(name));
+    return findIter;
+}
+
+// Alternate find class using a reference to a UMLClass object
+std::list<UMLClass>::iterator UMLData::findClass(const UMLClass& uclass)
+{
+    std::list<UMLClass>::iterator findIter = std::find(classes.begin(), classes.end(), uclass);
+    return findIter;
 }
 
 // Finds attribute by name and returns index within the attribute's vector, returns -1 if not found
-int UMLData::findAttribute(string name, vector<UMLAttribute> attributes)
+int UMLData::findAttribute(string name, const vector<std::shared_ptr<UMLAttribute>>& attributes)
 {
     for (int i = 0; i < attributes.size(); ++i)
     {
-        if (attributes[i].getAttributeName() == name)
+        if (attributes[i]->getAttributeName() == name)
         {
             return i;
         }
@@ -294,10 +305,10 @@ int UMLData::findRelationship(const UMLClass& sourceClassIn, const UMLClass& des
 // Gets class reference for the given name
 UMLClass& UMLData::getClass(string name)
 {
-    int loc = findClass(name);
-    if (loc < 0)
+    std::list<UMLClass>::iterator findIter = findClass(name);
+    if (findIter == classes.end())
         throw "Class not found";
-    return classes[loc];
+    return *findIter;
 }
 
 // Takes in relationship object and adds it to relationship vector
@@ -326,17 +337,20 @@ void UMLData::addRelationship(const UMLRelationship& relIn)
     relationships.push_back(relIn); 
 }
 
+// Generates json file given a set of data
 json UMLData::getJson()
 {
     json j;
     j["classes"] = json::array();
+
     for (UMLClass uclass : classes)
     {
         json jsonattr;
         jsonattr = json::array();
-        for (UMLAttribute uattr : uclass.getAttributes())
+        //add methods and fields here
+        for (auto uattr : uclass.getAttributes())
         {
-            jsonattr += { {"name", uattr.getAttributeName()} };
+            jsonattr += { {"name", uattr->getAttributeName()} };
         } 
           j["classes"] += { {"name", uclass.getName()}, {"attributes", jsonattr} };
     }
@@ -344,8 +358,31 @@ json UMLData::getJson()
     j["relationships"] = json::array();
     for (UMLRelationship urelationship : relationships)
     {
-        j["relationships"] += { {"source", urelationship.getSource().getName()}, {"destination", urelationship.getDestination().getName()} };
+        
+        j["relationships"] += { 
+            {"source", urelationship.getSource().getName()}, 
+            {"destination", urelationship.getDestination().getName()},
+            {"type", getRelationshipType(urelationship.getSource().getName(), urelationship.getDestination().getName())}
+            };
     }
-    
+
     return j;
+}
+
+// Checks if class exists within classses list (string argument) 
+bool UMLData::doesClassExist(const string& name)
+{
+    std::list<UMLClass>::iterator findIter = findClass(name);
+    if (findIter == classes.end())
+        return false;
+    return true;
+}
+
+// Checks if class exists with classes list (class argument)
+bool UMLData::doesClassExist(const UMLClass& uclass)
+{
+    std::list<UMLClass>::iterator findIter = findClass(uclass);
+    if (findIter == classes.end())
+        return false;
+    return true;
 }

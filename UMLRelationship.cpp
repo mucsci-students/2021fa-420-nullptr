@@ -34,6 +34,21 @@ Type UMLRelationship::getType() const
   return relationshipType;
 }
 
+Type UMLRelationship::string_to_type(const std::string& typeIn)
+{
+    if (typeIn == "aggregation")
+        return aggregation;
+    else if (typeIn == "composition")
+        return composition;
+    else if (typeIn == "generalization")
+        return generalization;
+    else if (typeIn == "realization")
+        return realization;
+    else {
+      return none;
+    }
+}
+
 // Set type of relationship
 void UMLRelationship::setType(int newType) {
   if (newType == 0) {
