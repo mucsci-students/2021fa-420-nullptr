@@ -53,6 +53,9 @@ class UMLClass
 		// Remove attributes from pointer vector
 		void deleteAttribute(string attributeName);
 
+		// Remove attribute from pointer vector by pointer
+		void deleteAttribute(std::shared_ptr<UMLAttribute> attributePrt);
+
 		// Finds attribute within pointer vector
 		int findAttribute(string attributeName);
 

@@ -228,6 +228,12 @@ void UMLData::removeClassAttribute(string className, string attributeName)
     throw "Attribute does not exist";
 }
 
+// Removes className class attribute by smart pointer
+void UMLData::removeClassAttribute(string className, std::shared_ptr<UMLAttribute> attr)
+{
+    getClass(className).deleteAttribute(attr); // Error handing in UMLClass
+}
+
 // Changes className class attribute by the new attribute name
 void UMLData::changeAttributeName(string className, string oldAttributeName, string newAttributeName)
 {
