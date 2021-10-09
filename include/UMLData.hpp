@@ -13,6 +13,7 @@
 #include <vector>
 #include <iostream>
 #include "json/json.hpp"
+#include <list>
 //--------------------------------------------------------------------
 
 //--------------------------------------------------------------------
@@ -26,7 +27,7 @@ class UMLData
 {
     private:
 
-        vector<UMLClass> classes;
+        std::list<UMLClass> classes;
         vector<UMLRelationship> relationships;
 
     public: 
@@ -37,7 +38,7 @@ class UMLData
         UMLData(const vector<UMLClass>& vclass);
 
         // Returns vector of all classes
-        vector<UMLClass> getClasses() const;
+        std::list<UMLClass> getClasses() const;
 
         // Return a single class
         UMLClass getClassCopy(std::string name);
@@ -99,11 +100,19 @@ class UMLData
         // Checks if class/attribute name is valid
         bool isValidName(string name);
 
+        //checks if class exists within classses list (string argument) 
+        bool doesClassExist(const string& name);
+
+        //checks if class exists with classes list (class argument)
+        bool doesClassExist(const UMLClass& uclass);
+
         json getJson();
 
     private:
-        // Finds class by name and returns index within member classes vector, returns -1 if not found
-        int findClass(string name);
+        // Finds class by name and returns iterator within member classes list, returns end() if not found
+        std::list<UMLClass>::iterator findClass(string name);
+        std::list<UMLClass>::iterator findClass(const UMLClass& uclass);
+
 
         // Finds attribute by name and returns index within the attribute's vector, returns -1 if not found
         int findAttribute(string name, vector<UMLAttribute> attributes);

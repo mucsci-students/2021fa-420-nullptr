@@ -16,18 +16,6 @@
 int main(int argc, char** argv)
 {
     // Parameter check to see if user wants CLI or GUI
-    UMLData data;
-    data.addClass("test");
-    data.addClass("fish");
-    data.addRelationship("fish", "test", 1);
-    for (auto rel : data.getRelationships())
-        std::cout << "rell" << rel.getDestination().getName() << std::endl;
-    data.addClass("anything");
-    for (auto rel : data.getRelationships())
-        std::cout << rel.getDestination().getName() << std::endl;
-
-    std::cout << data.getJson();
-
     if (argc > 1) {
         if (string(argv[1]) == "--cli") {
           CLI newInterface;

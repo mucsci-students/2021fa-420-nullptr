@@ -517,7 +517,7 @@ void CLI::displayCLI ()
 // Has conditional booleans to optionally display attributes and relationships.
 void CLI::displayDiagram (bool displayAttribute, bool displayRelationship) 
 {
-    vector<UMLClass> classes = data.getClasses();
+    std::list<UMLClass> classes = data.getClasses();
     cout << "Classes:" << endl << endl;
     for (UMLClass umlclass : classes) {
         cout << umlclass.getName() << endl;
