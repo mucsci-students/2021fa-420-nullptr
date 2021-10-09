@@ -148,7 +148,7 @@ void CLI::displayCLI ()
                     bool attributeLoop = true;
                     while (attributeLoop)
                     {
-                        cout << "Add Method or Field:" << endl << "[1] Field" << endl << "[2] Method" << endl << endl << "Choice: ";
+                        cout << "Add method or field:" << endl << "[1] Field" << endl << "[2] Method" << endl << endl << "Choice: ";
                         cin >> userChoice;
                         cout << endl;
                         // User chooses to add a field                     
@@ -562,7 +562,7 @@ void CLI::displayClass (string className)
 void CLI::listAttributes(UMLClass& c)
 {
     //list Fields first
-    cout <<  "Fields:" << endl;
+    cout << "Fields:" << endl;
     for(auto attribute : c.getAttributes())
     {
         if(attribute->identifier() == "field")
