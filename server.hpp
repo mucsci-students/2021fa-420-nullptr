@@ -52,7 +52,7 @@ namespace umlserver
         svr.Get("/add/relationship", [&](const httplib::Request& req, httplib::Response& res) {
             std::string source = req.params.find("source")->second;
             std::string dest = req.params.find("dest")->second;
-            std::string type = req.params.find("type")->second;
+            std::string type = req.params.find("reltype")->second;
             ERR_ADD(data.addRelationship(source, dest, std::stoi(type)));
             res.set_redirect("/");
          });
@@ -93,6 +93,17 @@ namespace umlserver
             ERR_ADD(data.changeAttributeName(className, oldAttributeName, newAttributeName));
             res.set_redirect("/");
         });
+
+
+         svr.Get("/index", [&](const httplib::Request& req, httplib::Response& res) {
+            inja::Environment env;
+            inja::Template temp = env.parse_template("../templates/index.html");
+            json j = data.getJson();
+            j["errors"] = errors;
+            errors.clear();
+            res.set_content(env.render(temp, j), "text/html");
+        });
+
 
         std::cout << "running at http:://localhost:8080/" << std::endl;
 

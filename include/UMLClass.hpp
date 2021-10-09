@@ -11,6 +11,7 @@
 #include <iostream>
 #include <vector>
 #include <stdexcept>
+#include <memory>
 #include "UMLAttribute.hpp"
 //--------------------------------------------------------------------
 
@@ -25,7 +26,7 @@ class UMLClass
 	private:
 		// Name of class and a vector of all of its attributes as objects
 		string className;
-		vector<UMLAttribute> classAttributes;
+		vector<std::shared_ptr<UMLAttribute>> classAttributes;
 
 	public:
 		// Constructor for class object without attributes
@@ -41,17 +42,25 @@ class UMLClass
 		void changeName(string newClassName);
 
 		// Adds attribute to attribute vector
-		void addAttribute(UMLAttribute newAttribute);
+		void addAttribute(const UMLAttribute& newAttribute);
+
+		// Adds attribute to attribute vector with a smart pointer
+        void addAttribute(std::shared_ptr<UMLAttribute> newAttribute);
 
 		// Changes name of attribute within class
 		void changeAttributeName(string oldAttributeName, string newAttributeName);
 
-		// Removes attribute from attribute vector
-		vector<UMLAttribute>::iterator deleteAttribute(string attributeName);
+		// Remove attributes from pointer vector
+		void deleteAttribute(string attributeName);
 
-		// Finds attribute within attribute vector
-		vector<UMLAttribute>::iterator findAttribute(string attributeName);
+		// Finds attribute within pointer vector
+		int findAttribute(string attributeName);
 
-		// Returns vector of attributes 
-		vector<UMLAttribute> getAttributes() const;
+		// Finds attribute within pointer vector, returns smart pointer
+		std::shared_ptr<UMLAttribute> getAttribute(string attributeName); 
+
+		// Returns vector pointer of attributes 
+		vector<std::shared_ptr<UMLAttribute>> getAttributes() const;
+
+		bool operator==(const UMLClass& other) {return (this->getName() == other.getName());}
 };
