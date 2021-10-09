@@ -358,7 +358,6 @@ json UMLData::getJson()
     j["relationships"] = json::array();
     for (UMLRelationship urelationship : relationships)
     {
-        
         j["relationships"] += { 
             {"source", urelationship.getSource().getName()}, 
             {"destination", urelationship.getDestination().getName()},
