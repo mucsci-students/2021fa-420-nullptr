@@ -195,7 +195,7 @@ void UMLData::changeClassName(string oldName, string newName)
 }
 
 // Gets class attributes for a className class and returns them in a vector
-vector<UMLAttribute> UMLData::getClassAttributes(string className)
+vector<std::shared_ptr<UMLAttribute>> UMLData::getClassAttributes(string className)
 {
     return getClass(className).getAttributes();
 }
@@ -208,32 +208,19 @@ void UMLData::addClassAttribute(string className, UMLAttribute attribute)
     getClass(className).addAttribute(attribute);
 }
 
-// X_X
-void UMLData::addClassAttributeP(string className, std::shared_ptr<UMLAttribute> attribute)
+void UMLData::addClassAttribute(string className, std::shared_ptr<UMLAttribute> attribute)
 {
-  //  if (!isValidName(attribute.getAttributeName()))
-   //     throw "Attribute name is not valid";
-    getClass(className).addAttributeP(attribute);
-}
-
-// Removes className class attribute by the name
-void UMLData::removeClassAttribute(string className, string attributeName)
-{
-      for (UMLAttribute attr : getClass(className).getAttributes()) {
-           if (attr.getAttributeName() == attributeName){
-                getClass(className).deleteAttribute(attributeName);
-                return;
-           }
-       }
-        throw "Attribute does not exist";
+    if (!isValidName(attribute->getAttributeName()))
+        throw "Attribute name is not valid";
+    getClass(className).addAttribute(attribute);
 }
 
 // TEMP remove from pointer
-void UMLData::removeClassAttributeP(string className, string attributeName)
+void UMLData::removeClassAttribute(string className, string attributeName)
 {
-      for (std::shared_ptr<UMLAttribute> attr : getClass(className).getAttributesP()) {
+      for (std::shared_ptr<UMLAttribute> attr : getClass(className).getAttributes()) {
            if (attr->getAttributeName() == attributeName){
-                getClass(className).deleteAttributeP(attributeName);
+                getClass(className).deleteAttribute(attributeName);
                 return;
            }
        }
@@ -284,11 +271,11 @@ std::list<UMLClass>::iterator UMLData::findClass(const UMLClass& uclass)
 }
 
 // Finds attribute by name and returns index within the attribute's vector, returns -1 if not found
-int UMLData::findAttribute(string name, vector<UMLAttribute> attributes)
+int UMLData::findAttribute(string name, const vector<std::shared_ptr<UMLAttribute>>& attributes)
 {
     for (int i = 0; i < attributes.size(); ++i)
     {
-        if (attributes[i].getAttributeName() == name)
+        if (attributes[i]->getAttributeName() == name)
         {
             return i;
         }
@@ -352,24 +339,23 @@ json UMLData::getJson()
 {
     json j;
     j["classes"] = json::array();
-    std::cout << "adding classes" << std::endl;
+
     for (UMLClass uclass : classes)
     {
         json jsonattr;
         jsonattr = json::array();
         //add methods and fields here
-        for (UMLAttribute uattr : uclass.getAttributes())
+        for (auto uattr : uclass.getAttributes())
         {
-            jsonattr += { {"name", uattr.getAttributeName()} };
+            jsonattr += { {"name", uattr->getAttributeName()} };
         } 
           j["classes"] += { {"name", uclass.getName()}, {"attributes", jsonattr} };
     }
-    std::cout << "adding relationships" << std::endl;
+
     j["relationships"] = json::array();
     for (UMLRelationship urelationship : relationships)
     {
-        std::cout << "size: " << relationships.size() << std::endl;
-        std::cout << "adding" << urelationship.getSource().getName() << " <-> " << std::endl;
+        
         j["relationships"] += { 
             {"source", urelationship.getSource().getName()}, 
             {"destination", urelationship.getDestination().getName()},
@@ -377,8 +363,6 @@ json UMLData::getJson()
             };
     }
 
-    std::cout << "done adding ships" << std::endl;
-    
     return j;
 }
 

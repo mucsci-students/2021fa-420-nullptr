@@ -26,8 +26,7 @@ class UMLClass
 	private:
 		// Name of class and a vector of all of its attributes as objects
 		string className;
-		vector<UMLAttribute> classAttributes; //OLD
-		vector<std::shared_ptr<UMLAttribute>> classAttributesP;
+		vector<std::shared_ptr<UMLAttribute>> classAttributes;
 
 	public:
 		// Constructor for class object without attributes
@@ -43,33 +42,24 @@ class UMLClass
 		void changeName(string newClassName);
 
 		// Adds attribute to attribute vector
-		void addAttribute(UMLAttribute newAttribute);
+		void addAttribute(const UMLAttribute& newAttribute);
 
 		// temp
-        void addAttributeP(std::shared_ptr<UMLAttribute> newAttribute);
+        void addAttribute(std::shared_ptr<UMLAttribute> newAttribute);
 
 		// Changes name of attribute within class
 		void changeAttributeName(string oldAttributeName, string newAttributeName);
 
-		// Removes attribute from attribute vector
-		vector<UMLAttribute>::iterator deleteAttribute(string attributeName);
-
 		// TEMP remove from pointer vector
-		void deleteAttributeP(string attributeName);
-
-		// Finds attribute within attribute vector
-		vector<UMLAttribute>::iterator findAttribute(string attributeName);
+		void deleteAttribute(string attributeName);
 
 		// TEMP find attribute within pointer vector
-		int findAttributeP(string attributeName);
+		int findAttribute(string attributeName);
 
 		std::shared_ptr<UMLAttribute> getAttribute(string attributeName); 
 
-		// OLD Returns vector of attributes 
-		vector<UMLAttribute> getAttributes() const;
-
 		// Returns vector pointer of attributes 
-		vector<std::shared_ptr<UMLAttribute>> getAttributesP() const;
+		vector<std::shared_ptr<UMLAttribute>> getAttributes() const;
 
 		bool operator==(const UMLClass& other) {return (this->getName() == other.getName());}
 };

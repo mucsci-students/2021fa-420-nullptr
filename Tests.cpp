@@ -73,9 +73,9 @@ TEST(UMLDataAttributeTest, AddAttributeWorks)
     data.addClass("test");
     UMLAttribute attribute("hastest");
     data.addClassAttribute("test", attribute);
-       for (UMLAttribute attr : data.getClassAttributes("test")) {
-           if(attr.getAttributeName() == "hastest"){
-               ASSERT_EQ(attr.getAttributeName(), "hastest");
+       for (auto attr : data.getClassAttributes("test")) {
+           if(attr->getAttributeName() == "hastest"){
+               ASSERT_EQ(attr->getAttributeName(), "hastest");
            }
        }
 }
@@ -93,11 +93,11 @@ TEST(UMLDataAttributeTest, ChangeAttributeNameWorks)
     data.addClassAttribute("test", attribute);
     data.changeAttributeName("test", "hastest", "newHasTest");
 
-        for (UMLAttribute attr : data.getClassAttributes("test")) {
-           if(attr.getAttributeName() == "hastest"){
+        for (auto attr : data.getClassAttributes("test")) {
+           if(attr->getAttributeName() == "hastest"){
                hasTestGone = false;
            }
-            if(attr.getAttributeName() == "newHasTest"){
+            if(attr->getAttributeName() == "newHasTest"){
               newHasTestPresent = true;
            }
        }
@@ -448,9 +448,9 @@ TEST(UMLClassFileTest, AddAttributeWorks)
     class1.addAttribute(attribute);
     bool attrFound = false;
 
-    for(UMLAttribute attr : class1.getAttributes())
+    for(auto attr : class1.getAttributes())
     {
-        if(attr.getAttributeName() == "testattribute")
+        if(attr->getAttributeName() == "testattribute")
         {
             attrFound = true;
         }
@@ -467,9 +467,9 @@ TEST(UMLClassFileTest, ChangeAttributeWorks)
     class1.changeAttributeName("testattributeOld","testattributeNew");
     bool attrFound = false;
 
-    for(UMLAttribute attr : class1.getAttributes())
+    for(auto attr : class1.getAttributes())
     {
-        if(attr.getAttributeName() == "testattributeNew")
+        if(attr->getAttributeName() == "testattributeNew")
         {
             attrFound = true;
         }
@@ -477,9 +477,9 @@ TEST(UMLClassFileTest, ChangeAttributeWorks)
 
     ASSERT_EQ(attrFound, true);
 
-    for(UMLAttribute attr : class1.getAttributes())
+    for(auto attr : class1.getAttributes())
     {
-        if(attr.getAttributeName() == "testattributeOld")
+        if(attr->getAttributeName() == "testattributeOld")
         {
             attrFound = false;
         }
@@ -496,9 +496,9 @@ TEST(UMLClassFileTest, DeleteAttributeWorks)
     bool attrFound = false;
     class1.deleteAttribute("testattribute");
 
-    for(UMLAttribute attr : class1.getAttributes())
+    for(auto attr : class1.getAttributes())
     {
-        if(attr.getAttributeName() == "testattribute")
+        if(attr->getAttributeName() == "testattribute")
         {
             attrFound = true;
         }
@@ -514,7 +514,7 @@ TEST(UMLClassFileTest, FindAttributeWorks)
     class1.addAttribute(attribute);
     
 
-    ASSERT_EQ(class1.findAttribute("testattribute")->getAttributeName(), attribute.getAttributeName());
+    ASSERT_EQ(class1.getAttribute("testattribute")->getAttributeName(), attribute.getAttributeName());
 }
 
 TEST(UMLClassFileTest, GetAttributesWorks) 
@@ -527,11 +527,11 @@ TEST(UMLClassFileTest, GetAttributesWorks)
     test.push_back(attribute);
     
     bool isEqual = true;
-    vector<UMLAttribute> test2 = class1.getAttributes();
+    vector<std::shared_ptr<UMLAttribute>> test2 = class1.getAttributes();
 
     for(int i = 0; i < test.size(); i++)
     {
-        if(test[i].getAttributeName() != test2[i].getAttributeName())
+        if(test[i].getAttributeName() != test2[i]->getAttributeName())
         {
             isEqual = false;
         }

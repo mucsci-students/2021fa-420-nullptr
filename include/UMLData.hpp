@@ -80,10 +80,12 @@ class UMLData
         void changeClassName(string oldName, string newName);
 
         // Gets class attributes for a className class and returns them in a vector
-        vector<UMLAttribute> getClassAttributes(string className);
+        vector<std::shared_ptr<UMLAttribute>> getClassAttributes(string className);
 
         // Adds class attribute to specified className
         void addClassAttribute(string className, UMLAttribute attribute);
+        void addClassAttribute(string className, std::shared_ptr<UMLAttribute> attribute);
+
 
         // temp
         void addClassAttributeP(string className, std::shared_ptr<UMLAttribute> attribute);
@@ -115,7 +117,7 @@ class UMLData
 
 
         // Finds attribute by name and returns index within the attribute's vector, returns -1 if not found
-        int findAttribute(string name, vector<UMLAttribute> attributes);
+        int findAttribute(string name, const vector<std::shared_ptr<UMLAttribute>>&);
 
         // Finds relationship using two UML classes and returns index within member classes vector
         int findRelationship(const UMLClass& sourceClassIn, const UMLClass& destClassIn);

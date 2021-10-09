@@ -159,7 +159,7 @@ void CLI::displayCLI ()
                             cout << endl << "Enter type: ";
                             string type;
                             cin >> type;
-                            ERR_CATCH(data.addClassAttributeP(className, std::make_shared<UMLField>(attributeName, type)));
+                            ERR_CATCH(data.addClassAttribute(className, std::make_shared<UMLField>(attributeName, type)));
                             if (errorStatus == false) cout << endl << "Field " << attributeName << " added to " << className << endl << endl;
                             else errorStatus = false;
                             attributeLoop = false;
@@ -224,7 +224,7 @@ void CLI::displayCLI ()
                                     cout << endl << "Invalid choice!" << endl;
                             }
                             
-                            ERR_CATCH(data.addClassAttributeP(className, std::make_shared<UMLMethod>(attributeName, returnType, paramList) )); //REMEMBER TO DEALLOCATE
+                            ERR_CATCH(data.addClassAttribute(className, std::make_shared<UMLMethod>(attributeName, returnType, paramList) ));
                             if (errorStatus == false) cout << endl << "Method " << attributeName << " added to " << className << endl << endl;
                             else errorStatus = false;
                             attributeLoop = false;
@@ -248,7 +248,7 @@ void CLI::displayCLI ()
                     cout << "Enter the name of the attribute: ";
                     cin >> attributeName;
 
-                    ERR_CATCH(data.removeClassAttributeP(className, attributeName));
+                    ERR_CATCH(data.removeClassAttribute(className, attributeName));
                     if (errorStatus == false) cout << endl << "Attribute " << attributeName << " removed from " << className << endl << endl;
                     else errorStatus = false;
                 } 
@@ -563,7 +563,7 @@ void CLI::listAttributes(UMLClass& c)
 {
     //list Fields first
     cout <<  "Fields:" << endl;
-    for(auto attribute : c.getAttributesP())
+    for(auto attribute : c.getAttributes())
     {
         if(attribute->identifier() == "field")
             cout << attribute->getType() << " " << attribute->getAttributeName() << endl;
@@ -573,22 +573,14 @@ void CLI::listAttributes(UMLClass& c)
     // List methods
     cout << "Methods:" << endl;
     
-    for(auto attribute : c.getAttributesP())
+    for(auto attribute : c.getAttributes())
     {
         if(attribute->identifier() == "method")
         {
             cout << attribute->getType() << " " << attribute->getAttributeName() << endl;
-            cout << "Param: ";
-            // Get and print parameters TODO
-            /*
-            if(UMLMethod* test = dynamic_cast<UMLMethod*>(attribute))
-            for(vector<UMLParameter>::iterator i = test->getParam().begin(); i != test->getParam().end(); ++i)
-            {
-                cout << i->getType() << " " << i->getName();
-                if(i++ != test->getParam().end())
-                    cout << ", ";
-            }*/
-            
+            cout << "Parameters: " << endl;
+            for (auto param : (std::static_pointer_cast<UMLMethod>(attribute))->getParam())
+                cout << param.getType() << " " << param.getName() << endl;
         }
     }
     cout << endl;
