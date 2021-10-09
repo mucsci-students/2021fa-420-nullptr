@@ -19,7 +19,7 @@ UMLData::UMLData()
 // Constructor that takes in vector of classes 
 UMLData::UMLData(const vector<UMLClass>& vclass)
 {
-    for (UMLClass uclass : vclass )
+    for (UMLClass uclass : vclass)
     {
         addClass(uclass);
     }
@@ -208,6 +208,7 @@ void UMLData::addClassAttribute(string className, UMLAttribute attribute)
     getClass(className).addAttribute(attribute);
 }
 
+// Adds class attribute to specified className using a smart pointer
 void UMLData::addClassAttribute(string className, std::shared_ptr<UMLAttribute> attribute)
 {
     if (!isValidName(attribute->getAttributeName()))
@@ -215,16 +216,16 @@ void UMLData::addClassAttribute(string className, std::shared_ptr<UMLAttribute> 
     getClass(className).addAttribute(attribute);
 }
 
-// TEMP remove from pointer
+// Removes className class attribute by the name
 void UMLData::removeClassAttribute(string className, string attributeName)
 {
-      for (std::shared_ptr<UMLAttribute> attr : getClass(className).getAttributes()) {
-           if (attr->getAttributeName() == attributeName){
-                getClass(className).deleteAttribute(attributeName);
-                return;
-           }
-       }
-        throw "Attribute does not exist";
+    for (std::shared_ptr<UMLAttribute> attr : getClass(className).getAttributes()) {
+        if (attr->getAttributeName() == attributeName){
+            getClass(className).deleteAttribute(attributeName);
+            return;
+        }
+    }
+    throw "Attribute does not exist";
 }
 
 // Changes className class attribute by the new attribute name
@@ -264,6 +265,7 @@ std::list<UMLClass>::iterator UMLData::findClass(string name)
     return findIter;
 }
 
+// Alternate find class using a reference to a UMLClass object
 std::list<UMLClass>::iterator UMLData::findClass(const UMLClass& uclass)
 {
     std::list<UMLClass>::iterator findIter = std::find(classes.begin(), classes.end(), uclass);
@@ -335,6 +337,7 @@ void UMLData::addRelationship(const UMLRelationship& relIn)
     relationships.push_back(relIn); 
 }
 
+// Generates json file given a set of data
 json UMLData::getJson()
 {
     json j;
@@ -366,6 +369,7 @@ json UMLData::getJson()
     return j;
 }
 
+// Checks if class exists within classses list (string argument) 
 bool UMLData::doesClassExist(const string& name)
 {
     std::list<UMLClass>::iterator findIter = findClass(name);
@@ -374,6 +378,7 @@ bool UMLData::doesClassExist(const string& name)
     return true;
 }
 
+// Checks if class exists with classes list (class argument)
 bool UMLData::doesClassExist(const UMLClass& uclass)
 {
     std::list<UMLClass>::iterator findIter = findClass(uclass);

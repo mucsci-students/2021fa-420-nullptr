@@ -18,12 +18,15 @@ using std::string;
 
 class UMLField : public UMLAttribute
 {
-  private:
-		  
+	private:
+		
+		// No private methods
+
 	public:
 
 		// Creates a UMLField object with the constructor's parameters as its fields
-	    UMLField(string newName, string newType);
+		UMLField(string newName, string newType);
 
+		// Identifies this attribute as a field
 		string identifier();
 };

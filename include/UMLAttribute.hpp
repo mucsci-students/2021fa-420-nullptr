@@ -26,9 +26,10 @@ class UMLAttribute
 		string type;
 
 	public:
-		// Constructor for attribute objects
+		// OLD Constructor for attribute objects without a type
 		UMLAttribute(string newName);
 
+		// Constructor for attribute objects with a type
 		UMLAttribute(string newName, string newType);
 
 		// Grab name of the given attribute

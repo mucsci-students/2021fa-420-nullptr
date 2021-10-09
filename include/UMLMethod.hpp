@@ -40,6 +40,6 @@ class UMLMethod : public UMLAttribute
 		// Adds a parameter to the list of parameters
 		void addParam(UMLParameter newParam);
 
-		// Identifies this attribute as a Method
+		// Identifies this attribute as a method
 		string identifier();
 };

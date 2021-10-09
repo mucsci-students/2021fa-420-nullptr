@@ -5,7 +5,6 @@
 
 /************************************************************/
 // Catch for functions to protect from invalid inputs
-#include <memory>
 #define ERR_CATCH(fun)                           \
     try {                                        \
         fun;                                     \
@@ -18,6 +17,7 @@
 
 //--------------------------------------------------------------------
 // System includes
+#include <memory>
 #include "include/CLI.hpp"
 //--------------------------------------------------------------------
 
@@ -144,7 +144,7 @@ void CLI::displayCLI ()
                     cin >> className;
                     cout << endl;
                     
-                    // Allow user to choose between a Method or a Field
+                    // Allow user to choose between a method or a field
                     bool attributeLoop = true;
                     while (attributeLoop)
                     {
@@ -165,7 +165,7 @@ void CLI::displayCLI ()
                             attributeLoop = false;
                         }
 
-                        //User chooses to add a method
+                        // User chooses to add a method
                         else if (userChoice == "2")
                         {
                             cout << "Enter the name of the method: ";
@@ -173,40 +173,35 @@ void CLI::displayCLI ()
                             cout << endl << "Enter return type: ";
                             string returnType;
                             cin >> returnType;
-                            // Promt user to enter as many parameters as they want
+                            // Prompt user to enter as many parameters as they want
                             bool paramLoop = true;
                             vector<UMLParameter> paramList = {};
                             string userChoice2;
                             // First loop to check for correct input
-                            while(paramLoop)
-                            {
+                            while(paramLoop) {
                                 cout << endl << "Add parameter? (y/n): ";
                                 cin >> userChoice2;
                                 // Add the parameters
-                                if(userChoice2 == "y" || userChoice2 == "Y")
-                                {
+                                if(userChoice2 == "y" || userChoice2 == "Y") {
                                     string paramName;
                                     string paramType;
                                     // Second loop to allow for unlimited parameters
-                                    while(paramLoop)
-                                    {
+                                    while(paramLoop) {
                                         cout << endl << "Enter parameter name: ";
                                         cin >> paramName;
                                         cout << endl << "Enter parameter type: ";
                                         cin >> paramType;
-                                        paramList.push_back( UMLParameter(paramName, paramType) );
+                                        paramList.push_back(UMLParameter(paramName, paramType));
                                         // Loop to check user input
                                         bool paramLoop2 = true;
-                                        while(paramLoop2)
-                                        {
+                                        while(paramLoop2) {
                                             cout << endl << "Add more? (y/n): ";
                                             cin >> userChoice2;
                                             // Add parameter again
                                             if(userChoice2 == "y" || userChoice2 == "Y")
                                                 paramLoop2 = false;
                                             // Exit add parameter loop
-                                            else if(userChoice2 == "n" || userChoice2 == "N")
-                                            {
+                                            else if(userChoice2 == "n" || userChoice2 == "N") {
                                                 paramLoop = false;
                                                 paramLoop2 = false;
                                             }

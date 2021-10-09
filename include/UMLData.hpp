@@ -84,17 +84,12 @@ class UMLData
 
         // Adds class attribute to specified className
         void addClassAttribute(string className, UMLAttribute attribute);
+
+        // Adds class attribute to specified className using a smart pointer
         void addClassAttribute(string className, std::shared_ptr<UMLAttribute> attribute);
-
-
-        // temp
-        void addClassAttributeP(string className, std::shared_ptr<UMLAttribute> attribute);
 
         // Removes className class attribute by the name
         void removeClassAttribute(string className, string attributeName);
-
-        // TEMP remove from pointer
-        void removeClassAttributeP(string className, string attributeName);
 
         // Changes className class attribute by the new attribute name
         void changeAttributeName(string className, string oldAttributeName, string newAttributeName);
@@ -102,19 +97,21 @@ class UMLData
         // Checks if class/attribute name is valid
         bool isValidName(string name);
 
-        //checks if class exists within classses list (string argument) 
+        // Checks if class exists within classses list (string argument) 
         bool doesClassExist(const string& name);
 
-        //checks if class exists with classes list (class argument)
+        // Checks if class exists with classes list (class argument)
         bool doesClassExist(const UMLClass& uclass);
 
+        // Generates json file given a set of data
         json getJson();
 
     private:
         // Finds class by name and returns iterator within member classes list, returns end() if not found
         std::list<UMLClass>::iterator findClass(string name);
+        
+        // Alternate find class using a reference to a UMLClass object
         std::list<UMLClass>::iterator findClass(const UMLClass& uclass);
-
 
         // Finds attribute by name and returns index within the attribute's vector, returns -1 if not found
         int findAttribute(string name, const vector<std::shared_ptr<UMLAttribute>>&);

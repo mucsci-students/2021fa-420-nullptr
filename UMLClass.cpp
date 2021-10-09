@@ -42,7 +42,8 @@ void UMLClass::addAttribute(const UMLAttribute& newAttribute)
 {
 	addAttribute(std::make_shared<UMLAttribute>(newAttribute));
 }
-// TEMP
+
+// Adds attribute to attribute vector with a smart pointer
 void UMLClass::addAttribute(std::shared_ptr<UMLAttribute> newAttribute) 
 {
 	for(auto attribute : classAttributes)
@@ -58,7 +59,8 @@ void UMLClass::changeAttributeName(string oldAttributeName, string newAttributeN
 {
 	getAttribute(oldAttributeName)->changeName(newAttributeName);
 }
-// TEMP remove attribute from pointer vector
+
+// Remove attributes from pointer vector
 void UMLClass::deleteAttribute(string attributeName) 
 {
 	int loc = findAttribute(attributeName);
@@ -71,7 +73,7 @@ void UMLClass::deleteAttribute(string attributeName)
 
 }
 
-// TEMP finds attribute within pointer vector
+// Finds attribute within pointer vector
 int UMLClass::findAttribute(string attributeName) 
 {
 	for (int i = 0; i < classAttributes.size(); ++i) {
@@ -83,16 +85,15 @@ int UMLClass::findAttribute(string attributeName)
 	return -1;
 }
 
+// Finds attribute within pointer vector, returns smart pointer
 std::shared_ptr<UMLAttribute> UMLClass::getAttribute(string attributeName)
 {
 	int loc = findAttribute(attributeName);
 	if (loc < 0)
 	{
-		throw "attribute not found";
+		throw "Attribute not found";
 	}
-
 	return classAttributes[loc];
-	
 }
 
 // Returns vector pointer of attributes 

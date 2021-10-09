@@ -18,13 +18,10 @@ using std::string;
 class UMLParameter
 {
 	private:
-		// Name of parameter
 		string name;
-		// Type of parameter
 		string type;
 
 	public:
-		// Params: string newParameter (name of parameter)
 		// Constructor for parameter objects
 		UMLParameter(string name, string type);
 
@@ -39,5 +36,4 @@ class UMLParameter
 
 		// Change type of the given parameter
 		void changeType(string newType);
-
 };

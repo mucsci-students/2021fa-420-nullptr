@@ -8,13 +8,13 @@
 #include "include/UMLAttribute.hpp"
 //--------------------------------------------------------------------
 
-// OLD Constructor for attribute objects
+// OLD Constructor for attribute objects without a type
 UMLAttribute::UMLAttribute(string newName) 
 :name(newName)
 {
 }
 
-// Constructor for attribute objects
+// Constructor for attribute objects with a type
 UMLAttribute::UMLAttribute(string newName, string newType) 
 :name(newName)
 ,type(newType)
@@ -45,7 +45,7 @@ void UMLAttribute::changeType(string newType)
 	type = newType;
 }
 
-//
+// Placeholder to identifiy what type an attribute is
 string UMLAttribute::identifier()
 {
 	return "attribute";

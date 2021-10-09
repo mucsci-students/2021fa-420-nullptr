@@ -44,18 +44,19 @@ class UMLClass
 		// Adds attribute to attribute vector
 		void addAttribute(const UMLAttribute& newAttribute);
 
-		// temp
+		// Adds attribute to attribute vector with a smart pointer
         void addAttribute(std::shared_ptr<UMLAttribute> newAttribute);
 
 		// Changes name of attribute within class
 		void changeAttributeName(string oldAttributeName, string newAttributeName);
 
-		// TEMP remove from pointer vector
+		// Remove attributes from pointer vector
 		void deleteAttribute(string attributeName);
 
-		// TEMP find attribute within pointer vector
+		// Finds attribute within pointer vector
 		int findAttribute(string attributeName);
 
+		// Finds attribute within pointer vector, returns smart pointer
 		std::shared_ptr<UMLAttribute> getAttribute(string attributeName); 
 
 		// Returns vector pointer of attributes 
