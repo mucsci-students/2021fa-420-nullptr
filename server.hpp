@@ -1,8 +1,12 @@
 #include "include/UMLAttribute.hpp"
 #include "include/UMLData.hpp"
+#include "include/UMLFile.hpp"
 #include "include/httplib/httplib.h"
 #include "include/json/json.hpp"
 #include "include/inja/inja.hpp"
+#include "include/UMLField.hpp"
+#include "include/UMLMethod.hpp"
+#include <memory>
 #include <string>
 
 using json = nlohmann::json;
@@ -25,6 +29,7 @@ namespace umlserver
         httplib::Server svr;
         UMLData data;
         json errors = json::array();
+        json success = json::array();
 
         svr.Get("/", [&](const httplib::Request& req, httplib::Response& res) {
             inja::Environment env;
@@ -32,6 +37,9 @@ namespace umlserver
             json j = data.getJson();
             j["errors"] = errors;
             errors.clear();
+            j["success"] = success;
+            success.clear();
+            j["files"] = UMLFile::listSaves();
             res.set_content(env.render(temp, j), "text/html");
         });
 
@@ -41,13 +49,32 @@ namespace umlserver
             res.set_redirect("/");
          });
 
-        svr.Get(R"(/add/attribute/(\w+))", [&](const httplib::Request& req, httplib::Response& res) {
+        svr.Get(R"(/add/field/(\w+))", [&](const httplib::Request& req, httplib::Response& res) {
             std::string className = req.matches[1].str();
-            std::string attributeName = req.params.find("aname")->second;
-            UMLAttribute attribute (attributeName);
-            ERR_ADD(data.addClassAttribute(className, attribute));
+            std::string fieldName = req.params.find("fname")->second;
+            std::string fieldType = req.params.find("ftype")->second;
+            ERR_ADD(data.addClassAttribute(className, std::make_shared<UMLField>(fieldName, fieldType)));
             res.set_redirect("/");
          }); 
+
+         svr.Get(R"(/add/method/(\w+))", [&](const httplib::Request& req, httplib::Response& res) {
+            std::string className = req.matches[1].str();
+            std::string methodName = req.params.find("mname")->second;
+            std::string methodType = req.params.find("mtype")->second;
+            ERR_ADD(data.addClassAttribute(className, std::make_shared<UMLMethod>(methodName, methodType, std::vector<UMLParameter>{})));
+            res.set_redirect("/");
+         }); 
+
+         svr.Get(R"(/add/parameter/(\w+)/(\w+))", [&](const httplib::Request& req, httplib::Response& res) {
+            std::string className = req.matches[1].str();
+            std::string methodName = req.matches[2].str();
+            std::string paramName = req.params.find("pname")->second;
+            std::string paramType = req.params.find("ptype")->second;
+            std::shared_ptr<UMLAttribute> attr = data.getClassCopy(className).getAttribute(methodName);
+            std::static_pointer_cast<UMLMethod>(attr)->addParam(UMLParameter(paramName, paramType));
+            res.set_redirect("/");
+         }); 
+
 
         svr.Get("/add/relationship", [&](const httplib::Request& req, httplib::Response& res) {
             std::string source = req.params.find("source")->second;
@@ -102,6 +129,22 @@ namespace umlserver
             j["errors"] = errors;
             errors.clear();
             res.set_content(env.render(temp, j), "text/html");
+        });
+
+        svr.Get("/save", [&](const httplib::Request& req, httplib::Response& res) {
+            std::string fileName = req.params.find("save")->second;
+            UMLFile file (fileName + ".json");
+            ERR_ADD(file.save(data));
+            success += "File Saved!";
+            res.set_redirect("/");
+        });
+
+        svr.Get("/load", [&](const httplib::Request& req, httplib::Response& res) {
+            std::string fileName = req.params.find("load")->second;
+            UMLFile file (fileName + ".json");
+            ERR_ADD(data = file.load());
+            success += "File Loaded!";
+            res.set_redirect("/");
         });
 
 

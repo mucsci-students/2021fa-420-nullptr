@@ -3,27 +3,68 @@
     </head>
     <body>
         {% for error in errors %}
-            <p style="color:red;">{{ error }}</p>
+            <p style="color:red; font-size: 30px;">{{ error }}</p>
+        {% endfor %}
+        {% for succ in success %}
+            <p style="color:green;font-size: 30px;">{{ succ }}</p>
         {% endfor %}
         <h1>Classes:</h1>
-        <form action="/add/class" method="GET">
+        {% for class in classes %}
+        
+            <h2 id="{{ class.name }}"><span>{{ class.name }}</span> <button id="{{ class.name }}edit">edit</button> <a href="/delete/class/{{ class.name }}">delete</a></h2>
+        <div style="margin-left:50px;">    
+            <h3>Fields:</h3>
+            <div style="margin-left:50px;">  
+            {% for field in class.fields %}
+                <p id="{{ field.name }}">{{ field.type }} {{ field.name }} <button id="{{ field.name }}edit">edit</button> <a href="/delete/attribute/{{ class.name }}/{{ field.name }}">delete</a></p>
+            {% endfor %}
+            </div>
+            <form style="margin-top: 50px;" action="/add/field/{{ class.name }}" method="GET">
+                <label for="fname">Field name:</label>
+                <input type="text" id="fname" name="fname">
+                <label for="ftype">Field type:</label>
+                <input type="text" id="ftype" name="ftype">
+                <input type="submit" value="add field">
+            </form>
+            <h3>Methods:</h3>
+            <div style="margin-left:50px;">  
+            {% for method in class.methods %}
+            <hr>
+                <h4 id="{{ method.name }}">{{ method.return_type }} {{ method.name }}() <button id="{{ method.name }}edit">edit</button> <a href="/delete/attribute/{{ class.name }}/{{ method.name }}">delete</a></h4>
+                <!--parameters-->
+                <h5>Params</h5>
+                {% for param in method.params %}
+                    <p>{{param.type}} {{param.name}}</p>
+                {% endfor %}
+                <form action="/add/parameter/{{ class.name }}/{{ method.name }}" method="GET">
+                    <label for="pname">Parameter name:</label>
+                    <input type="text" id="panme" name="pname">
+                    <label for="ptype">Parameter type:</label>
+                    <input type="text" id="ptype" name="ptype">
+                    <input type="submit" value="add parameter">
+                </form>
+                <hr>
+            {% endfor %}
+            </div>
+            <form style="margin-top: 50px;" action="/add/method/{{ class.name }}" method="GET">
+                <label for="mname">Method name:</label>
+                <input type="text" id="mname" name="mname">
+                <label for="mtype">Method type:</label>
+                <input type="text" id="mtype" name="mtype">
+                <input type="submit" value="add method">
+            </form>
+        </div>
+        {% endfor %}
+        <form style="margin-top: 50px;" action="/add/class" method="GET">
             <label for="cname">Class name:</label>
             <input type="text" id="cname" name="cname">
             <input type="submit" value="add class">
         </form>
-        {% for class in classes %}
-            <h2 id="{{ class.name }}"><span>{{ class.name }}</span> <button id="{{ class.name }}edit">edit</button> <a href="/delete/class/{{ class.name }}">delete</a></h2>
-            <p>Attributes:</p>
-            {% for attribute in class.attributes %}
-                <p id="{{ attribute.name }}">{{ attribute.name }} <button id="{{ attribute.name }}edit">edit</button> <a href="/delete/attribute/{{ class.name }}/{{ attribute.name }}">delete</a></p>
-            {% endfor %}
-            <form action="/add/attribute/{{ class.name }}" method="GET">
-                <label for="aname">Attribute name:</label>
-                <input type="text" id="aname" name="aname">
-                <input type="submit" value="add attribute">
-            </form>
-        {% endfor %}
         <h1>Relationships:</h1>
+        {% for relationship in relationships %}
+            <p>{{relationship.source}} -> {{relationship.destination}} type: {{relationship.type}}
+                <a href="/delete/relationship/{{relationship.source}}/{{relationship.destination}}">delete</a></p>
+        {% endfor %}
         <form action="/add/relationship" method="GET">
             <label for="cname">Source:</label>
             <input type="text" id="source" name="source">
@@ -37,12 +78,23 @@
             </select>
             <input type="submit" value="add relationship">
         </form>
-        {% for relationship in relationships %}
-            <p>{{relationship.source}} -> {{relationship.destination}} type: {{relationship.type}}
-                <a href="/delete/relationship/{{relationship.source}}/{{relationship.destination}}">delete</a></p>
-        {% endfor %}
         <h1>File:</h1>
-        <button>Save</button><button>Load</button>
+        <form action="/save">
+            <label for="save">File Name:</label>
+            <input type="text" name="save" id="save">
+            <input type="submit" value="save">
+        </form>
+        <h3>OR</h3>
+        <form action="/load" method="GET">
+            <label for="load">File Name:</label>
+            <select name="load" id="load">
+                {% for file in files %}
+                <option value="{{file}}">{{file }}</option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="load">
+        </form>
+        
     </body>
     <script>
         {% for class in classes %}
@@ -54,12 +106,12 @@
                         "<input type='submit' value='edit class'>"
                     "</form>";
             });
-            {% for attribute in class.attributes %}
-            element = document.getElementById('{{ attribute.name }}edit');
+            {% for method in class.methods %}
+            element = document.getElementById('{{ method.name }}edit');
             element.addEventListener("click", () => {
-                document.getElementById("{{attribute.name}}").innerHTML =
-                    "<form action='/edit/attribute/{{ class.name }}/{{ attribute.name }}' method='GET'>" + 
-                        "<input type='text' id='aname' name='aname' value='{{ attribute.name }}'>" +
+                document.getElementById("{{method.name}}").innerHTML =
+                    "<form action='/edit/attribute/{{ class.name }}/{{ method.name }}' method='GET'>" + 
+                        "<input type='text' id='aname' name='aname' value='{{ method.name }}'>" +
                         "<input type='submit' value='edit attribute'>"
                     "</form>";
             });

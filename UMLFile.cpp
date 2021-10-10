@@ -13,6 +13,7 @@
 #include "include/UMLField.hpp"
 
 #include <memory>
+#include <filesystem>
 //--------------------------------------------------------------------
 
 // constructor: takes in the name of the file to save
@@ -78,5 +79,22 @@ void UMLFile::addRelationships(UMLData& data, const json& j)
         relationship["destination"], 
         UMLRelationship::string_to_type(relationship["type"]));
     }
+}
+
+json UMLFile::listSaves()
+{
+    json files = json::array();
+    for (const auto & entry : std::filesystem::directory_iterator("."))
+    {
+        if (entry.path().string().find("json") != std::string::npos && entry.path().string().find("compile_commands") == std::string::npos)
+        {
+            std::string path = entry.path().string();
+            path = path.substr(2, std::string::npos);
+            path = path.substr(0, path.find(".json"));
+            files += path;
+        }
+            
+    }
+    return files;
 }
 
