@@ -7,6 +7,7 @@
 // System includes
 #include "include/UMLFile.hpp"
 #include "include/UMLMethod.hpp"
+#include "include/UMLParameter.hpp"
 #include "include/UMLRelationship.hpp"
 #include <algorithm>
 #include <list>
@@ -206,6 +207,8 @@ void UMLData::addClassAttribute(string className, UMLAttribute attribute)
 {
     if (!isValidName(attribute.getAttributeName()))
         throw "Attribute name is not valid";
+    else if (!isValidName(attribute.getType()))
+        throw "Attribute type is not valid";
     getClass(className).addAttribute(attribute);
 }
 
@@ -214,6 +217,8 @@ void UMLData::addClassAttribute(string className, std::shared_ptr<UMLAttribute> 
 {
     if (!isValidName(attribute->getAttributeName()))
         throw "Attribute name is not valid";
+    else if (!isValidName(attribute->getType()))
+        throw "Attribute type is not valid";
     getClass(className).addAttribute(attribute);
 }
 
@@ -221,7 +226,7 @@ void UMLData::addClassAttribute(string className, std::shared_ptr<UMLAttribute> 
 void UMLData::removeClassAttribute(string className, string attributeName)
 {
     for (std::shared_ptr<UMLAttribute> attr : getClass(className).getAttributes()) {
-        if (attr->getAttributeName() == attributeName){
+        if (attr->getAttributeName() == attributeName) {
             getClass(className).deleteAttribute(attributeName);
             return;
         }
@@ -245,21 +250,39 @@ void UMLData::changeAttributeName(string className, string oldAttributeName, str
     getClass(className).changeAttributeName(oldAttributeName, newAttributeName);
 }
 
-// Checks if class/attribute name is valid
+// Adds parameter to a given method
+void UMLData::addParameter(std::shared_ptr<UMLMethod> method, string paramName, string paramType){
+    if (!isValidName(paramName))
+        throw "Parameter name is not valid";
+    else if (!isValidName(paramType))
+        throw "Parameter type is not valid";
+    else {
+        for (UMLParameter param : method->getParam()) {
+            if (param.getName() == paramName && param.getType() == paramType) {
+                throw "Parameter already exists";
+            }
+        }
+    }
+    method->addParam(UMLParameter(paramName, paramType));
+}
+
+// Checks if identiifier name is valid
 bool UMLData::isValidName(string name)
 {
-    //checking first character
-    if (name.size() < 1)
+    // Cannot have empty type
+    if (name.size() < 1) 
     {
         return false;
-    } else 
+    } 
+    else 
     {
-        //check first character
-        if (!((name[0] >= 'a' && name[0] <= 'z') || (name[0] >= 'A' && name[0] <= 'Z'))) return false;
-        //check the rest of the chracters 
-        for (int i = 1; i < name.length(); i++) 
+        // Check first character, detect if it is a letter
+        if (isalpha(name[0]) == 0) return false;
+        // Check the rest of the characters 
+        for (int i = 1; i < name.length(); ++i) 
         {
-            if (!((name[i] >= 'a' && name[i] <= 'z') || (name[i] >= 'A' && name[i] <= 'Z') || (name[i] >= '0' && name[i] <= '9') || name[i] == '_')) return false;
+            // Anything afterwards can be a letter, digit, or underscore. If not, return false
+            if (isalpha(name[i]) == 0 && isdigit(name[i]) == 0 && name[i] != '_') return false;
         }
     }
     return true;
