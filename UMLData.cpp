@@ -6,6 +6,7 @@
 //--------------------------------------------------------------------
 // System includes
 #include "include/UMLFile.hpp"
+#include "include/UMLMethod.hpp"
 #include "include/UMLRelationship.hpp"
 #include <algorithm>
 #include <list>
@@ -352,19 +353,31 @@ json UMLData::getJson()
     for (UMLClass uclass : classes)
     {
         json jsonattr;
-        jsonattr = json::array();
-        //add methods and fields here
+        jsonattr["fields"] = json::array();
+        jsonattr["methods"] = json::array();
+
         for (auto uattr : uclass.getAttributes())
         {
-            jsonattr += { {"name", uattr->getAttributeName()} };
+            if (uattr->identifier() == "field")
+                jsonattr["fields"] += { {"name", uattr->getAttributeName()}, {"type", uattr->getType()} };
+
+            else
+            {
+                json jsonparams = json::array();
+                for (auto param : (std::static_pointer_cast<UMLMethod>(uattr))->getParam())
+                {
+                   jsonparams += {{"name", param.getName()}, {"type", param.getType()}};
+                } 
+
+                jsonattr["methods"] += {{"name", uattr->getAttributeName()}, {"return_type", uattr->getType()}, {"params", jsonparams}};
+            }
         } 
-          j["classes"] += { {"name", uclass.getName()}, {"attributes", jsonattr} };
+          j["classes"] += { {"name", uclass.getName()}, {"fields", jsonattr["fields"]}, {"methods", jsonattr["methods"]} };
     }
 
     j["relationships"] = json::array();
     for (UMLRelationship urelationship : relationships)
     {
-        
         j["relationships"] += { 
             {"source", urelationship.getSource().getName()}, 
             {"destination", urelationship.getDestination().getName()},
