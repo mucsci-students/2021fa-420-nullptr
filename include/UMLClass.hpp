@@ -50,6 +50,9 @@ class UMLClass
 		// Changes name of attribute within class
 		void changeAttributeName(string oldAttributeName, string newAttributeName);
 
+		// Changes name of attribute within class using smart ptr 
+		void changeAttributeName(std::shared_ptr<UMLAttribute> attribute, string newAttributeName);
+
 		// Remove attributes from pointer vector
 		void deleteAttribute(string attributeName);
 
@@ -59,8 +62,11 @@ class UMLClass
 		// Finds attribute within pointer vector
 		int findAttribute(string attributeName);
 
-		// Finds attribute within pointer vector, returns smart pointer
-		std::shared_ptr<UMLAttribute> getAttribute(string attributeName); 
+		// Checks attribute within pointer vector to see if it causes identical attributes to exist
+		bool checkAttribute(std::shared_ptr<UMLAttribute> attribute);
+
+		// OLD Finds attribute within pointer vector, returns smart pointer
+		std::shared_ptr<UMLAttribute> getAttribute(string attributeName);
 
 		// Returns vector pointer of attributes 
 		vector<std::shared_ptr<UMLAttribute>> getAttributes() const;

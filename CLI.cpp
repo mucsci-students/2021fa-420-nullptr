@@ -87,14 +87,14 @@ void CLI::displayCLI ()
                         data.deleteClass(name);
                         cout << endl << "Class named " << name << " removed" << endl << endl;
                     }
-                    // User either canceled or there were no classes
+                    // User either cancelled or there were no classes
                     else errorStatus = false;
                 } 
                 // Rename class
                 else if (userChoice == "3") {
                     // Prompt user for class
                     ERR_CATCH(name = orderClasses(false, false));
-                    // User either canceled or there were no classes
+                    // User either cancelled or there were no classes
                     if (errorStatus)
                         errorStatus = false;
                     else
@@ -143,7 +143,7 @@ void CLI::displayCLI ()
                 if (userChoice == "1") {
                     // Prompt user for class
                     ERR_CATCH(className = orderClasses(false, false));
-                    // User either canceled or there were no classes
+                    // User either cancelled or there were no classes
                     if (errorStatus)
                         errorStatus = false;
                     else
@@ -262,7 +262,7 @@ void CLI::displayCLI ()
                 else if (userChoice == "3") {
                     // Prompt user for class
                     ERR_CATCH(className = orderClasses(true, false));
-                    // User either canceled or there were no classes
+                    // User either cancelled or there were no classes
                     if (errorStatus)
                         errorStatus = false;
                     else
@@ -272,12 +272,12 @@ void CLI::displayCLI ()
                         // Prompts user for attribute from the class they chose
                         std::shared_ptr<UMLAttribute> attribute;
                         ERR_CATCH(attribute = orderAttributes(data.getClassCopy(className)));
-                        // User either canceled or the class had no attributes
+                        // User either cancelled or the class had no attributes
                         if (errorStatus)
                             errorStatus = false;
                         else
                         {
-                            string identity = attribute->identifier(); // prints correct attribute type to console
+                            string identity = attribute->identifier(); // For printing correct attribute type to console
                             // Primary loop to maintain the structure of modifying an attribute
                             bool changeLoop = true;
                             // First changeLoop for changing name
@@ -291,10 +291,13 @@ void CLI::displayCLI ()
                                 {
                                     cout << "Enter new name of " << identity << ": ";
                                     cin >> change;
-                                    // Directly change attribute name (may change to fit future design patterns)
-                                    attribute->changeName(change);
-                                    changeLoop = false;
-                                    changed = true;
+                                    // Change attribute name within model
+                                    ERR_CATCH(data.changeAttributeName(className, attribute, change));
+                                    // Only break out of loop if there wasn't an error
+                                    if (!errorStatus) {
+                                        changeLoop = false;
+                                        changed = true;
+                                    }
                                 }
                                 else if(option == "n" || option == "N")
                                     changeLoop = false;
@@ -327,7 +330,7 @@ void CLI::displayCLI ()
                             // Only change parameters if the attribute is a method
                             if(identity == "method")
                             {
-                                // Change parameter loop
+                                // Third changeLoop for changing parameters
                                 changeLoop = true;
                                 while (changeLoop)
                                 {

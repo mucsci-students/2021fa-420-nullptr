@@ -250,6 +250,21 @@ void UMLData::changeAttributeName(string className, string oldAttributeName, str
     getClass(className).changeAttributeName(oldAttributeName, newAttributeName);
 }
 
+void UMLData::changeAttributeName(string className, std::shared_ptr<UMLAttribute> attribute, string newAttributeName)
+{
+    if (getClass(className).checkAttribute(attribute)) {
+        if (attribute->identifier() == "field") {
+            throw "Field cannot be added, conflicts with other attributes";
+        }
+        else if (attribute->identifier() == "method") {
+            throw "Method cannot be added, conflicts with other attributes";
+        }
+    }
+    else if (!isValidName(newAttributeName))
+        throw "New attribute name is not valid";
+    getClass(className).changeAttributeName(attribute, newAttributeName);
+}
+
 // Adds parameter to a given method
 void UMLData::addParameter(std::shared_ptr<UMLMethod> method, string paramName, string paramType){
     if (!isValidName(paramName))

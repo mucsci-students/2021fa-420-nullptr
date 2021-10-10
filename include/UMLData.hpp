@@ -98,6 +98,12 @@ class UMLData
         // Changes className class attribute by the new attribute name
         void changeAttributeName(string className, string oldAttributeName, string newAttributeName);
 
+        // Overload of changeAttributeName to work with a smart pointer
+        void changeAttributeName(string className, std::shared_ptr<UMLAttribute> attribute, string newAttributeName);
+
+        // Changes className class attribute's type by the new type name 
+        void changeAttributeType(string className, std::shared_ptr<UMLAttribute> attribute, string newTypeName);
+
         // Adds parameter to a given method
         void addParameter(std::shared_ptr<UMLMethod> method, string paramName, string paramType);
 
