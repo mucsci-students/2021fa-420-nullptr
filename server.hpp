@@ -24,6 +24,8 @@ using json = nlohmann::json;
 
 namespace umlserver
 {
+    void addAttributeIndexes(json& j, const UMLData& data);
+
     void start (int port)
     {
         httplib::Server svr;
@@ -35,6 +37,8 @@ namespace umlserver
             inja::Environment env;
             inja::Template temp = env.parse_template("../templates/test.html");
             json j = data.getJson();
+            //for each for all the attributes in each class add the index number to the json object
+            addAttributeIndexes(j, data);
             j["errors"] = errors;
             errors.clear();
             j["success"] = success;
@@ -154,5 +158,70 @@ namespace umlserver
         std::cout << "running at http:://localhost:8080/" << std::endl;
 
         svr.listen("localhost", port);
+    }
+
+    void addAttributeIndexes(json& j, const UMLData& data)
+    {
+        for (auto uclass : data.getClasses())
+            {
+                  int index = 0;
+                //assign vector element id for each attribute
+                for (auto attr : uclass.getAttributes())
+                {
+                    //for field, match the name
+                    if (attr->identifier() == "field")
+                    {
+                        for (int classID = 0; classID < j["classes"].size(); ++classID)
+                        {
+                            for (int fieldID = 0; fieldID < j["classes"][classID]["fields"].size(); ++fieldID )
+                            {
+                                if ( j["classes"][classID]["fields"][fieldID]["name"] == attr->getAttributeName())
+                                {
+                                    j["classes"][classID]["fields"][fieldID]["index"] = index;
+                                }
+                            }
+                        }
+                    }
+                    else if (attr->identifier() == "method") //for method, match  name and parameters
+                    {
+
+                        for (int classID = 0; classID < j["classes"].size(); ++classID)
+                        {
+                            for (int methodID = 0; methodID < j["classes"][classID]["methods"].size(); ++methodID )
+                            {
+                                //check params match as methods have same name 
+                                if ( j["classes"][classID]["methods"][methodID]["name"] == attr->getAttributeName())
+                                {
+                                  std::vector<UMLParameter> params = std::dynamic_pointer_cast<UMLMethod>(attr)->getParam();
+                                  bool containsParameter = false;
+                                  for (int i = 0; i < params.size(); ++i)
+                                  {                  
+                                    for (int k = 0; k < j["classes"][classID]["methods"][methodID]["params"].size(); ++k)
+                                    {
+                                        if (params[i].getType() == j["classes"][classID]["methods"][methodID]["params"][k]["type"])
+                                        {
+                                          containsParameter = true;
+                                        }
+                                    }
+                                    if (!containsParameter)
+                                    {
+                                      break;
+                                    }
+                                  }
+
+                                  if (containsParameter || (params.size() == 0 && j["classes"][classID]["methods"][methodID]["params"].size() == 0))
+                                  {
+                                    j["classes"][classID]["methods"][methodID]["index"] = index;
+                                  }
+
+                                }
+                            }
+                        
+                    }   
+                }
+                ++index;
+            }
+          
+        }
     }
 };
