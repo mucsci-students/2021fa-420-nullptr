@@ -307,7 +307,7 @@ void UMLData::addParameter(std::shared_ptr<UMLMethod> method, string paramName, 
 }
 
 // Deletes parameter from given method
-void deleteParameter(std::shared_ptr<UMLMethod> method, string paramName) 
+void UMLData::deleteParameter(std::shared_ptr<UMLMethod> method, string paramName) 
 {
     method->deleteParameter(paramName);
 }

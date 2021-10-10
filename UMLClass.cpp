@@ -62,7 +62,7 @@ void UMLClass::changeAttributeName(string oldAttributeName, string newAttributeN
 }
 
 // Changes name of attribute within class using smart ptr 
-void changeAttributeName(std::shared_ptr<UMLAttribute> attribute, string newAttributeName) 
+void UMLClass::changeAttributeName(std::shared_ptr<UMLAttribute> attribute, string newAttributeName) 
 {
 	attribute->changeName(newAttributeName);
 }
@@ -107,6 +107,7 @@ int UMLClass::findAttribute(string attributeName)
 }
 
 // Checks attribute within pointer vector to see if it causes identical attributes to exist
+// If true, it causes identical attributes. If false, it does not
 bool UMLClass::checkAttribute(std::shared_ptr<UMLAttribute> attribute)
 {
 	if(attribute->identifier() == "field") {
@@ -126,16 +127,34 @@ bool UMLClass::checkAttribute(std::shared_ptr<UMLAttribute> attribute)
 				return true;
 			}
 			else if (classAttributes[i]->getAttributeName() == attribute->getAttributeName() && classAttributes[i]->identifier() == "method"){
-				if(std::dynamic_pointer_cast<UMLMethod>(classAttributes[i])->getParam() == std::dynamic_pointer_cast<UMLMethod>(attribute)->getParam()) {
-					return true;
+				bool containsParameter = false;
+				auto params1 = std::dynamic_pointer_cast<UMLMethod>(classAttributes[i])->getParam();
+				auto params2 = std::dynamic_pointer_cast<UMLMethod>(attribute)->getParam();
+				
+				// Compare each parameter in params1 to each parameter in params2 
+				for (UMLParameter param : params1) {
+					for (UMLParameter param2 : params2) {
+						if (param.getName() == param2.getName() && param.getType() == param2.getType()) {
+							containsParameter = true;
+						}
+					}
+					if (!containsParameter) {
+						// Method does not break identitical attribute rules
+						return false;
+					}
+					else {
+						containsParameter = false;
+					}
 				}
+				// If loop completes, parameters are identical, so the rules are broken
+				return true;
 			}
 		}
-		// Attribute does not break identitical attribute rules
+		// Method does not break identitical attribute rules
 		return false;
 	}
-	// Attribute does not break identitical attribute rules
-	return false;
+	// Attribute breaks rules by default as it lacks the proper identifier
+	return true;
 }
 
 // OLD Finds attribute within pointer vector, returns smart pointer

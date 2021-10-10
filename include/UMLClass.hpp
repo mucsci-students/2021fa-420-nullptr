@@ -63,6 +63,7 @@ class UMLClass
 		int findAttribute(string attributeName);
 
 		// Checks attribute within pointer vector to see if it causes identical attributes to exist
+		// If true, it causes identical attributes. If false, it does not
 		bool checkAttribute(std::shared_ptr<UMLAttribute> attribute);
 
 		// OLD Finds attribute within pointer vector, returns smart pointer
