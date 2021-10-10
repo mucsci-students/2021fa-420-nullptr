@@ -8,8 +8,6 @@
 #include "include/UMLClass.hpp"
 #include "include/UMLAttribute.hpp"
 #include "include/UMLMethod.hpp"
-#include "include/UMLParameter.hpp"
-#include <memory>
 //--------------------------------------------------------------------
 
 // Constructor for class object without attributes
@@ -63,20 +61,40 @@ void UMLClass::changeAttributeName(string oldAttributeName, string newAttributeN
 	getAttribute(oldAttributeName)->changeName(newAttributeName);
 }
 
+// Changes name of attribute within class using smart ptr 
+void UMLClass::changeAttributeName(std::shared_ptr<UMLAttribute> attribute, string newAttributeName) 
+{
+	attribute->changeName(newAttributeName);
+}
+
 // Remove attributes from pointer vector
 void UMLClass::deleteAttribute(string attributeName) 
 {
 	int loc = findAttribute(attributeName);
 	if (loc < 0)
 	{
-		throw "attriubte not found";
+		throw "Attribute not found";
 	}
 
 	classAttributes.erase(classAttributes.begin() + loc);
 
 }
 
-// Finds attribute within pointer vector
+// Remove attribute from pointer vector by pointer
+void UMLClass::deleteAttribute(std::shared_ptr<UMLAttribute> attributePtr)
+{
+	for(int i = 0; i < classAttributes.size(); i++)
+	{
+		if(attributePtr == classAttributes[i])
+		{
+			classAttributes.erase(classAttributes.begin() + i);
+			return;
+		}
+	}
+	throw "Attribute not found";
+}
+
+// OLD Finds attribute within pointer vector
 int UMLClass::findAttribute(string attributeName) 
 {
 	for (int i = 0; i < classAttributes.size(); ++i) {
@@ -88,7 +106,58 @@ int UMLClass::findAttribute(string attributeName)
 	return -1;
 }
 
-// Finds attribute within pointer vector, returns smart pointer
+// Checks attribute within pointer vector to see if it causes identical attributes to exist
+// If true, it causes identical attributes. If false, it does not
+bool UMLClass::checkAttribute(std::shared_ptr<UMLAttribute> attribute)
+{
+	if(attribute->identifier() == "field") {
+		for (int i = 0; i < classAttributes.size(); ++i) {
+			// Check if the name is the same--doesn't matter if it's a field or method
+			if (classAttributes[i]->getAttributeName() == attribute->getAttributeName()) {
+				return true;
+			}
+		}
+		// Attribute does not break identitical attribute rules
+		return false;
+	}
+	else if (attribute->identifier() == "method") {
+		for (int i = 0; i < classAttributes.size(); ++i) {
+			// If they share the same name but the other one is a field, then the attribute cannot exist
+			if (classAttributes[i]->getAttributeName() == attribute->getAttributeName() && classAttributes[i]->identifier() == "field") {
+				return true;
+			}
+			else if (classAttributes[i]->getAttributeName() == attribute->getAttributeName() && classAttributes[i]->identifier() == "method"){
+				bool containsParameter = false;
+				auto params1 = std::dynamic_pointer_cast<UMLMethod>(classAttributes[i])->getParam();
+				auto params2 = std::dynamic_pointer_cast<UMLMethod>(attribute)->getParam();
+				
+				// Compare each parameter in params1 to each parameter in params2 
+				for (UMLParameter param : params1) {
+					for (UMLParameter param2 : params2) {
+						if (param.getType() == param2.getType()) {
+							containsParameter = true;
+						}
+					}
+					if (!containsParameter) {
+						// Method does not break identitical attribute rules
+						return false;
+					}
+					else {
+						containsParameter = false;
+					}
+				}
+				// If loop completes, parameters are identical, so the rules are broken
+				return true;
+			}
+		}
+		// Method does not break identitical attribute rules
+		return false;
+	}
+	// Attribute breaks rules by default as it lacks the proper identifier
+	return true;
+}
+
+// OLD Finds attribute within pointer vector, returns smart pointer
 std::shared_ptr<UMLAttribute> UMLClass::getAttribute(string attributeName)
 {
 	int loc = findAttribute(attributeName);
