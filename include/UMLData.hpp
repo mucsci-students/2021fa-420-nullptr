@@ -91,6 +91,9 @@ class UMLData
         // Removes className class attribute by the name
         void removeClassAttribute(string className, string attributeName);
 
+        // Removes className class attribute by smart pointer
+        void removeClassAttribute(string className, std::shared_ptr<UMLAttribute> attr);
+
         // Changes className class attribute by the new attribute name
         void changeAttributeName(string className, string oldAttributeName, string newAttributeName);
 

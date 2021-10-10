@@ -7,6 +7,7 @@
 // System includes
 #include <string>
 #include <vector>
+#include <list>
 #include "include/UMLMethod.hpp"
 //--------------------------------------------------------------------
 
@@ -17,32 +18,48 @@ using std::vector;
 //--------------------------------------------------------------------
 
 // Creates a UMLMethod object with the constructor's parameters as its fields
-UMLMethod::UMLMethod(string newName, string newType, vector<UMLParameter> newParam)
+UMLMethod::UMLMethod(string newName, string newType, std::list<UMLParameter> newParam)
 :UMLAttribute(newName, newType)
-,param(newParam)
+,parameterList(newParam)
 {
 }
 
 // Returns a list of all of the method's parameters
-vector<UMLParameter> UMLMethod::getParam()
+std::list<UMLParameter> UMLMethod::getParam()
 {
-	return param;
+	return parameterList;
 }
 
 // Changes the list of the method's parameters to match the parameter
-void UMLMethod::setParam(vector<UMLParameter> newParam)
+void UMLMethod::setParam(std::list<UMLParameter> newParam)
 {
-	param = newParam;
+	parameterList = newParam;
 }
 
 // Adds a parameter to the list of parameters
 void UMLMethod::addParam(UMLParameter newParam)
 {
-	param.push_back(newParam);
+	parameterList.push_back(newParam);
 }
 
 // Identifies this attribute as a method
 string UMLMethod::identifier()
 {
 	return "method";
+}
+
+// Delete parameter from parameter vector
+void UMLMethod::deleteParameter(string name)
+{
+	auto paramIndex = parameterList.begin();
+	for(auto paramIndex = parameterList.begin(); paramIndex != parameterList.end(); ++paramIndex)
+	{
+		if (paramIndex->getName() == name)
+		{
+			parameterList.erase(paramIndex);
+			return;
+		}
+	}
+	throw
+		"Parameter not found.";
 }

@@ -50,8 +50,26 @@ class CLI
         // Main UML data object storing UML stuff
         UMLData data;
 
-        //Displays fields and methods to command line
-        void listAttributes(UMLClass& c);        
+        // Displays fields and methods of a class to command line
+        void listAttributes(UMLClass& umlclass); 
+
+        // Display relationships of a class to command line
+        void listRelationships(UMLClass& umlclass);
+
+        // Displays classes in a numerical order and allows selection    
+        string orderClasses(bool displayAttribute, bool displayRelationship);
+
+        // Displays attributes in a numerical order and allows selection    
+        std::shared_ptr<UMLAttribute> orderAttributes(UMLClass c);
+
+        // Display relationships of a class to command line and allows selection
+        string orderRelationships(UMLClass umlclass);
+
+        // Displays the parameters of a method
+        void listParameters(std::shared_ptr<UMLMethod> method);
+
+        // Displays the parameters of a method with a corresponding number and allows selection based on the number
+        UMLParameter orderParameters(std::shared_ptr<UMLMethod> method);
         
     public:
         // Displays command line interface

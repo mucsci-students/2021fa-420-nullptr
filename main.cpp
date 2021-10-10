@@ -24,6 +24,5 @@ int main(int argc, char** argv)
     } else {
       umlserver::start(8080);
     }   
-
     return 0;
 };

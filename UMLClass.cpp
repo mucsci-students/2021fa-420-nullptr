@@ -73,6 +73,20 @@ void UMLClass::deleteAttribute(string attributeName)
 
 }
 
+// Remove attribute from pointer vector by pointer
+void UMLClass::deleteAttribute(std::shared_ptr<UMLAttribute> attributePtr)
+{
+	for(int i = 0; i < classAttributes.size(); i++)
+	{
+		if(attributePtr == classAttributes[i])
+		{
+			classAttributes.erase(classAttributes.begin() + i);
+			return;
+		}
+	}
+	throw "Attribute not found";
+}
+
 // Finds attribute within pointer vector
 int UMLClass::findAttribute(string attributeName) 
 {
