@@ -10,11 +10,25 @@
 #include "include/UMLAttribute.hpp"
 #include "include/UMLClass.hpp"
 #include "include/UMLData.hpp"
+#include "include/UMLMethod.hpp"
+#include "include/UMLParameter.hpp"
 #include "server.hpp"
 //--------------------------------------------------------------------
 
 int main(int argc, char** argv)
 {
+
+    //  inja::Environment env;
+    //  inja::Template temp = env.parse_template("../templates/test.html");
+    //  UMLData data;
+    //  data = UMLFile("save.json").load();
+    //  json j = data.getJson();
+    //  j["errors"] = json::array();
+    //  j["success"] = json::array();
+    //  j["files"] = json::array();
+
+    std::cout << env.render(temp, j) << std::endl;
+
     // Parameter check to see if user wants CLI or GUI
     if (argc > 1) {
         if (string(argv[1]) == "--cli") {

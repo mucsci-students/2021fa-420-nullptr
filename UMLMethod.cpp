@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include "include/UMLMethod.hpp"
+#include "include/UMLParameter.hpp"
 //--------------------------------------------------------------------
 
 //--------------------------------------------------------------------

@@ -16,7 +16,7 @@
             <h3>Fields:</h3>
             <div style="margin-left:50px;">  
             {% for field in class.fields %}
-                <p id="{{ field.name }}">{{ field.type }} {{ field.name }} <button id="{{ field.name }}edit">edit</button> <a href="/delete/attribute/{{ class.name }}/{{ field.name }}">delete</a></p>
+                <h4 id="{{ field.name }}">{{ field.type }} {{ field.name }} <button id="{{ field.name }}edit">edit</button> <a href="/delete/attribute/{{ class.name }}/{{ field.name }}">delete</a></h4>
             {% endfor %}
             </div>
             <form style="margin-top: 50px;" action="/add/field/{{ class.name }}" method="GET">
@@ -111,8 +111,20 @@
             element.addEventListener("click", () => {
                 document.getElementById("{{method.name}}").innerHTML =
                     "<form action='/edit/attribute/{{ class.name }}/{{ method.name }}' method='GET'>" + 
-                        "<input type='text' id='aname' name='aname' value='{{ method.name }}'>" +
-                        "<input type='submit' value='edit attribute'>"
+                        "<input type='text' id='type' name='type' placeholder='return type' value='{{ method.return_type }}'>" +
+                        "<input type='text' id='name' name='name' placeholder='name' value='{{ method.name }}'>" +
+                        "<input type='submit' value='edit attribute'>" +
+                    "</form>";
+            });
+            {% endfor %}
+            {% for field in class.fields %}
+            element = document.getElementById('{{ field.name }}edit');
+            element.addEventListener("click", () => {
+                document.getElementById("{{field.name}}").innerHTML =
+                    "<form action='/edit/attribute/{{ class.name }}/{{ field.name }}' method='GET'>" + 
+                        "<input type='text' id='type' name='type' placeholder='type' value='{{ field.type }}'>" +
+                        "<input type='text' id='name' name='name' placeholder='name' value='{{ field.name }}'>" +
+                        "<input type='submit' value='edit attribute'>" +
                     "</form>";
             });
             {% endfor %}

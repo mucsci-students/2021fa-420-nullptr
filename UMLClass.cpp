@@ -7,6 +7,9 @@
 // System includes
 #include "include/UMLClass.hpp"
 #include "include/UMLAttribute.hpp"
+#include "include/UMLMethod.hpp"
+#include "include/UMLParameter.hpp"
+#include <memory>
 //--------------------------------------------------------------------
 
 // Constructor for class object without attributes

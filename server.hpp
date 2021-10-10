@@ -116,8 +116,11 @@ namespace umlserver
         svr.Get(R"(/edit/attribute/(\w+)/(\w+))", [&](const httplib::Request& req, httplib::Response& res) {
             std::string className = req.matches[1].str();
             std::string oldAttributeName = req.matches[2].str();
-            std::string newAttributeName = req.params.find("aname")->second;
-            ERR_ADD(data.changeAttributeName(className, oldAttributeName, newAttributeName));
+            std::string newName = req.params.find("name")->second;
+            std::string newType = req.params.find("type")->second;
+            std::shared_ptr<UMLAttribute> attr = data.getClassCopy(className).getAttribute(oldAttributeName);
+            attr->changeName(newName);
+            attr->changeType(newType);
             res.set_redirect("/");
         });
 
