@@ -345,24 +345,28 @@ void CLI::displayCLI ()
                                     // Check user input
                                     if(option == "y" || option == "Y")
                                     {
+                                        bool paramLoop, paramLoop2, paramLoop3 = true;
                                         ERR_CATCH(listParameters(std::dynamic_pointer_cast<UMLMethod>(attribute)));
                                         // Only enter loop if there was no issue in listing parameters
                                         if (errorStatus)
                                             errorStatus = false;
                                         else
                                         {
+                                            
                                             std::shared_ptr<UMLMethod> method = std::dynamic_pointer_cast<UMLMethod>(attribute);
-                                            // add parameters
                                             string userChoice2;
-                                            // Loop to check for correct input
-                                            bool paramLoop2 = true;
-                                            while(paramLoop2) {
+                                            // Reset paramLoop
+                                            bool paramLoop = true;
+                                            // Add parameters loop
+                                            while(paramLoop) {
                                                 cout << endl << "Add? (y/n): ";
                                                 cin >> userChoice2;
                                                 // User chooses to add the parameters
                                                 if(userChoice2 == "y" || userChoice2 == "Y") {
                                                     string paramName;
                                                     string paramType;
+                                                    // Reset paramLoop2
+                                                    bool paramLoop2 = true;
                                                     // Loop to allow for unlimited parameters
                                                     while(paramLoop2) {
                                                         cout << endl << "Enter parameter name: ";
@@ -375,8 +379,9 @@ void CLI::displayCLI ()
                                                             errorStatus = false;
                                                         else
                                                             changed = true;
-                                                        // Loop to check user input
+                                                       
                                                         bool paramLoop3 = true;
+                                                        // Final loop to check if more should be added, otherwise break paramLoops
                                                         while(paramLoop3) {
                                                             cout << endl << "Add more? (y/n): ";
                                                             cin >> userChoice2;
@@ -385,6 +390,7 @@ void CLI::displayCLI ()
                                                                 paramLoop3 = false;
                                                             // Exit add parameter loop
                                                             else if(userChoice2 == "n" || userChoice2 == "N") {
+                                                                paramLoop = false;
                                                                 paramLoop2 = false;
                                                                 paramLoop3 = false;
                                                             }
@@ -396,43 +402,45 @@ void CLI::displayCLI ()
                                                 }
                                                 // Do not add the parameters
                                                 else if(userChoice2 == "n" || userChoice2 == "N")
-                                                    paramLoop2 = false;
+                                                    paramLoop = false;
                                                 // Enter input again
                                                 else
                                                     cout << endl << "Invalid choice!" << endl;
                                             }
-                                            // Delete loop
-                                            paramLoop2 = true;
-                                            while(paramLoop2) 
+                                            
+                                            // Reset paramLoop
+                                            paramLoop = true;
+                                            // Delete parameters loop
+                                            while(paramLoop) 
                                             {
                                                 cout << endl << "Delete? (y/n): ";
                                                 cin >> userChoice2;
                                                 // User chooses to delete parameters
                                                 if(userChoice2 == "y" || userChoice2 == "Y") {
                                                     // Loop to allow for unlimited deletion
-                                                    while(method->getParam().size() > 0 && paramLoop2) {
+                                                    while(method->getParam().size() > 0 && paramLoop) {
                                                         ERR_CATCH(data.deleteParameter(method, orderParameters(method).getName()));
                                                         // Error or user selected go back
                                                         if(errorStatus)
                                                         {
                                                             errorStatus = false;
-                                                            paramLoop2 = false;
                                                         }
                                                         else
                                                         {
                                                             // Successfully deleted
                                                             changed = true;
-                                                            // Loop to check user input
-                                                            bool paramLoop2 = true;
+                                                            // Reset paramLoop2
+                                                            paramLoop2 = true;
+                                                            // Final loop to check if more should be added, otherwise break paramLoops
                                                             while(paramLoop2) {
                                                                 cout << endl << "Delete more? (y/n): ";
                                                                 cin >> userChoice2;
-                                                                // Add parameter again
+                                                                // Delete parameter again
                                                                 if(userChoice2 == "y" || userChoice2 == "Y")
                                                                     paramLoop2 = false;
-                                                                // Exit add parameter loop
+                                                                // Exit delete parameter loop
                                                                 else if(userChoice2 == "n" || userChoice2 == "N") {
-                                                                    paramLoop2 = false;
+                                                                    paramLoop = false;
                                                                     paramLoop2 = false;
                                                                 }
                                                                 // Invalid input, enter again
@@ -443,33 +451,33 @@ void CLI::displayCLI ()
                                                     }
                                                     if(method->getParam().size() == 0)
                                                     {
-                                                        paramLoop2 = false;
+                                                        paramLoop = false;
                                                         cout << endl << "No parameters to delete." << endl;
                                                     }
                                                 }
                                                 // Do not delete the parameters
                                                 else if(userChoice2 == "n" || userChoice2 == "N")
-                                                    paramLoop2 = false;
+                                                    paramLoop = false;
                                                 // Enter input again
                                                 else
                                                     cout << endl << "Invalid choice!" << endl;
                                             }
+                                            // Reset paramLoop
+                                            paramLoop = true;
                                             // Change parameters loop
-                                            paramLoop2 = true;
-                                            while(paramLoop2) 
+                                            while(paramLoop) 
                                             {  
                                                 cout << endl << "Change? (y/n): ";
                                                 cin >> userChoice2;
                                                 // User chooses to change parameters
                                                 if(userChoice2 == "y" || userChoice2 == "Y") {
                                                     // Loop to allow for unlimited changing
-                                                    while(method->getParam().size() > 0 && paramLoop2) {
+                                                    while(method->getParam().size() > 0 && paramLoop) {
                                                         // User selected method for changed first gets deleted
                                                         ERR_CATCH(data.deleteParameter(method, orderParameters(method).getName()));
                                                         if(errorStatus)
                                                         {
                                                             errorStatus = false;
-                                                            paramLoop2 = false;
                                                         }
                                                         else
                                                         {
@@ -484,9 +492,9 @@ void CLI::displayCLI ()
                                                             // If fails, just set to false and move to "change more"
                                                             if(errorStatus)
                                                                 errorStatus = false;
-                                                            // Allow for user to change more
-                                                            // Loop to check user input
-                                                            bool paramLoop2 = true;
+                                                            // Reset paramLoop2
+                                                            paramLoop2 = true;
+                                                            // Final loop to check if more should be changed, otherwise break paramLoops
                                                             while(paramLoop2) {
                                                                 cout << endl << "Change more? (y/n): ";
                                                                 cin >> userChoice2;
@@ -517,11 +525,14 @@ void CLI::displayCLI ()
                                                 else
                                                     cout << endl << "Invalid choice!" << endl;
                                             }
+                                            // Loop is over, break changeLoop
                                             changeLoop = false;
                                         }
                                     }
+                                    // Don't change anything within the parameters
                                     else if(option == "n" || option == "N")
                                         changeLoop = false;
+                                    // Enter input again
                                     else
                                         cout << "Invalid input!" << endl << endl;
                                 }
