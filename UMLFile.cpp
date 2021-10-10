@@ -48,6 +48,7 @@ UMLData UMLFile::load()
     return data;
 }
 
+// gets the relationships from the json file and adds them to the UMLData object
 void UMLFile::addClasses(UMLData& data, const json& j)
 {
     for (auto umlclass : j["classes"])
@@ -61,7 +62,7 @@ void UMLFile::addClasses(UMLData& data, const json& j)
         }
         for (auto method : umlclass["methods"])
         {
-            std::vector<UMLParameter> params;
+            std::list<UMLParameter> params;
             for (auto param : method["params"])
                 params.push_back(UMLParameter(param["name"], param["type"]));
 
@@ -70,6 +71,7 @@ void UMLFile::addClasses(UMLData& data, const json& j)
     }
 }
 
+// gets the relationships from the json file and adds them to the UMLData object
 void UMLFile::addRelationships(UMLData& data, const json& j)
 {
     for (auto relationship : j["relationships"])

@@ -87,14 +87,14 @@ void CLI::displayCLI ()
                         data.deleteClass(name);
                         cout << endl << "Class named " << name << " removed" << endl << endl;
                     }
-                    // User either canceled or there were no classes
+                    // User either cancelled or there were no classes
                     else errorStatus = false;
                 } 
                 // Rename class
                 else if (userChoice == "3") {
                     // Prompt user for class
                     ERR_CATCH(name = orderClasses(false, false));
-                    // User either canceled or there were no classes
+                    // User either cancelled or there were no classes
                     if (errorStatus)
                         errorStatus = false;
                     else
@@ -136,14 +136,14 @@ void CLI::displayCLI ()
                 cin >> userChoice;
                 cout << endl << endl;
 
-                // Class and attribute name input storage
-                string className, attributeName, attributeName2;
+                // Class, attribute name, type input storage
+                string className, attributeName, attributeName2, type;
                 
                 // Add attribute
                 if (userChoice == "1") {
                     // Prompt user for class
                     ERR_CATCH(className = orderClasses(false, false));
-                    // User either canceled or there were no classes
+                    // User either cancelled or there were no classes
                     if (errorStatus)
                         errorStatus = false;
                     else
@@ -162,72 +162,82 @@ void CLI::displayCLI ()
                                 cout << "Enter the name of the field: ";
                                 cin >> attributeName;
                                 cout << endl << "Enter type: ";
-                                string type;
                                 cin >> type;
                                 ERR_CATCH(data.addClassAttribute(className, std::make_shared<UMLField>(attributeName, type)));
                                 if (errorStatus == false) cout << endl << "Field " << attributeName << " added to " << className << endl << endl;
                                 else errorStatus = false;
                                 attributeLoop = false;
                             }
-
                             // User chooses to add a method
                             else if (userChoice == "2")
                             {
                                 cout << "Enter the name of the method: ";
                                 cin >> attributeName;
-                                cout << endl << "Enter return type: ";
-                                string returnType;
-                                cin >> returnType;
-                                // Prompt user to enter as many parameters as they want
-                                bool paramLoop2 = true;
-                                std::list<UMLParameter> paramList = {};
-                                string userChoice2;
-                                // First loop to check for correct input
-                                while(paramLoop2) {
-                                    cout << endl << "Add parameter? (y/n): ";
-                                    cin >> userChoice2;
-                                    // User chooses to add the parameters
-                                    if(userChoice2 == "y" || userChoice2 == "Y") {
-                                        string paramName;
-                                        string paramType;
-                                        // Loop to allow for unlimited parameters
-                                        while(paramLoop2) {
-                                            cout << endl << "Enter parameter name: ";
-                                            cin >> paramName;
-                                            cout << endl << "Enter parameter type: ";
-                                            cin >> paramType;
-                                            paramList.push_back(UMLParameter(paramName, paramType));
-                                            // Loop to check user input
-                                            bool paramLoop2 = true;
-                                            while(paramLoop2) {
-                                                cout << endl << "Add more? (y/n): ";
-                                                cin >> userChoice2;
-                                                // Add parameter again
-                                                if(userChoice2 == "y" || userChoice2 == "Y")
-                                                    paramLoop2 = false;
-                                                // Exit add parameter loop
-                                                else if(userChoice2 == "n" || userChoice2 == "N") {
-                                                    paramLoop2 = false;
-                                                    paramLoop2 = false;
+                                cout << endl << "Enter type: ";
+                                cin >> type;
+                                // Construct new method with an empty list, save method for ease of modification
+                                auto newMethod = std::make_shared<UMLMethod>(attributeName, type, std::list<UMLParameter>());
+                                ERR_CATCH(data.addClassAttribute(className, newMethod));
+                                if (errorStatus == false) {
+                                    cout << endl << "Method " << attributeName << " added to " << className << endl << endl;
+                                    // para
+                                    bool paramLoop = true;
+                                    bool paramLoop2 = true;
+                                    string userChoice2;
+                                    // First loop to check for correct input
+                                    while(paramLoop) {
+                                        cout << "Add parameter? (y/n): ";
+                                        cin >> userChoice2;
+                                        // User chooses to add the parameters
+                                        if(userChoice2 == "y" || userChoice2 == "Y") {
+                                            string paramName;
+                                            string paramType;
+                                            // Loop to allow for unlimited parameters
+                                            while(paramLoop) {
+                                                cout << endl << "Enter parameter name: ";
+                                                cin >> paramName;
+                                                cout << endl << "Enter parameter type: ";
+                                                cin >> paramType;
+                                                
+                                                ERR_CATCH(data.addParameter(newMethod, paramName, paramType));
+                                                if (errorStatus == false) cout << endl << "Parameter " << paramName <<
+                                                    " of type " << paramType << " added to " << attributeName << endl << endl;
+                                                else errorStatus = false;
+
+                                                // Loop to check user input
+                                                bool paramLoop2 = true;
+                                                while(paramLoop2) {
+                                                    cout << "Add more? (y/n): ";
+                                                    cin >> userChoice2;
+                                                    // Prompt to add parameter again
+                                                    if(userChoice2 == "y" || userChoice2 == "Y")
+                                                        paramLoop2 = false;
+                                                    // Exit add parameter loop
+                                                    else if(userChoice2 == "n" || userChoice2 == "N") {
+                                                        // Fix spacing, set all attribute loop booleans to false
+                                                        cout << endl;
+                                                        paramLoop = false;
+                                                        paramLoop2 = false;
+                                                        attributeLoop = false;
+                                                    }
+                                                    // Invalid input, enter again
+                                                    else
+                                                        cout << endl << "Invalid choice!" << endl;
                                                 }
-                                                // Invalid input, enter again
-                                                else
-                                                    cout << endl << "Invalid choice!" << endl;
                                             }
                                         }
+                                        // Do not add the parameters
+                                        else if(userChoice2 == "n" || userChoice2 == "N")
+                                            paramLoop = false;
+                                        // Enter input again
+                                        else
+                                            cout << endl << "Invalid choice!" << endl;
                                     }
-                                    // Do not add the parameters
-                                    else if(userChoice2 == "n" || userChoice2 == "N")
-                                        paramLoop2 = false;
-                                    // Enter input again
-                                    else
-                                        cout << endl << "Invalid choice!" << endl;
                                 }
-                                ERR_CATCH(data.addClassAttribute(className, std::make_shared<UMLMethod>(attributeName, returnType, paramList) ));
-                                if (errorStatus == false) 
-                                    cout << endl << "Method " << attributeName << " added to " << className << endl << endl;
-                                else errorStatus = false;
+                                else {
+                                    errorStatus = false;
                                     attributeLoop = false;
+                                }
                             }  
                             //Redo loop if invalid option entered
                             else
@@ -239,15 +249,15 @@ void CLI::displayCLI ()
                 else if (userChoice == "2") {
                     // Prompt user for class
                     ERR_CATCH(className = orderClasses(true, false));
-                    // User either canceled or there were no classes
+                    // User either cancelled or there were no classes
                     if (errorStatus)
                         errorStatus = false;
                     else
                     {
                         // Prompts user for attribute from the class they chose
                         std::shared_ptr<UMLAttribute> attribute;
-                        ERR_CATCH( attribute = orderAttributes(data.getClassCopy(className)) );
-                        // User either canceled or the class had no attributes
+                        ERR_CATCH(attribute = orderAttributes(data.getClassCopy(className)));
+                        // User either cancelled or the class had no attributes
                         if (errorStatus)
                             errorStatus = false;
                         else
@@ -261,7 +271,7 @@ void CLI::displayCLI ()
                 else if (userChoice == "3") {
                     // Prompt user for class
                     ERR_CATCH(className = orderClasses(true, false));
-                    // User either canceled or there were no classes
+                    // User either cancelled or there were no classes
                     if (errorStatus)
                         errorStatus = false;
                     else
@@ -271,12 +281,12 @@ void CLI::displayCLI ()
                         // Prompts user for attribute from the class they chose
                         std::shared_ptr<UMLAttribute> attribute;
                         ERR_CATCH(attribute = orderAttributes(data.getClassCopy(className)));
-                        // User either canceled or the class had no attributes
+                        // User either cancelled or the class had no attributes
                         if (errorStatus)
                             errorStatus = false;
                         else
                         {
-                            string identity = attribute->identifier(); // prints correct attribute type to console
+                            string identity = attribute->identifier(); // For printing correct attribute type to console
                             // Primary loop to maintain the structure of modifying an attribute
                             bool changeLoop = true;
                             // First changeLoop for changing name
@@ -290,10 +300,14 @@ void CLI::displayCLI ()
                                 {
                                     cout << "Enter new name of " << identity << ": ";
                                     cin >> change;
-                                    // Directly change attribute name (may change to fit future design patterns)
-                                    attribute->changeName(change);
-                                    changeLoop = false;
-                                    changed = true;
+                                    // Change attribute name within model
+                                    ERR_CATCH(data.changeAttributeName(className, attribute, change));
+                                    // Only break out of loop if there wasn't an error
+                                    if (!errorStatus) {
+                                        changeLoop = false;
+                                        changed = true;
+                                    }
+                                    else errorStatus = false;
                                 }
                                 else if(option == "n" || option == "N")
                                     changeLoop = false;
@@ -314,9 +328,13 @@ void CLI::displayCLI ()
                                     cout << "Enter new type of " << identity << ": ";
                                     cin >> change;
                                     // Directly change attribute type (may change to fit future design patterns)
-                                    attribute->changeType(change);
-                                    changeLoop = false;
-                                    changed = true;
+                                    // attribute->changeType(change);
+                                    ERR_CATCH(data.changeAttributeType(attribute, change));
+                                    if (!errorStatus) {
+                                        changeLoop = false;
+                                        changed = true;
+                                    }
+                                    else errorStatus = false;
                                 }
                                 else if(option == "n" || option == "N")
                                     changeLoop = false;
@@ -326,47 +344,55 @@ void CLI::displayCLI ()
                             // Only change parameters if the attribute is a method
                             if(identity == "method")
                             {
-                                // Change parameter loop
+                                // Third changeLoop for changing parameters
                                 changeLoop = true;
                                 while (changeLoop)
                                 {
-                                    cout << "Add, delete, or change parameter? (y/n): ";
+                                    cout << "Add, delete, or change parameters? (y/n): ";
                                     string option;
                                     cin >> option;
                                     // Check user input
                                     if(option == "y" || option == "Y")
                                     {
-                                        ERR_CATCH(listParameters(std::static_pointer_cast<UMLMethod>(attribute)));
+                                        bool paramLoop, paramLoop2, paramLoop3 = true;
+                                        ERR_CATCH(listParameters(std::dynamic_pointer_cast<UMLMethod>(attribute)));
                                         // Only enter loop if there was no issue in listing parameters
                                         if (errorStatus)
                                             errorStatus = false;
                                         else
                                         {
-                                            std::shared_ptr<UMLMethod> method = std::static_pointer_cast<UMLMethod>(attribute);
-                                            // add parameters
+                                            std::shared_ptr<UMLMethod> method = std::dynamic_pointer_cast<UMLMethod>(attribute);
                                             string userChoice2;
-                                            // Loop to check for correct input
-                                            bool paramLoop2 = true;
-                                            while(paramLoop2) {
+                                            // Reset paramLoop
+                                            bool paramLoop = true;
+                                            // Add parameters loop
+                                            while(paramLoop) {
                                                 cout << endl << "Add? (y/n): ";
                                                 cin >> userChoice2;
                                                 // User chooses to add the parameters
                                                 if(userChoice2 == "y" || userChoice2 == "Y") {
                                                     string paramName;
                                                     string paramType;
+                                                    // Reset paramLoop2
+                                                    bool paramLoop2 = true;
                                                     // Loop to allow for unlimited parameters
                                                     while(paramLoop2) {
                                                         cout << endl << "Enter parameter name: ";
                                                         cin >> paramName;
                                                         cout << endl << "Enter parameter type: ";
                                                         cin >> paramType;
-                                                        ERR_CATCH(method->addParam(UMLParameter(paramName, paramType))); // No error by default but NEEDS ERROR CHECKING, probably
-                                                        if(errorStatus)
-                                                            errorStatus = false;
-                                                        else
+                                                       
+                                                        // Cast attribute to parameter, add parameter
+                                                        ERR_CATCH(data.addParameter(method, paramName, paramType));
+                                                        if (errorStatus == false) {
+                                                            cout << endl << "Parameter " << paramName <<
+                                                            " of type " << paramType << " added to " << method->getAttributeName() << endl << endl;
                                                             changed = true;
-                                                        // Loop to check user input
+                                                        }
+                                                        else errorStatus = false;
+
                                                         bool paramLoop3 = true;
+                                                        // Final loop to check if more should be added, otherwise break paramLoops
                                                         while(paramLoop3) {
                                                             cout << endl << "Add more? (y/n): ";
                                                             cin >> userChoice2;
@@ -375,6 +401,7 @@ void CLI::displayCLI ()
                                                                 paramLoop3 = false;
                                                             // Exit add parameter loop
                                                             else if(userChoice2 == "n" || userChoice2 == "N") {
+                                                                paramLoop = false;
                                                                 paramLoop2 = false;
                                                                 paramLoop3 = false;
                                                             }
@@ -386,43 +413,46 @@ void CLI::displayCLI ()
                                                 }
                                                 // Do not add the parameters
                                                 else if(userChoice2 == "n" || userChoice2 == "N")
-                                                    paramLoop2 = false;
+                                                    paramLoop = false;
                                                 // Enter input again
                                                 else
                                                     cout << endl << "Invalid choice!" << endl;
                                             }
-                                            // Delete loop
-                                            paramLoop2 = true;
-                                            while(paramLoop2) 
+                                            
+                                            // Reset paramLoop
+                                            paramLoop = true;
+                                            // Delete parameters loop
+                                            while(paramLoop) 
                                             {
                                                 cout << endl << "Delete? (y/n): ";
                                                 cin >> userChoice2;
                                                 // User chooses to delete parameters
                                                 if(userChoice2 == "y" || userChoice2 == "Y") {
                                                     // Loop to allow for unlimited deletion
-                                                    while(method->getParam().size() > 0 && paramLoop2) {
-                                                        ERR_CATCH(method->deleteParameter(orderParameters(method).getName()));
+                                                    while(method->getParam().size() > 0 && paramLoop) {
+                                                        ERR_CATCH(data.deleteParameter(method, orderParameters(method).getName()));
+                                                        cout << endl << "Parameter deleted" << endl << endl;
                                                         // Error or user selected go back
                                                         if(errorStatus)
                                                         {
                                                             errorStatus = false;
-                                                            paramLoop2 = false;
                                                         }
                                                         else
                                                         {
                                                             // Successfully deleted
                                                             changed = true;
-                                                            // Loop to check user input
-                                                            bool paramLoop2 = true;
+                                                            // Reset paramLoop2
+                                                            paramLoop2 = true;
+                                                            // Final loop to check if more should be added, otherwise break paramLoops
                                                             while(paramLoop2) {
                                                                 cout << endl << "Delete more? (y/n): ";
                                                                 cin >> userChoice2;
-                                                                // Add parameter again
+                                                                // Delete parameter again
                                                                 if(userChoice2 == "y" || userChoice2 == "Y")
                                                                     paramLoop2 = false;
-                                                                // Exit add parameter loop
+                                                                // Exit delete parameter loop
                                                                 else if(userChoice2 == "n" || userChoice2 == "N") {
-                                                                    paramLoop2 = false;
+                                                                    paramLoop = false;
                                                                     paramLoop2 = false;
                                                                 }
                                                                 // Invalid input, enter again
@@ -433,33 +463,33 @@ void CLI::displayCLI ()
                                                     }
                                                     if(method->getParam().size() == 0)
                                                     {
-                                                        paramLoop2 = false;
+                                                        paramLoop = false;
                                                         cout << endl << "No parameters to delete." << endl;
                                                     }
                                                 }
                                                 // Do not delete the parameters
                                                 else if(userChoice2 == "n" || userChoice2 == "N")
-                                                    paramLoop2 = false;
+                                                    paramLoop = false;
                                                 // Enter input again
                                                 else
                                                     cout << endl << "Invalid choice!" << endl;
                                             }
+                                            // Reset paramLoop
+                                            paramLoop = true;
                                             // Change parameters loop
-                                            paramLoop2 = true;
-                                            while(paramLoop2) 
+                                            while(paramLoop) 
                                             {  
                                                 cout << endl << "Change? (y/n): ";
                                                 cin >> userChoice2;
                                                 // User chooses to change parameters
                                                 if(userChoice2 == "y" || userChoice2 == "Y") {
                                                     // Loop to allow for unlimited changing
-                                                    while(method->getParam().size() > 0 && paramLoop2) {
+                                                    while(method->getParam().size() > 0 && paramLoop) {
                                                         // User selected method for changed first gets deleted
-                                                        ERR_CATCH(method->deleteParameter(orderParameters(method).getName()));
+                                                        ERR_CATCH(data.deleteParameter(method, orderParameters(method).getName()));
                                                         if(errorStatus)
                                                         {
                                                             errorStatus = false;
-                                                            paramLoop2 = false;
                                                         }
                                                         else
                                                         {
@@ -470,23 +500,26 @@ void CLI::displayCLI ()
                                                             cin >> paramName;
                                                             cout << endl << "Enter new type: ";
                                                             cin >> paramType;
-                                                            ERR_CATCH(method->addParam(UMLParameter(paramName, paramType))); //NEEDS ERROR CHECKING, probably
+                                                            ERR_CATCH(data.addParameter(method, paramName, paramType));
+                                                            // If fails, just set to false and move to "change more"
                                                             if(errorStatus)
                                                                 errorStatus = false;
-                                                            // ELSE STATEMENT FOR FUTURE ERROR CHECKING
-                                                            
-                                                            // Allow for user to change more
-                                                            // Loop to check user input
-                                                            bool paramLoop2 = true;
-                                                            while(paramLoop2) {
+                                                            else
+                                                                cout << endl << "Parameter deleted" << endl << endl;
+                                                            // Reset paramLoop2
+                                                            paramLoop2 = true;
+                                                            // Final loop to check if more should be changed, otherwise break paramLoops
+                                                            while(paramLoop2) 
+                                                            {
                                                                 cout << endl << "Change more? (y/n): ";
                                                                 cin >> userChoice2;
                                                                 // Add parameter again
                                                                 if(userChoice2 == "y" || userChoice2 == "Y")
                                                                     paramLoop2 = false;
                                                                 // Exit add parameter changeLoop
-                                                                else if(userChoice2 == "n" || userChoice2 == "N") {
-                                                                    paramLoop2 = false;
+                                                                else if(userChoice2 == "n" || userChoice2 == "N") 
+                                                                {
+                                                                    paramLoop = false;
                                                                     paramLoop2 = false;
                                                                 }
                                                                 // Invalid input, enter again
@@ -502,17 +535,23 @@ void CLI::displayCLI ()
                                                     }
                                                 }
                                                 // Do not change the parameters
-                                                else if(userChoice2 == "n" || userChoice2 == "N")
+                                                else if(userChoice2 == "n" || userChoice2 == "N") 
+                                                {
+                                                    paramLoop = false;
                                                     paramLoop2 = false;
+                                                }
                                                 // Enter input again
                                                 else
                                                     cout << endl << "Invalid choice!" << endl;
                                             }
+                                            // Loop is over, break changeLoop
                                             changeLoop = false;
                                         }
                                     }
+                                    // Don't change anything within the parameters
                                     else if(option == "n" || option == "N")
                                         changeLoop = false;
+                                    // Enter input again
                                     else
                                         cout << "Invalid input!" << endl << endl;
                                 }
@@ -871,7 +910,7 @@ void CLI::listAttributes(UMLClass& umlclass)
         {
             cout << "     " << attribute->getType() << " " << attribute->getAttributeName() << endl;
             cout << "      Parameters: " << endl;
-            for (auto param : (std::static_pointer_cast<UMLMethod>(attribute))->getParam())
+            for (auto param : (std::dynamic_pointer_cast<UMLMethod>(attribute))->getParam())
                 cout << "       " << param.getType() << " " << param.getName() << endl;
             isMethod = true;
         }
@@ -995,7 +1034,7 @@ std::shared_ptr<UMLAttribute> CLI::orderAttributes(UMLClass c)
                 option++;
                 cout << "[" << option << "] " << attribute->getType() << " " << attribute->getAttributeName() << endl;
                 cout << "     Parameters: " << endl;
-                for (auto param : (std::static_pointer_cast<UMLMethod>(attribute))->getParam())
+                for (auto param : (std::dynamic_pointer_cast<UMLMethod>(attribute))->getParam())
                     cout << "      " << param.getType() << " " << param.getName() << endl;
                 method = true;
             }
