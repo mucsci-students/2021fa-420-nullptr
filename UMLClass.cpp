@@ -134,7 +134,7 @@ bool UMLClass::checkAttribute(std::shared_ptr<UMLAttribute> attribute)
 				// Compare each parameter in params1 to each parameter in params2 
 				for (UMLParameter param : params1) {
 					for (UMLParameter param2 : params2) {
-						if (param.getName() == param2.getName() && param.getType() == param2.getType()) {
+						if (param.getType() == param2.getType()) {
 							containsParameter = true;
 						}
 					}
