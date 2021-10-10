@@ -9,6 +9,7 @@
 //  System includes
 #include <string>
 #include <vector>
+#include <list>
 #include "UMLParameter.hpp"
 #include "UMLAttribute.hpp"
 // --------------------------------------------------------------------
@@ -24,22 +25,25 @@ class UMLMethod : public UMLAttribute
 	private:
 
 		// List of parameters for the method
-		vector<UMLParameter> param;
+		std::list<UMLParameter> parameterList;
 
 	public:
 
 		// Creates a UMLMethod object with the constructor's parameters as its fields
-		UMLMethod(string newName, string newType, vector<UMLParameter> newParam);
+		UMLMethod(string newName, string newType, std::list<UMLParameter> newParam);
 
 		// Returns a list of all of the method's parameters
-		vector<UMLParameter> getParam();
+		std::list<UMLParameter> getParam();
 
 		// Changes the list of the method's parameters to match the parameter
-		void setParam(vector<UMLParameter> newParam);
+		void setParam(std::list<UMLParameter> newParam);
 
 		// Adds a parameter to the list of parameters
 		void addParam(UMLParameter newParam);
 
 		// Identifies this attribute as a method
 		string identifier();
+
+		// Deletes a parameter from the given name
+		void deleteParameter(string name);
 };

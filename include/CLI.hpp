@@ -64,6 +64,12 @@ class CLI
 
         // Display relationships of a class to command line and allows selection
         string orderRelationships(UMLClass umlclass);
+
+        // Displays the parameters of a method
+        void listParameters(std::shared_ptr<UMLMethod> method);
+
+        // Displays the parameters of a method with a corresponding number and allows selection based on the number
+        UMLParameter orderParameters(std::shared_ptr<UMLMethod> method);
         
     public:
         // Displays command line interface
