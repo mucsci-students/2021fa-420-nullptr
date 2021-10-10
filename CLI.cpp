@@ -298,6 +298,7 @@ void CLI::displayCLI ()
                                         changeLoop = false;
                                         changed = true;
                                     }
+                                    else errorStatus = false;
                                 }
                                 else if(option == "n" || option == "N")
                                     changeLoop = false;
@@ -318,9 +319,13 @@ void CLI::displayCLI ()
                                     cout << "Enter new type of " << identity << ": ";
                                     cin >> change;
                                     // Directly change attribute type (may change to fit future design patterns)
-                                    attribute->changeType(change);
-                                    changeLoop = false;
-                                    changed = true;
+                                    // attribute->changeType(change);
+                                    ERR_CATCH(data.changeAttributeType(attribute, change));
+                                    if (!errorStatus) {
+                                        changeLoop = false;
+                                        changed = true;
+                                    }
+                                    else errorStatus = false;
                                 }
                                 else if(option == "n" || option == "N")
                                     changeLoop = false;
@@ -340,13 +345,13 @@ void CLI::displayCLI ()
                                     // Check user input
                                     if(option == "y" || option == "Y")
                                     {
-                                        ERR_CATCH(listParameters(std::static_pointer_cast<UMLMethod>(attribute)));
+                                        ERR_CATCH(listParameters(std::dynamic_pointer_cast<UMLMethod>(attribute)));
                                         // Only enter loop if there was no issue in listing parameters
                                         if (errorStatus)
                                             errorStatus = false;
                                         else
                                         {
-                                            std::shared_ptr<UMLMethod> method = std::static_pointer_cast<UMLMethod>(attribute);
+                                            std::shared_ptr<UMLMethod> method = std::dynamic_pointer_cast<UMLMethod>(attribute);
                                             // add parameters
                                             string userChoice2;
                                             // Loop to check for correct input
@@ -364,7 +369,8 @@ void CLI::displayCLI ()
                                                         cin >> paramName;
                                                         cout << endl << "Enter parameter type: ";
                                                         cin >> paramType;
-                                                        ERR_CATCH(method->addParam(UMLParameter(paramName, paramType))); // No error by default but NEEDS ERROR CHECKING, probably
+                                                        // Cast attribute to parameter, add parameter
+                                                        ERR_CATCH(data.addParameter(method, paramName, paramType));
                                                         if(errorStatus)
                                                             errorStatus = false;
                                                         else
@@ -405,7 +411,7 @@ void CLI::displayCLI ()
                                                 if(userChoice2 == "y" || userChoice2 == "Y") {
                                                     // Loop to allow for unlimited deletion
                                                     while(method->getParam().size() > 0 && paramLoop2) {
-                                                        ERR_CATCH(method->deleteParameter(orderParameters(method).getName()));
+                                                        ERR_CATCH(data.deleteParameter(method, orderParameters(method).getName()));
                                                         // Error or user selected go back
                                                         if(errorStatus)
                                                         {
@@ -459,7 +465,7 @@ void CLI::displayCLI ()
                                                     // Loop to allow for unlimited changing
                                                     while(method->getParam().size() > 0 && paramLoop2) {
                                                         // User selected method for changed first gets deleted
-                                                        ERR_CATCH(method->deleteParameter(orderParameters(method).getName()));
+                                                        ERR_CATCH(data.deleteParameter(method, orderParameters(method).getName()));
                                                         if(errorStatus)
                                                         {
                                                             errorStatus = false;
@@ -474,11 +480,10 @@ void CLI::displayCLI ()
                                                             cin >> paramName;
                                                             cout << endl << "Enter new type: ";
                                                             cin >> paramType;
-                                                            ERR_CATCH(method->addParam(UMLParameter(paramName, paramType))); //NEEDS ERROR CHECKING, probably
+                                                            ERR_CATCH(data.addParameter(method, paramName, paramType));
+                                                            // If fails, just set to false and move to "change more"
                                                             if(errorStatus)
                                                                 errorStatus = false;
-                                                            // ELSE STATEMENT FOR FUTURE ERROR CHECKING
-                                                            
                                                             // Allow for user to change more
                                                             // Loop to check user input
                                                             bool paramLoop2 = true;
@@ -875,7 +880,7 @@ void CLI::listAttributes(UMLClass& umlclass)
         {
             cout << "     " << attribute->getType() << " " << attribute->getAttributeName() << endl;
             cout << "      Parameters: " << endl;
-            for (auto param : (std::static_pointer_cast<UMLMethod>(attribute))->getParam())
+            for (auto param : (std::dynamic_pointer_cast<UMLMethod>(attribute))->getParam())
                 cout << "       " << param.getType() << " " << param.getName() << endl;
             isMethod = true;
         }
@@ -999,7 +1004,7 @@ std::shared_ptr<UMLAttribute> CLI::orderAttributes(UMLClass c)
                 option++;
                 cout << "[" << option << "] " << attribute->getType() << " " << attribute->getAttributeName() << endl;
                 cout << "     Parameters: " << endl;
-                for (auto param : (std::static_pointer_cast<UMLMethod>(attribute))->getParam())
+                for (auto param : (std::dynamic_pointer_cast<UMLMethod>(attribute))->getParam())
                     cout << "      " << param.getType() << " " << param.getName() << endl;
                 method = true;
             }

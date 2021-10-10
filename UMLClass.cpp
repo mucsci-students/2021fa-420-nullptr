@@ -126,7 +126,7 @@ bool UMLClass::checkAttribute(std::shared_ptr<UMLAttribute> attribute)
 				return true;
 			}
 			else if (classAttributes[i]->getAttributeName() == attribute->getAttributeName() && classAttributes[i]->identifier() == "method"){
-				if(std::static_pointer_cast<UMLMethod>(classAttributes[i])->getParam() == std::static_pointer_cast<UMLMethod>(attribute)->getParam()) {
+				if(std::dynamic_pointer_cast<UMLMethod>(classAttributes[i])->getParam() == std::dynamic_pointer_cast<UMLMethod>(attribute)->getParam()) {
 					return true;
 				}
 			}

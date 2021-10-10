@@ -219,6 +219,14 @@ void UMLData::addClassAttribute(string className, std::shared_ptr<UMLAttribute> 
         throw "Attribute name is not valid";
     else if (!isValidName(attribute->getType()))
         throw "Attribute type is not valid";
+    else if (getClass(className).checkAttribute(attribute)) {
+        if (attribute->identifier() == "field") {
+            throw "Field cannot be added, conflicts with other attributes";
+        }
+        else if (attribute->identifier() == "method") {
+            throw "Method cannot be added, conflicts with other attributes";
+        }
+    }
     getClass(className).addAttribute(attribute);
 }
 
@@ -250,14 +258,20 @@ void UMLData::changeAttributeName(string className, string oldAttributeName, str
     getClass(className).changeAttributeName(oldAttributeName, newAttributeName);
 }
 
+// Overload of changeAttributeName to work with a smart pointer
 void UMLData::changeAttributeName(string className, std::shared_ptr<UMLAttribute> attribute, string newAttributeName)
 {
-    if (getClass(className).checkAttribute(attribute)) {
+    // Make attribute that has the same type but a different name
+    std::shared_ptr<UMLAttribute> newAttribute;
+    newAttribute->changeName(newAttributeName);
+    newAttribute->changeType(attribute->getType());
+
+    if (getClass(className).checkAttribute(newAttribute)) {
         if (attribute->identifier() == "field") {
-            throw "Field cannot be added, conflicts with other attributes";
+            throw "Field name cannot be changed to " + newAttributeName + ", conflicts with other attributes";
         }
         else if (attribute->identifier() == "method") {
-            throw "Method cannot be added, conflicts with other attributes";
+            throw "Method name cannot be changed to " + newAttributeName + ", conflicts with other attributes";
         }
     }
     else if (!isValidName(newAttributeName))
@@ -265,8 +279,19 @@ void UMLData::changeAttributeName(string className, std::shared_ptr<UMLAttribute
     getClass(className).changeAttributeName(attribute, newAttributeName);
 }
 
+// Changes className class attribute's type by the new type name 
+void UMLData::changeAttributeType(std::shared_ptr<UMLAttribute> attribute, string newTypeName)
+{
+    if (!isValidName(newTypeName))
+        throw "New type name is not valid";
+    else {
+        attribute->changeType(newTypeName);
+    }
+}
+
 // Adds parameter to a given method
-void UMLData::addParameter(std::shared_ptr<UMLMethod> method, string paramName, string paramType){
+void UMLData::addParameter(std::shared_ptr<UMLMethod> method, string paramName, string paramType)
+{
     if (!isValidName(paramName))
         throw "Parameter name is not valid";
     else if (!isValidName(paramType))
@@ -279,6 +304,12 @@ void UMLData::addParameter(std::shared_ptr<UMLMethod> method, string paramName, 
         }
     }
     method->addParam(UMLParameter(paramName, paramType));
+}
+
+// Deletes parameter from given method
+void deleteParameter(std::shared_ptr<UMLMethod> method, string paramName) 
+{
+    method->deleteParameter(paramName);
 }
 
 // Checks if identiifier name is valid

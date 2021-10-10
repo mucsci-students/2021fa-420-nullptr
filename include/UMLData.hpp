@@ -102,10 +102,13 @@ class UMLData
         void changeAttributeName(string className, std::shared_ptr<UMLAttribute> attribute, string newAttributeName);
 
         // Changes className class attribute's type by the new type name 
-        void changeAttributeType(string className, std::shared_ptr<UMLAttribute> attribute, string newTypeName);
+        void changeAttributeType(std::shared_ptr<UMLAttribute> attribute, string newTypeName);
 
         // Adds parameter to a given method
         void addParameter(std::shared_ptr<UMLMethod> method, string paramName, string paramType);
+
+        // Deletes parameter from given method
+        void deleteParameter(std::shared_ptr<UMLMethod> method, string paramName);
 
         // Checks if identifier name is valid
         bool isValidName(string name);
