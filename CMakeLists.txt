@@ -1,18 +1,37 @@
 cmake_minimum_required(VERSION 3.10)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # set the project name
 project(project C CXX)
 
 add_subdirectory(include/json)
+add_subdirectory(include/httplib)
+add_subdirectory(include/inja)
 
-add_executable(project main.cpp)
+# add executables here
+
+add_executable(project main.cpp UMLClass.cpp UMLAttribute.cpp UMLRelationship.cpp UMLData.cpp UMLFile.cpp UMLParameter.cpp UMLMethod.cpp UMLField.cpp CLI.cpp)
+
+# add threads for http library
+find_package (Threads REQUIRED)
+
+target_link_libraries(project PUBLIC Threads::Threads)
 
 target_link_libraries(project PUBLIC json)
 
+target_link_libraries(project PUBLIC http)
 
+target_link_libraries(project PUBLIC inja)
+
+
+target_link_libraries(project PUBLIC http)
 
 target_include_directories(project PUBLIC
                           "${PROJECT_BINARY_DIR}"
                           "${PROJECT_SOURCE_DIR}/include/json"
+                          "${PROJECT_SOURCE_DIR}/include/http"
+                          "${PROJECT_SOURCE_DIR}/include/inja"
                           )
 
 include(FetchContent)
@@ -26,7 +45,8 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(Tests Tests.cpp)
+add_executable(Tests Tests.cpp UMLClass.cpp UMLAttribute.cpp UMLRelationship.cpp UMLData.cpp UMLFile.cpp UMLParameter.cpp UMLMethod.cpp UMLField.cpp CLI.cpp)
+
 target_link_libraries(Tests gtest_main)
 include(GoogleTest)
 gtest_discover_tests(Tests)
