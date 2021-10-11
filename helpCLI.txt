@@ -16,16 +16,22 @@ UML++ has the following hierarchy for its command-line interface:
                   new name prompted.
     - [4] Back: Returns back to the main set of commands.
     
-- [2] Attribute: Lists operations for modifying attributes.
-    - [1] Add: Prompts for a class and an attribute name. If the class exists
-               and the attribute does not already exist in the class and is 
-               valid, it will be inserted into the class.
-    - [2] Remove: Prompts for a class and an attribute name. If the class 
+- [2] Attribute: Lists operations for modifying attributes. UML++ supports two
+                 types of attributes: fields and methods. Fields only have a
+                 name and type, while methods can have parameters with their 
+                 own types.
+    - [1] Add: Prompts for a class which will hold the attribute, and then 
+               ask for the type of attribute that will be inserted. If a 
+               method is inserted, it will allow you to insert as many 
+               parameters as you would like to it.
+    - [2] Remove: Prompts for a class and an attribute. If the class 
                   exists alongside the attribute, the attribute will be 
                   removed.
-    - [3] Rename: Prompts for a class and an attribute name. If the class 
-                  exists alongside the attribute, and the attribute name is 
-                  valid, the attribute will be renamed.
+    - [3] Change: Prompts for a class and an attribute. Allows you to change 
+                  the name, type, and if the attribute is a method, modify 
+                  the parameters that exist within the method. Parameter
+                  modifications include adding, deleting, and replacing 
+                  parameters.
     - [4] Back: Returns back to the main set of commands.
     
 - [3] Relationship: Lists operations for modifying relationships.
