@@ -1,0 +1,19 @@
+UML++ serves as an editor for an implementation of a UML class diagram.
+
+This is an alpha of the GUI interface that is currently being implemented. As
+such, all features are a work in progress. It uses the inja templating 
+interface  as well as cpp-httplib to display a basic editor into your browser. 
+This editor opens on one's localhost at port 8080 by default when compiled 
+(localhost:8080).
+
+Each feature of the UML class diagram is implemented by inserting text into text 
+boxes. You are able to add...
+
+- Classes 
+    - Two types of attributes (fields, methods) with types to go alongside them
+        - Parameters to methods (with their own types)
+    - Relationships between classes 
+
+You can also save using the "File" section. You can either chose a file, or 
+select from the drop down based JSON files stored in the folder.
+    
