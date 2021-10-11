@@ -152,11 +152,7 @@ void UMLData::changeRelationshipType(const string& srcName, const string& destNa
             }
         }
     }
-    // Only change type if the type is actually different
-    else if (newType != oldType) {
-        getRelationship(srcName, destName).setType(newType);
-    }
-    // Don't change if relationship is already the same
+    getRelationship(srcName, destName).setType(newType);
 }
 
 // Gets relationship reference for the given string class names

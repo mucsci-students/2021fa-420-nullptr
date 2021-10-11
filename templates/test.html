@@ -8,6 +8,7 @@
         {% for succ in success %}
             <p style="color:green;font-size: 30px;">{{ succ }}</p>
         {% endfor %}
+        <a style="font-size: 17px" href="/help">help</a>
         <h1>Classes:</h1>
         {% for class in classes %}
         
@@ -62,8 +63,9 @@
         </form>
         <h1>Relationships:</h1>
         {% for relationship in relationships %}
-            <p>{{relationship.source}} -> {{relationship.destination}} type: {{relationship.type}}
-                <a href="/delete/relationship/{{relationship.source}}/{{relationship.destination}}">delete</a></p>
+            <h3 id="{{ relationship.destination}}{{ relationship.source }}">{{relationship.source}} -> {{relationship.destination}} type: {{relationship.type}}
+                <button id="{{ relationship.destination}}{{ relationship.source }}edit">edit</button>
+                <a href="/delete/relationship/{{relationship.source}}/{{relationship.destination}}">delete</a></h3>
         {% endfor %}
         <form action="/add/relationship" method="GET">
             <label for="cname">Source:</label>
@@ -139,6 +141,20 @@
                     "</form>";
             });
             {% endfor %}
+        {% endfor %}
+        {% for relationship in relationships %}
+        element = document.getElementById('{{ relationship.destination}}{{ relationship.source }}edit');
+            element.addEventListener("click", () => {
+                document.getElementById("{{ relationship.destination}}{{ relationship.source }}").innerHTML =
+                    "<form action='/edit/relationship/{{ relationship.source }}/{{ relationship.destination }}' method='GET'>" + 
+                     "<select name='reltype' id='reltype'>" +
+                        " <option value='0'>aggregation</option>" +
+                        "<option value='1'>composition</option>" +
+                        "<option value='2'>generalization</option>" +
+                        "<option value='3'>realization</option></select>" +
+                        "<input type='submit' value='edit relationship'>" +
+                    "</form>";
+            });
         {% endfor %}
     </script>
 </html>

@@ -1,3 +1,7 @@
+/*
+  Filename   : server.hpp
+  Description: Controller for the GUI.
+*/
 #include "include/UMLAttribute.hpp"
 #include "include/UMLData.hpp"
 #include "include/UMLFile.hpp"
@@ -113,12 +117,12 @@ namespace umlserver
             ERR_ADD(data.addRelationship(source, dest, std::stoi(type)));
             res.set_redirect("/");
          });
-
-        svr.Get("/edit/relationship", [&](const httplib::Request& req, httplib::Response& res) {
-            std::string source = req.params.find("source")->second;
-            std::string dest = req.params.find("dest")->second;
+        //edit/relationship/source/dest
+        svr.Get(R"(/edit/relationship/(\w+)/(\w+))", [&](const httplib::Request& req, httplib::Response& res) {
+            std::string source = req.matches[1].str();
+            std::string dest = req.matches[2].str();
             std::string type = req.params.find("reltype")->second;
-            ERR_ADD(data.addRelationship(source, dest, std::stoi(type)));
+            ERR_ADD(data.changeRelationshipType(source, dest, std::stoi(type)));
             res.set_redirect("/");
          });
 
@@ -167,6 +171,14 @@ namespace umlserver
          svr.Get("/index", [&](const httplib::Request& req, httplib::Response& res) {
             inja::Environment env;
             inja::Template temp = env.parse_template("../templates/index.html");
+            json j = data.getJson();
+            j["errors"] = errors;
+            errors.clear();
+            res.set_content(env.render(temp, j), "text/html");
+        });
+           svr.Get("/help", [&](const httplib::Request& req, httplib::Response& res) {
+            inja::Environment env;
+            inja::Template temp = env.parse_template("../helpGUI.txt");
             json j = data.getJson();
             j["errors"] = errors;
             errors.clear();
