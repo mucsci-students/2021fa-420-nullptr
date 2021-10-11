@@ -13,6 +13,7 @@
 #include <stdexcept>
 #include <memory>
 #include "UMLAttribute.hpp"
+#include "UMLParameter.hpp"
 //--------------------------------------------------------------------
 
 //--------------------------------------------------------------------

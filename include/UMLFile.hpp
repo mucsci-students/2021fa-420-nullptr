@@ -40,6 +40,9 @@ class UMLFile
         // loads a system file and returns a UML data object
         UMLData load();  
 
+        static json listSaves();
+
+
     private:
          // gets the classes from the json file and adds them to the UMLData object
         vector<UMLClass> getUMLClassVec();

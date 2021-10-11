@@ -9,6 +9,7 @@
 #include <vector>
 #include <list>
 #include "include/UMLMethod.hpp"
+#include "include/UMLParameter.hpp"
 //--------------------------------------------------------------------
 
 //--------------------------------------------------------------------
