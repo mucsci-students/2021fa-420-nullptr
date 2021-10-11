@@ -135,10 +135,6 @@ void UMLData::changeRelationshipType(const string& srcName, const string& destNa
     if (newType < 0 || newType > 3) {
         throw "Invalid type";
     }
-    // Type must not be the same as the previous type
-    else if (newType == oldType) {
-        throw "Type is already set as " + getRelationshipType(srcName, destName);
-    }
     // Generalization/realization check for self relationships
     else if (newType == 2 || newType == 3) {
         if (srcName == destName) {
@@ -156,7 +152,11 @@ void UMLData::changeRelationshipType(const string& srcName, const string& destNa
             }
         }
     }
-    getRelationship(srcName, destName).setType(newType);
+    // Only change type if the type is actually different
+    else if (newType != oldType) {
+        getRelationship(srcName, destName).setType(newType);
+    }
+    // Don't change if relationship is already the same
 }
 
 // Gets relationship reference for the given string class names

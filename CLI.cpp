@@ -819,7 +819,7 @@ void CLI::displayCLI ()
             else if (userChoice == "7") {
                 // Displays help if help file exists, otherwise display error
                 string line;
-                std::ifstream myfile ("../help.txt");
+                std::ifstream myfile ("../helpCLI.txt");
                 if (myfile.is_open()) {
                     while (getline (myfile,line) ) {
                         cout << line << '\n';

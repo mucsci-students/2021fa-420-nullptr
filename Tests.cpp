@@ -67,11 +67,11 @@ TEST(UMLDataRenameClassTest, RenameClassIntoClassThatAlreadyExists)
     ASSERT_ANY_THROW(data.changeClassName("test", "test"));
 }
 
-TEST(UMLDataAttributeTest, AddAttributeWorks) 
+TEST(UMLDataAttributeTest, AddMethodWorks) 
 {
     UMLData data;
     data.addClass("test");
-    UMLAttribute attribute("hastest");
+    UMLMethod attribute("hastest", "type", {});
     data.addClassAttribute("test", attribute);
        for (auto attr : data.getClassAttributes("test")) {
            if(attr->getAttributeName() == "hastest"){
@@ -80,7 +80,20 @@ TEST(UMLDataAttributeTest, AddAttributeWorks)
        }
 }
 
-TEST(UMLDataAttributeTest, ChangeAttributeNameWorks) 
+TEST(UMLDataAttributeTest, AddFieldWorks) 
+{
+    UMLData data;
+    data.addClass("test");
+    UMLField attribute("hastest", "type");
+    data.addClassAttribute("test", attribute);
+       for (auto attr : data.getClassAttributes("test")) {
+           if(attr->getAttributeName() == "hastest"){
+               ASSERT_EQ(attr->getAttributeName(), "hastest");
+           }
+       }
+}
+
+TEST(UMLDataAttributeTest, ChangeMethodNameWorks) 
 {
     bool hasTestGone;
     hasTestGone = true;
@@ -89,7 +102,31 @@ TEST(UMLDataAttributeTest, ChangeAttributeNameWorks)
 
     UMLData data;
     data.addClass("test");
-    UMLAttribute attribute("hastest");
+    UMLMethod attribute("hastest", "type", {});
+    data.addClassAttribute("test", attribute);
+    data.changeAttributeName("test", "hastest", "newHasTest");
+
+        for (auto attr : data.getClassAttributes("test")) {
+           if(attr->getAttributeName() == "hastest"){
+               hasTestGone = false;
+           }
+            if(attr->getAttributeName() == "newHasTest"){
+              newHasTestPresent = true;
+           }
+       }
+      ASSERT_EQ(hasTestGone, newHasTestPresent);  
+}
+
+TEST(UMLDataAttributeTest, ChangeFieldNameWorks) 
+{
+    bool hasTestGone;
+    hasTestGone = true;
+    bool newHasTestPresent;
+    newHasTestPresent = false;
+
+    UMLData data;
+    data.addClass("test");
+    UMLField attribute("hastest", "type");
     data.addClassAttribute("test", attribute);
     data.changeAttributeName("test", "hastest", "newHasTest");
 
@@ -569,19 +606,37 @@ TEST(UMLParameterTest, ChangeParameterTypeTest)
 
 // ****************************************************
 
-// Tests for UMLMethod.hpp TODO and OLD
+// Tests for UMLMethod
 // **************************
 
+TEST(UMLMethodTest, GetAttributeNameTest) 
+{
+    UMLMethod attribute("test", "type", {});
+    ASSERT_EQ(attribute.getAttributeName(), "test");
+}
+
+TEST(UMLMethodTest, RenameAttributeNameTest) 
+{
+    UMLMethod attribute("test", "type", {});
+    attribute.changeName("test2");
+    ASSERT_EQ(attribute.getAttributeName(), "test2");
+}
+
+// ****************************************************
+
+
+// Tests for UMLAttribute
+// **************************
 
 TEST(UMLAttributeTest, GetAttributeNameTest) 
 {
-    UMLAttribute attribute("test");
+    UMLField attribute("test", "type");
     ASSERT_EQ(attribute.getAttributeName(), "test");
 }
 
 TEST(UMLAttributeTest, RenameAttributeNameTest) 
 {
-    UMLAttribute attribute("test");
+    UMLField attribute("test", "type");
     attribute.changeName("test2");
     ASSERT_EQ(attribute.getAttributeName(), "test2");
 }
