@@ -5,12 +5,15 @@
 
 //--------------------------------------------------------------------
 // System includes
+#include "include/UMLAttribute.hpp"
+#include "include/UMLField.hpp"
 #include "include/UMLFile.hpp"
 #include "include/UMLMethod.hpp"
 #include "include/UMLParameter.hpp"
 #include "include/UMLRelationship.hpp"
 #include <algorithm>
 #include <list>
+#include <memory>
 //--------------------------------------------------------------------
 
 // Empty constructor
@@ -263,15 +266,17 @@ void UMLData::changeAttributeName(string className, std::shared_ptr<UMLAttribute
 {
     // Make attribute that has the same type but a different name
     std::shared_ptr<UMLAttribute> newAttribute;
-    newAttribute->changeName(newAttributeName);
-    newAttribute->changeType(attribute->getType());
+    if (attribute->identifier() == "method")
+         newAttribute = std::make_shared<UMLMethod>(newAttributeName, attribute->getType(), std::dynamic_pointer_cast<UMLMethod>(attribute)->getParam());
+    else if (attribute->identifier() == "field")
+         newAttribute = std::make_shared<UMLField>(newAttributeName, attribute->getType());
 
     if (getClass(className).checkAttribute(newAttribute)) {
         if (attribute->identifier() == "field") {
-            throw "Field name cannot be changed to " + newAttributeName + ", conflicts with other attributes";
+            throw "Field name cannot be changed due to conflicts with other attributes";
         }
         else if (attribute->identifier() == "method") {
-            throw "Method name cannot be changed to " + newAttributeName + ", conflicts with other attributes";
+            throw "Method name cannot be changed due to conflicts with other attributes";
         }
     }
     else if (!isValidName(newAttributeName))
@@ -298,7 +303,7 @@ void UMLData::addParameter(std::shared_ptr<UMLMethod> method, string paramName, 
         throw "Parameter type is not valid";
     else {
         for (UMLParameter param : method->getParam()) {
-            if (param.getName() == paramName && param.getType() == paramType) {
+            if (param.getName() == paramName) {
                 throw "Parameter already exists";
             }
         }

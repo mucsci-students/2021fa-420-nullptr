@@ -65,22 +65,56 @@ namespace umlserver
             std::string className = req.matches[1].str();
             std::string methodName = req.params.find("mname")->second;
             std::string methodType = req.params.find("mtype")->second;
-            ERR_ADD(data.addClassAttribute(className, std::make_shared<UMLMethod>(methodName, methodType, std::vector<UMLParameter>{})));
+            ERR_ADD(data.addClassAttribute(className, std::make_shared<UMLMethod>(methodName, methodType, std::list<UMLParameter>{})));
             res.set_redirect("/");
          }); 
 
-         svr.Get(R"(/add/parameter/(\w+)/(\w+))", [&](const httplib::Request& req, httplib::Response& res) {
+         svr.Get(R"(/add/parameter/(\w+)/(\d+))", [&](const httplib::Request& req, httplib::Response& res) {
             std::string className = req.matches[1].str();
-            std::string methodName = req.matches[2].str();
+            int methodIndex = std::stoi(req.matches[2].str());  
             std::string paramName = req.params.find("pname")->second;
             std::string paramType = req.params.find("ptype")->second;
-            std::shared_ptr<UMLAttribute> attr = data.getClassCopy(className).getAttribute(methodName);
+
+            auto attr = data.getClassCopy(className).getAttributes()[methodIndex];
             std::static_pointer_cast<UMLMethod>(attr)->addParam(UMLParameter(paramName, paramType));
             res.set_redirect("/");
          }); 
+        //delete/parameter/classname/methodindex/paramname
+        svr.Get(R"(/delete/parameter/(\w+)/(\d+)/(\w+))", [&](const httplib::Request& req, httplib::Response& res) {
+            std::string className = req.matches[1].str();
+            int methodIndex = std::stoi(req.matches[2].str());  
+            std::string paramName = req.matches[3].str();
+
+            auto attr = data.getClassCopy(className).getAttributes()[methodIndex];
+            ERR_ADD(data.deleteParameter(std::static_pointer_cast<UMLMethod>(attr), paramName));
+            res.set_redirect("/");
+         }); 
+
+        //edit/parameter/classname/methodINDEX/parametername/
+           svr.Get(R"(/edit/parameter/(\w+)/(\d+)/(\w+))", [&](const httplib::Request& req, httplib::Response& res) {
+            std::string className = req.matches[1].str();
+            int methodIndex = std::stoi(req.matches[2].str());  
+            std::string oldParamName = req.matches[3].str();
+           
+            std::string newParamName = req.params.find("pname")->second;
+            std::string newParamType = req.params.find("ptype")->second;
+
+            auto attr = data.getClassCopy(className).getAttributes()[methodIndex];
+            ERR_ADD(data.deleteParameter(std::static_pointer_cast<UMLMethod>(attr), oldParamName));
+            ERR_ADD(data.addParameter(std::static_pointer_cast<UMLMethod>(attr), newParamName, newParamType));
+            res.set_redirect("/");
+         });
 
 
         svr.Get("/add/relationship", [&](const httplib::Request& req, httplib::Response& res) {
+            std::string source = req.params.find("source")->second;
+            std::string dest = req.params.find("dest")->second;
+            std::string type = req.params.find("reltype")->second;
+            ERR_ADD(data.addRelationship(source, dest, std::stoi(type)));
+            res.set_redirect("/");
+         });
+
+        svr.Get("/edit/relationship", [&](const httplib::Request& req, httplib::Response& res) {
             std::string source = req.params.find("source")->second;
             std::string dest = req.params.find("dest")->second;
             std::string type = req.params.find("reltype")->second;
@@ -117,14 +151,15 @@ namespace umlserver
             res.set_redirect("/");
         });
         
-        svr.Get(R"(/edit/attribute/(\w+)/(\w+))", [&](const httplib::Request& req, httplib::Response& res) {
+        //edit/attribute/classname/(method/field INDEX)
+        svr.Get(R"(/edit/attribute/(\w+)/(\d+))", [&](const httplib::Request& req, httplib::Response& res) {
             std::string className = req.matches[1].str();
-            std::string oldAttributeName = req.matches[2].str();
+            int attrIndex = std::stoi(req.matches[2].str()); 
             std::string newName = req.params.find("name")->second;
             std::string newType = req.params.find("type")->second;
-            std::shared_ptr<UMLAttribute> attr = data.getClassCopy(className).getAttribute(oldAttributeName);
-            attr->changeName(newName);
-            attr->changeType(newType);
+            auto attr = data.getClassCopy(className).getAttributes()[attrIndex];
+            ERR_ADD(data.changeAttributeType(attr, newType));
+            ERR_ADD(data.changeAttributeName(className, attr, newName));
             res.set_redirect("/");
         });
 
@@ -192,14 +227,14 @@ namespace umlserver
                                 //check params match as methods have same name 
                                 if ( j["classes"][classID]["methods"][methodID]["name"] == attr->getAttributeName())
                                 {
-                                  std::vector<UMLParameter> params = std::dynamic_pointer_cast<UMLMethod>(attr)->getParam();
+                                  std::list<UMLParameter> params = std::dynamic_pointer_cast<UMLMethod>(attr)->getParam();
                                   bool containsParameter = false;
-                                  for (int i = 0; i < params.size(); ++i)
+                                  for (auto param : params)
                                   {                  
                                     for (int k = 0; k < j["classes"][classID]["methods"][methodID]["params"].size(); ++k)
                                     {
-                                        if (params[i].getType() == j["classes"][classID]["methods"][methodID]["params"][k]["type"])
-                                        {
+                                        if (param.getType() == j["classes"][classID]["methods"][methodID]["params"][k]["type"])
+                                        { 
                                           containsParameter = true;
                                         }
                                     }

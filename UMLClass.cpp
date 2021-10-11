@@ -153,8 +153,8 @@ bool UMLClass::checkAttribute(std::shared_ptr<UMLAttribute> attribute)
 		// Method does not break identitical attribute rules
 		return false;
 	}
-	// Attribute breaks rules by default as it lacks the proper identifier
-	return true;
+	// Attribute shouldn't break rules by default
+	return false;
 }
 
 // OLD Finds attribute within pointer vector, returns smart pointer
