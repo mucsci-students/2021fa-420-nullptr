@@ -39,6 +39,10 @@ int main(int argc, char** argv)
     //       }
 
 
+      UMLData data;
+    UMLFile file("cc.json");
+    data = file.load();
+    std:cout << data.getJson();
 
     // Parameter check to see if user wants CLI or GUI
     if (argc > 1) {

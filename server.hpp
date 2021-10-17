@@ -12,6 +12,7 @@
 #include "include/UMLMethod.hpp"
 #include <memory>
 #include <string>
+#include "include/State.hpp"
 
 using json = nlohmann::json;
 
@@ -19,7 +20,8 @@ using json = nlohmann::json;
 // Catch for functions to protect from invalid inputs
 #define ERR_ADD(fun)                           \
     try {                                        \
-        fun;                                     \
+        fun;                                       \
+        state.update(data);                        \
     }                                            \
     catch (const char* error) {                  \
         errors += error;                         \
@@ -34,6 +36,7 @@ namespace umlserver
     {
         httplib::Server svr;
         UMLData data;
+        State state(data);
         json errors = json::array();
         json success = json::array();
 
@@ -201,6 +204,17 @@ namespace umlserver
             res.set_redirect("/");
         });
 
+         svr.Get("/undo", [&](const httplib::Request& req, httplib::Response& res) {
+            if (!state.is_undo_empty())
+                data = state.undo();
+            res.set_redirect("/");
+        });
+
+        svr.Get("/redo", [&](const httplib::Request& req, httplib::Response& res) {
+            if (!state.is_redo_empty())
+                data = state.redo();
+            res.set_redirect("/");
+        });
 
         std::cout << "running at http:://localhost:8080/" << std::endl;
 

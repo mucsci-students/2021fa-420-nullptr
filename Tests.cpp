@@ -8,10 +8,13 @@
 
 #include "include/UMLData.hpp"
 #include "include/UMLClass.hpp"
+#include "include/UMLMethod.hpp"
 #include "include/UMLRelationship.hpp"
 #include "include/UMLParameter.hpp"
 #include "include/CLI.hpp"
+#include "include/State.hpp"
 
+#include <memory>
 #include <string>
 #include <iostream>
 
@@ -338,6 +341,21 @@ TEST(UMLDataRelationshipTest, ChangeRelationshipTypeErrors)
     ASSERT_ANY_THROW(data.changeRelationshipType("test", "test1", 1));
 }
 
+TEST(UMLDataJsonTest, ReturnedJSONIsCorrect)
+{
+  json j = "{\"classes\":[{\"fields\":[{\"name\":\"test\",\"type\":\"int\"}],\"methods\":[{\"name\":\"ff\",\"params\":[{\"name\":\"something\",\"type\":\"something\"}],\"return_type\":\"string\"}],\"name\":\"fish2\"},{\"fields\":[],\"methods\":[],\"name\":\"test\"}],\"relationships\":[{\"destination\":\"test\",\"source\":\"fish2\",\"type\":\"aggregation\"}]}"_json;
+  UMLData data;
+  data.addClass("fish2");
+  data.addClass("test");
+  data.addClassAttribute("fish2", std::make_shared<UMLField>("test", "int"));
+  auto m = std::make_shared<UMLMethod>("ff", "string", std::list<UMLParameter>{});
+  data.addClassAttribute("fish2", m);
+  data.addParameter(m, "something", "something");
+  data.addRelationship("fish2", "test", 0);
+
+  ASSERT_EQ(j, data.getJson());
+}
+
 /*
 TEST(UMLDataAttributeTest, RemovingAttributeWorks) {
     UMLData data;
@@ -642,3 +660,71 @@ TEST(UMLAttributeTest, RenameAttributeNameTest)
 }
 
 // ****************************************************
+
+// Tests for state (UNDO and REDO)
+// ****************************************************
+TEST(StateTest, UndoOnceAfterAddClass)
+{
+    //add class
+    UMLData data;
+    State state(data);
+    json stateBeforeUndo = data.getJson();
+    data.addClass("test");
+    state.update(data);
+    //undo
+    data = state.undo();
+    //check that json in data equals what is was before added class
+    ASSERT_EQ(data.getJson(), stateBeforeUndo);
+    ASSERT_ANY_THROW(data.getClassCopy("test"));
+}
+
+TEST(StateTest, UndoOnceAfterAddRelationship)
+{
+    UMLData data;
+    State state(data);
+    data.addClass("test");
+    state.update(data);
+    data.addClass("testing");
+    state.update(data);
+    json stateBefore = data.getJson();
+    data.addRelationship("testing", "test", 2);
+    state.update(data);
+
+    //undo
+    data = state.undo();
+
+    ASSERT_EQ(data.getJson(), stateBefore);
+}
+
+TEST(StateTest, UndoOnceAfterAddAttribute)
+{
+    UMLData data;
+    State state(data);
+    data.addClass("test");
+    state.update(data);
+    json stateBefore = data.getJson();
+    data.addClassAttribute("test", std::make_shared<UMLMethod>("test", "string", std::list<UMLParameter>{}));
+    state.update(data);
+
+    data = state.undo();
+
+    ASSERT_EQ(data.getJson(), stateBefore);
+}
+
+TEST(StateTest, UndoOnceAfterAddParameter)
+{
+    UMLData data;
+    State state(data);
+    data.addClass("test");
+    state.update(data);
+    auto m = std::make_shared<UMLMethod>("test", "string", std::list<UMLParameter> {});
+    data.addClassAttribute("test", m);
+    state.update(data);
+    json stateBefore = data.getJson();
+    data.addParameter(m, "param", "int");
+    state.update(data);
+    
+    data = state.undo();
+
+    ASSERT_EQ(data.getJson(), stateBefore);
+}

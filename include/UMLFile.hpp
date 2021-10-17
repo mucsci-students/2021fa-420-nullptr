@@ -43,13 +43,9 @@ class UMLFile
         static json listSaves();
 
 
-    private:
-         // gets the classes from the json file and adds them to the UMLData object
-        vector<UMLClass> getUMLClassVec();
-        
         // gets the classes from the json file and adds them to the UMLData object
-        void addClasses(UMLData& data, const json& j);
+        static void addClasses(UMLData& data, const json& j);
         
         // gets the relationships from the json file and adds them to the UMLData object
-        void addRelationships(UMLData& data, const json& j);  
+        static void addRelationships(UMLData& data, const json& j); 
 };
