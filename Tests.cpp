@@ -663,7 +663,7 @@ TEST(UMLAttributeTest, RenameAttributeNameTest)
 
 // Tests for state (UNDO and REDO)
 // ****************************************************
-TEST(StateTest, UndoOnceAfterAddClass)
+TEST(StateTestUndo, UndoOnceAfterAddClass)
 {
     //add class
     UMLData data;
@@ -678,7 +678,7 @@ TEST(StateTest, UndoOnceAfterAddClass)
     ASSERT_ANY_THROW(data.getClassCopy("test"));
 }
 
-TEST(StateTest, UndoOnceAfterAddRelationship)
+TEST(StateTestUndo, UndoOnceAfterAddRelationship)
 {
     UMLData data;
     State state(data);
@@ -696,7 +696,7 @@ TEST(StateTest, UndoOnceAfterAddRelationship)
     ASSERT_EQ(data.getJson(), stateBefore);
 }
 
-TEST(StateTest, UndoOnceAfterAddAttribute)
+TEST(StateTestUndo, UndoOnceAfterAddAttribute)
 {
     UMLData data;
     State state(data);
@@ -711,7 +711,7 @@ TEST(StateTest, UndoOnceAfterAddAttribute)
     ASSERT_EQ(data.getJson(), stateBefore);
 }
 
-TEST(StateTest, UndoOnceAfterAddParameter)
+TEST(StateTestUndo, UndoOnceAfterAddParameter)
 {
     UMLData data;
     State state(data);
@@ -727,4 +727,38 @@ TEST(StateTest, UndoOnceAfterAddParameter)
     data = state.undo();
 
     ASSERT_EQ(data.getJson(), stateBefore);
+}
+
+TEST(StateTestRedo, RedoAfterDeletingClass)
+{
+    UMLData data;
+    State state(data);
+    data.addClass("test");
+    state.update(data);
+    json stateBefore = data.getJson();
+    data.deleteClass("test");
+    state.update(data);
+    //undo
+    data = state.undo();
+
+    ASSERT_EQ(data.getJson(), stateBefore);
+}
+
+TEST(StateTestEmpty, CheckIsEmptyWorks)
+{
+    UMLData data;
+    State state(data);
+    data.addClass("test");
+    state.update(data);
+    json stateBefore = data.getJson();
+    data.deleteClass("test");
+    state.update(data);
+    ASSERT_EQ(state.is_redo_empty(), true);
+    //undo
+    data = state.undo();
+    ASSERT_EQ(state.is_undo_empty(), false);
+    ASSERT_EQ(state.is_redo_empty(), false);
+    data = state.undo();
+    ASSERT_EQ(state.is_undo_empty(), true);
+    ASSERT_EQ(state.is_redo_empty(), false);
 }

@@ -12,17 +12,23 @@ void State::update(UMLData& data)
 
 UMLData State::undo()
 {
-    redoStack.push(currentState);
-    currentState = undoStack.top();
-    undoStack.pop();
+    if (!is_undo_empty())
+    {
+        redoStack.push(currentState);
+        currentState = undoStack.top();
+        undoStack.pop();
+    }
     return load_current_state();
 }
 
 UMLData State::redo()
 {
-    undoStack.push(currentState);
-    currentState = redoStack.top();
-    redoStack.pop();
+    if (!is_redo_empty())
+    {
+        undoStack.push(currentState);
+        currentState = redoStack.top();
+        redoStack.pop();
+    }
     return load_current_state();
 }
 
