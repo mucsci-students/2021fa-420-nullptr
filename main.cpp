@@ -19,25 +19,6 @@
 int main(int argc, char** argv)
 {
 
-    //  inja::Environment env;
-    //  inja::Template temp = env.parse_template("../templates/test.html");
-    //  UMLData data;
-    //  data = UMLFile("save.json").load();
-    //  json j = data.getJson();
-    //  j["errors"] = json::array();
-    //  j["success"] = json::array();
-    //  j["files"] = json::array();
-     
-    
-
-    //       std::cout << j << std::endl;
-    //       int count = 0;
-    //       for (auto attr : data.getClassAttributes("fish"))
-    //       {
-    //         std::cout << count << ". " <<  attr->getAttributeName() << std::endl;
-    //         ++count;
-    //       }
-
 
 
     // Parameter check to see if user wants CLI or GUI
