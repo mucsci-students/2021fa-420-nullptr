@@ -1,3 +1,5 @@
+![example workflow](https://github.com/mucsci-students/2021fa-420-nullptr/docs/actions/workflows/config.yml/badge.svg)
+
 # 2021fa-420-nullptr
 
 UML++ is a C++ editor of UML class diagrams.
