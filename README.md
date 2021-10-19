@@ -1,4 +1,4 @@
-![example workflow](https://github.com/mucsci-students/2021fa-420-nullptr/actions/workflows/cmake.yml/badge.svg)
+![workflow](https://github.com/mucsci-students/2021fa-420-nullptr/actions/workflows/cmake.yml/badge.svg)
 
 # 2021fa-420-nullptr
 
