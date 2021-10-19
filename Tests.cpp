@@ -327,8 +327,6 @@ TEST(UMLDataRelationshipTest, ChangeRelationshipTypeErrors)
     // Test for bounds
     ASSERT_ANY_THROW(data.changeRelationshipType("test", "test1", 4));
     ASSERT_ANY_THROW(data.changeRelationshipType("test", "test1", -1));
-    // Test for identical type
-    ASSERT_ANY_THROW(data.changeRelationshipType("test", "test1", 0));
     // Test for self-inheritance
     data.addRelationship("test", "test", 0);
     ASSERT_ANY_THROW(data.changeRelationshipType("test", "test", 2));
