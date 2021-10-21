@@ -4,6 +4,20 @@
   When compiled, performs all tests and displays any errors that occur.
 */
 
+/************************************************************/
+// Error checking macro for functions with expected errors
+#define ERR_CHECK(fun, errorString)                     \
+    EXPECT_THROW (                                      \
+        try {                                           \
+            fun;                                        \
+        }                                               \
+        catch (const std::runtime_error& error) {       \
+            EXPECT_STREQ(errorString, error.what());    \
+            throw;                                      \
+        },                                              \
+    std::runtime_error);                                \
+/************************************************************/
+
 #include <gtest/gtest.h>
 
 #include "include/UMLData.hpp"
@@ -40,20 +54,18 @@ TEST(UMLDataAddClassTest, AddClassAndGetCopy)
 }
 
 // Shouldn't be able to add a class that already exists
-// TODO: proper error catching beyond ASSERT_ANY_THROW
 TEST(UMLDataAddClassTest, AddClassThatAlreadyExists) 
 {
     UMLData data;
     data.addClass("test");
-    ASSERT_ANY_THROW(data.addClass("test"));
+    ERR_CHECK(data.addClass("test"), "Class name already exists");
 }
 
 // Shouldn't be able to remove a class that doesn't exist
-// TODO: proper error catching beyond ASSERT_ANY_THROW
 TEST(UMLDataRemoveClassTest, RemoveClassThatDoesntExist) 
 {
     UMLData data;
-    ASSERT_ANY_THROW(data.deleteClass("test"));
+    ERR_CHECK(data.deleteClass("test"), "Class not found");
 }
 
 // Renaming the class in the data model should = the operation in UMLClass
@@ -69,12 +81,13 @@ TEST(UMLDataRenameClassTest, RenameAClassWorks)
     ASSERT_EQ(updatedName, updatedName);
 }
 
-// Shouldn't be allowed to rename a class to one that already exists in te data model
+// Shouldn't be allowed to rename a class to one that already exists in the data model
 TEST(UMLDataRenameClassTest, RenameClassIntoClassThatAlreadyExists) 
 {
     UMLData data;
     data.addClass("test");
-    ASSERT_ANY_THROW(data.changeClassName("test", "test"));
+    data.addClass("test2");
+    ERR_CHECK(data.changeClassName("test", "test2"), "Class name already exists");
 }
 
 // ****************************************************
@@ -164,12 +177,13 @@ TEST(UMLDataAttributeTest, ChangeFieldNameWorks)
       ASSERT_EQ(hasTestGone, newHasTestPresent);  
 }
 
+// Checks if an error occurs when you attempt to remove a class attribute that isn't owned by the class.
 TEST(UMLDataAttributeTest, RemovingNonExistantAttribute) 
 {
     UMLData data;
     data.addClass("test");
-    UMLAttribute attribute("hastestt");
-    ASSERT_ANY_THROW(data.removeClassAttribute("test", "hastestt"));
+    UMLAttribute attribute("testAttribute");
+    ERR_CHECK(data.removeClassAttribute("test", "testAttribute"), "Attribute does not exist");
 }
 
 // ****************************************************
@@ -215,12 +229,12 @@ TEST(UMLDataRelationshipTest, AddingInvalidType)
     data.addClass("test");
     data.addClass("test1");
     // Relationship type shouldn't be over 3
-    ASSERT_ANY_THROW(data.addRelationship("test", "test1", 4));
+    ERR_CHECK(data.addRelationship("test", "test1", 4), "Invalid type");
 
     data.addClass("test2");
     data.addClass("test3");
     // Relationship type shouldn't be less than 0
-    ASSERT_ANY_THROW(data.addRelationship("test2", "test3", -1));
+    ERR_CHECK(data.addRelationship("test2", "test3", -1), "Invalid type");
 }
 
 // Error check to see if adding self inheritance causes an error.
@@ -232,8 +246,8 @@ TEST(UMLDataRelationshipTest, AddingSelfInheritance)
     data.addClass("test");
     data.addClass("test1");
     // Cannot have self-generalization or self-realization
-    ASSERT_ANY_THROW(data.addRelationship("test", "test", 2));
-    ASSERT_ANY_THROW(data.addRelationship("test1", "test1", 3));
+    ERR_CHECK(data.addRelationship("test", "test", 2), "Cannot have self-relationship of generalizations or realizations");
+    ERR_CHECK(data.addRelationship("test1", "test1", 3), "Cannot have self-relationship of generalizations or realizations");
 }
 
 // Error check to see if adding multiple compositions causes an error.
@@ -248,7 +262,7 @@ TEST(UMLDataRelationshipTest, AddingMultipleCompositions)
     data.addClass("test2");
     data.addRelationship("test", "test1", 1);
     // Cannot be the destination of multiple compositions
-    ASSERT_ANY_THROW(data.addRelationship("test2", "test1", 1));
+    ERR_CHECK(data.addRelationship("test2", "test1", 1), "Class can not be the destination for more than one composition");
 } 
 
 // Sees if deleting a relationship works. 
@@ -288,13 +302,13 @@ TEST(UMLDataRelationshipTest, DeletingNonexistentRelationship)
     UMLData data;
 
     // Attempt to delete relationship that does not exist
-    ASSERT_ANY_THROW(data.deleteRelationship("test", "test"));
+    ERR_CHECK(data.deleteRelationship("test", "test"), "Class not found");
     
     // Same as above, but with the class existing and two different classes
     data.addClass("test");
     data.addClass("test1");
-    ASSERT_ANY_THROW(data.deleteRelationship("test", "test"));
-    ASSERT_ANY_THROW(data.deleteRelationship("test", "test1"));
+    ERR_CHECK(data.deleteRelationship("test", "test"), "Relationship not found");
+    ERR_CHECK(data.deleteRelationship("test", "test1"), "Relationship not found");
 }
 
 // Sees if getting the proper relationship type works after adding a relationship.
@@ -374,15 +388,15 @@ TEST(UMLDataRelationshipTest, ChangeRelationshipTypeErrors)
 
     data.addRelationship("test", "test1", 0);
     // Test for bounds
-    ASSERT_ANY_THROW(data.changeRelationshipType("test", "test1", 4));
-    ASSERT_ANY_THROW(data.changeRelationshipType("test", "test1", -1));
+    ERR_CHECK(data.changeRelationshipType("test", "test1", 4), "Invalid type");
+    ERR_CHECK(data.changeRelationshipType("test", "test1", -1), "Invalid type");
     // Test for self-inheritance
     data.addRelationship("test", "test", 0);
-    ASSERT_ANY_THROW(data.changeRelationshipType("test", "test", 2));
-    ASSERT_ANY_THROW(data.changeRelationshipType("test", "test", 3));
+    ERR_CHECK(data.changeRelationshipType("test", "test", 2), "Cannot have self-relationship of generalizations or realizations");
+    ERR_CHECK(data.changeRelationshipType("test", "test", 3), "Cannot have self-relationship of generalizations or realizations");
     // Test for multiple compositions
     data.addRelationship("test2", "test1", 1);
-    ASSERT_ANY_THROW(data.changeRelationshipType("test", "test1", 1));
+    ERR_CHECK(data.changeRelationshipType("test", "test1", 1), "Class can not be the destination for more than one composition");
 }
 
 // Tests for UMLRelationship.hpp
@@ -499,7 +513,7 @@ TEST(UMLClassTest, AddAttributeWorks)
 }
 
 // Tests to see if an attribute inside of a class properly gets modified based on name.
-TEST(UMLClassTest, ChangeAttributeWorks) 
+TEST(UMLClassTest, ChangeAttributeNameWorks) 
 {
     UMLClass class1("test");
     UMLAttribute attribute("testattributeOld");
@@ -529,31 +543,25 @@ TEST(UMLClassTest, ChangeAttributeWorks)
 }
 
 // Tests to see if an attribute inside of a class properly gets modified based on an attribute reference.
-TEST(UMLClasstest, ChangeAttributeReferenceWorks)
+TEST(UMLClasstest, ChangeAttributeNameReferenceWorks)
 {
     UMLClass class1("test");
-    UMLAttribute attribute("testattributeOld");
+    auto attribute = std::make_shared<UMLAttribute>("oldName");
     class1.addAttribute(attribute);
-   
-    // Make reference attribute and add
-    auto attributeRef = std::make_shared<UMLAttribute>();
-    class1.changeAttributeName(attributeRef, "testattributeNew");
+
+    // See if attribute was changed based on reference modification
+    class1.changeAttributeName(attribute, "newName");
+    ASSERT_EQ(attribute->getAttributeName(), "newName");
 
     bool attrFound = false;
 
     for(auto attr : class1.getAttributes())
     {
-        if(attr->getAttributeName() == "testattributeNew")
+        if(attr->getAttributeName() == "newName")
         {
             attrFound = true;
         }
-    }
-
-    ASSERT_EQ(attrFound, true);
-
-    for(auto attr : class1.getAttributes())
-    {
-        if(attr->getAttributeName() == "testattributeOld")
+        else if(attr->getAttributeName() == "oldName" && attrFound)
         {
             attrFound = false;
         }
@@ -566,15 +574,15 @@ TEST(UMLClasstest, ChangeAttributeReferenceWorks)
 TEST(UMLClassTest, DeleteAttributeWorks) 
 {
     UMLClass class1("test");
-    UMLAttribute attribute("testattribute");
+    UMLAttribute attribute("test");
     class1.addAttribute(attribute);
-    class1.deleteAttribute("testattribute");
+    class1.deleteAttribute("test");
 
     // See if attribute still exists
     bool attrFound = false;
     for(auto attr : class1.getAttributes())
     {
-        if(attr->getAttributeName() == "testattribute")
+        if(attr->getAttributeName() == "test")
         {
             attrFound = true;
         }
@@ -587,18 +595,17 @@ TEST(UMLClassTest, DeleteAttributeWorks)
 TEST(UMLClassTest, DeleteAttributeReferenceWorks) 
 {
     UMLClass class1("test");
-    UMLAttribute attribute("testattribute");
+    auto attribute = std::make_shared<UMLAttribute>("test");
     class1.addAttribute(attribute);
     
     // Create reference and delete based on it
-    auto attributeRef = std::make_shared<UMLAttribute>();
-    class1.deleteAttribute(attributeRef);
+    class1.deleteAttribute(attribute);
 
     // See if attribute still exists
     bool attrFound = false;
     for(auto attr : class1.getAttributes())
     {
-        if(attr->getAttributeName() == "testattribute")
+        if(attr->getAttributeName() == "test")
         {
             attrFound = true;
         }

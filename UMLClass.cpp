@@ -50,9 +50,9 @@ void UMLClass::addAttribute(std::shared_ptr<UMLAttribute> newAttribute)
 	for(auto attribute : classAttributes)
 	{
 		if(attribute->getAttributeName() == newAttribute->getAttributeName())
-			throw "No duplicate attributes";
+			throw std::runtime_error("No duplicate attributes");
 	}
-	classAttributes.push_back(newAttribute); //NEW POINTER VECTOR
+	classAttributes.push_back(newAttribute); // NEW POINTER VECTOR
 }
 
 // Changes name of attribute within class
@@ -73,7 +73,7 @@ void UMLClass::deleteAttribute(string attributeName)
 	int loc = findAttribute(attributeName);
 	if (loc < 0)
 	{
-		throw "Attribute not found";
+		throw std::runtime_error("Attribute not found");
 	}
 
 	classAttributes.erase(classAttributes.begin() + loc);
@@ -91,7 +91,7 @@ void UMLClass::deleteAttribute(std::shared_ptr<UMLAttribute> attributePtr)
 			return;
 		}
 	}
-	throw "Attribute not found";
+	throw std::runtime_error("Attribute not found");
 }
 
 // OLD Finds attribute within pointer vector
@@ -163,7 +163,7 @@ std::shared_ptr<UMLAttribute> UMLClass::getAttribute(string attributeName)
 	int loc = findAttribute(attributeName);
 	if (loc < 0)
 	{
-		throw "Attribute not found";
+		throw std::runtime_error("Attribute not found");
 	}
 	return classAttributes[loc];
 }

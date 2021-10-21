@@ -2,6 +2,20 @@
   Filename   : server.hpp
   Description: Controller for the GUI.
 */
+
+/************************************************************/
+// Catch for functions to protect from invalid inputs
+#define ERR_ADD(fun)                             \
+    try {                                        \
+        fun;                                     \
+    }                                            \
+    catch (const std::runtime_error& error) {    \
+        errors += error.what();                  \
+    }                                            \
+/************************************************************/
+
+#include <memory>
+#include <string>
 #include "include/UMLAttribute.hpp"
 #include "include/UMLData.hpp"
 #include "include/UMLFile.hpp"
@@ -10,21 +24,8 @@
 #include "include/inja/inja.hpp"
 #include "include/UMLField.hpp"
 #include "include/UMLMethod.hpp"
-#include <memory>
-#include <string>
 
 using json = nlohmann::json;
-
-
-// Catch for functions to protect from invalid inputs
-#define ERR_ADD(fun)                           \
-    try {                                        \
-        fun;                                     \
-    }                                            \
-    catch (const char* error) {                  \
-        errors += error;                         \
-                                                 \
-    }
 
 namespace umlserver
 {
