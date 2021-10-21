@@ -12,6 +12,7 @@
 #include "include/UMLParameter.hpp"
 #include "include/CLI.hpp"
 
+#include <memory>
 #include <string>
 #include <iostream>
 
@@ -498,13 +499,46 @@ TEST(UMLClassTest, AddAttributeWorks)
 }
 
 // Tests to see if an attribute inside of a class properly gets modified based on name.
-// Needs to be updated to be based on reference instead, as change is no longer used.
 TEST(UMLClassTest, ChangeAttributeWorks) 
 {
     UMLClass class1("test");
     UMLAttribute attribute("testattributeOld");
     class1.addAttribute(attribute);
-    class1.changeAttributeName("testattributeOld","testattributeNew");
+    class1.changeAttributeName("testattributeOld", "testattributeNew");
+    bool attrFound = false;
+
+    for(auto attr : class1.getAttributes())
+    {
+        if(attr->getAttributeName() == "testattributeNew")
+        {
+            attrFound = true;
+        }
+    }
+
+    ASSERT_EQ(attrFound, true);
+
+    for(auto attr : class1.getAttributes())
+    {
+        if(attr->getAttributeName() == "testattributeOld")
+        {
+            attrFound = false;
+        }
+    }
+
+    ASSERT_EQ(attrFound, true);
+}
+
+// Tests to see if an attribute inside of a class properly gets modified based on an attribute reference.
+TEST(UMLClasstest, ChangeAttributeReferenceWorks)
+{
+    UMLClass class1("test");
+    UMLAttribute attribute("testattributeOld");
+    class1.addAttribute(attribute);
+   
+    // Make reference attribute and add
+    auto attributeRef = std::make_shared<UMLAttribute>();
+    class1.changeAttributeName(attributeRef, "testattributeNew");
+
     bool attrFound = false;
 
     for(auto attr : class1.getAttributes())
@@ -529,15 +563,39 @@ TEST(UMLClassTest, ChangeAttributeWorks)
 }
 
 // Checks if deleting attribute based on name works.
-// Should be updated to do the delete based on reference instead.
 TEST(UMLClassTest, DeleteAttributeWorks) 
 {
     UMLClass class1("test");
     UMLAttribute attribute("testattribute");
     class1.addAttribute(attribute);
-    bool attrFound = false;
     class1.deleteAttribute("testattribute");
 
+    // See if attribute still exists
+    bool attrFound = false;
+    for(auto attr : class1.getAttributes())
+    {
+        if(attr->getAttributeName() == "testattribute")
+        {
+            attrFound = true;
+        }
+    }
+
+    ASSERT_EQ(attrFound, false);
+}
+
+// Checks if deleting attribute based on its reference works.
+TEST(UMLClassTest, DeleteAttributeReferenceWorks) 
+{
+    UMLClass class1("test");
+    UMLAttribute attribute("testattribute");
+    class1.addAttribute(attribute);
+    
+    // Create reference and delete based on it
+    auto attributeRef = std::make_shared<UMLAttribute>();
+    class1.deleteAttribute(attributeRef);
+
+    // See if attribute still exists
+    bool attrFound = false;
     for(auto attr : class1.getAttributes())
     {
         if(attr->getAttributeName() == "testattribute")
@@ -557,12 +615,10 @@ TEST(UMLClassTest, FindAttributeWorks)
     UMLAttribute attribute("testattribute");
     class1.addAttribute(attribute);
     
-
     ASSERT_EQ(class1.getAttribute("testattribute")->getAttributeName(), attribute.getAttributeName());
 }
 
 // Test that sees that adding a test attribute works as intended.
-// Should do a test based on reference along with overload to findAttribute.
 TEST(UMLClassTest, GetAttributesWorks) 
 {
     UMLClass class1("test");
@@ -576,6 +632,7 @@ TEST(UMLClassTest, GetAttributesWorks)
     bool isEqual = true;
     vector<std::shared_ptr<UMLAttribute>> test2 = class1.getAttributes();
 
+    // Expand test later to check deeper if two attributes are equal
     for(int i = 0; i < test.size(); i++)
     {
         if(test[i].getAttributeName() != test2[i]->getAttributeName())
