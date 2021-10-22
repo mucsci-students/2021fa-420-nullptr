@@ -4,6 +4,20 @@
   When compiled, performs all tests and displays any errors that occur.
 */
 
+/************************************************************/
+// Error checking macro for functions with expected errors
+#define ERR_CHECK(fun, errorString)                     \
+    EXPECT_THROW (                                      \
+        try {                                           \
+            fun;                                        \
+        }                                               \
+        catch (const std::runtime_error& error) {       \
+            EXPECT_STREQ(errorString, error.what());    \
+            throw;                                      \
+        },                                              \
+    std::runtime_error);                                \
+/************************************************************/
+
 #include <gtest/gtest.h>
 
 #include "include/UMLData.hpp"
@@ -20,6 +34,7 @@
 
 // Test Format
 // **************************
+// Describe what the point of the test is in a comment.
 // TEST(TestSuiteName, TestName) 
 // {
 //   ... test body ...
@@ -28,9 +43,11 @@
 
 // ****************************************************
 
-// Tests for UMLData.hpp
+// Tests for UMLData.hpp involing classes
 // **************************
 
+// Checks to see if getting a copy of a class has the same name
+// TODO: See if it has the same contents. Also see if this method is still necessary.
 TEST(UMLDataAddClassTest, AddClassAndGetCopy) 
 {
     UMLData data;
@@ -38,19 +55,22 @@ TEST(UMLDataAddClassTest, AddClassAndGetCopy)
     ASSERT_EQ("test", data.getClassCopy("test").getName());
 }
 
+// Shouldn't be able to add a class that already exists
 TEST(UMLDataAddClassTest, AddClassThatAlreadyExists) 
 {
     UMLData data;
     data.addClass("test");
-    ASSERT_ANY_THROW(data.addClass("test"));
+    ERR_CHECK(data.addClass("test"), "Class name already exists");
 }
 
+// Shouldn't be able to remove a class that doesn't exist
 TEST(UMLDataRemoveClassTest, RemoveClassThatDoesntExist) 
 {
     UMLData data;
-    ASSERT_ANY_THROW(data.deleteClass("test"));
+    ERR_CHECK(data.deleteClass("test"), "Class not found");
 }
 
+// Renaming the class in the data model should = the operation in UMLClass
 TEST(UMLDataRenameClassTest, RenameAClassWorks) 
 {
     UMLData data;
@@ -63,13 +83,22 @@ TEST(UMLDataRenameClassTest, RenameAClassWorks)
     ASSERT_EQ(updatedName, updatedName);
 }
 
+// Shouldn't be allowed to rename a class to one that already exists in the data model
 TEST(UMLDataRenameClassTest, RenameClassIntoClassThatAlreadyExists) 
 {
     UMLData data;
     data.addClass("test");
-    ASSERT_ANY_THROW(data.changeClassName("test", "test"));
+    data.addClass("test2");
+    ERR_CHECK(data.changeClassName("test", "test2"), "Class name already exists");
 }
 
+// ****************************************************
+
+// Tests for UMLData.hpp involving attributes (method/field)
+// **************************
+
+// Checks to see if adding method in UMLData works. 
+// TODO: Clean up variable names.
 TEST(UMLDataAttributeTest, AddMethodWorks) 
 {
     UMLData data;
@@ -83,6 +112,8 @@ TEST(UMLDataAttributeTest, AddMethodWorks)
        }
 }
 
+// Checks to see if adding a field in UMLData works. 
+// TODO: Clean up variable names.
 TEST(UMLDataAttributeTest, AddFieldWorks) 
 {
     UMLData data;
@@ -96,6 +127,8 @@ TEST(UMLDataAttributeTest, AddFieldWorks)
        }
 }
 
+// Checks to see if changing the name of a field in UMLData works. 
+// TODO: Clean up variable names.
 TEST(UMLDataAttributeTest, ChangeMethodNameWorks) 
 {
     bool hasTestGone;
@@ -120,6 +153,8 @@ TEST(UMLDataAttributeTest, ChangeMethodNameWorks)
       ASSERT_EQ(hasTestGone, newHasTestPresent);  
 }
 
+// Checks to see if changing the name of a field in UMLData works. 
+// TODO: Clean up variable names.
 TEST(UMLDataAttributeTest, ChangeFieldNameWorks) 
 {
     bool hasTestGone;
@@ -144,14 +179,22 @@ TEST(UMLDataAttributeTest, ChangeFieldNameWorks)
       ASSERT_EQ(hasTestGone, newHasTestPresent);  
 }
 
+// Checks if an error occurs when you attempt to remove a class attribute that isn't owned by the class.
 TEST(UMLDataAttributeTest, RemovingNonExistantAttribute) 
 {
     UMLData data;
     data.addClass("test");
-    UMLAttribute attribute("hastestt");
-    ASSERT_ANY_THROW(data.removeClassAttribute("test", "hastestt"));
+    UMLAttribute attribute("testAttribute");
+    ERR_CHECK(data.removeClassAttribute("test", "testAttribute"), "Attribute does not exist");
 }
 
+// ****************************************************
+
+// Tests for UMLData.hpp involving relationships
+// **************************
+
+// Basic check to see if adding a relationship to the data model works.
+// It should appear in the vector and have the same source, destination, and type.
 TEST(UMLDataRelationshipTest, AddingRelationshipWorks) 
 {
     bool haveRelationship = false;
@@ -178,6 +221,9 @@ TEST(UMLDataRelationshipTest, AddingRelationshipWorks)
     ASSERT_EQ(rel.size(), std::size_t(1));
 }
 
+// Error check to see if adding invalid types causes a throw.
+// Correct exceptions to see if it's doing a proper throw.
+// Also see if it's possible to change this so it doesn't use magic numbers.
 TEST(UMLDataRelationshipTest, AddingInvalidType) 
 {
     UMLData data;
@@ -185,14 +231,16 @@ TEST(UMLDataRelationshipTest, AddingInvalidType)
     data.addClass("test");
     data.addClass("test1");
     // Relationship type shouldn't be over 3
-    ASSERT_ANY_THROW(data.addRelationship("test", "test1", 4));
+    ERR_CHECK(data.addRelationship("test", "test1", 4), "Invalid type");
 
     data.addClass("test2");
     data.addClass("test3");
     // Relationship type shouldn't be less than 0
-    ASSERT_ANY_THROW(data.addRelationship("test2", "test3", -1));
+    ERR_CHECK(data.addRelationship("test2", "test3", -1), "Invalid type");
 }
 
+// Error check to see if adding self inheritance causes an error.
+// Correct exceptions to see if it's doing a proper throw.
 TEST(UMLDataRelationshipTest, AddingSelfInheritance) 
 {
     UMLData data;
@@ -200,10 +248,13 @@ TEST(UMLDataRelationshipTest, AddingSelfInheritance)
     data.addClass("test");
     data.addClass("test1");
     // Cannot have self-generalization or self-realization
-    ASSERT_ANY_THROW(data.addRelationship("test", "test", 2));
-    ASSERT_ANY_THROW(data.addRelationship("test1", "test1", 3));
+    ERR_CHECK(data.addRelationship("test", "test", 2), "Cannot have self-relationship of generalizations or realizations");
+    ERR_CHECK(data.addRelationship("test1", "test1", 3), "Cannot have self-relationship of generalizations or realizations");
 }
 
+// Error check to see if adding multiple compositions causes an error.
+// Correct exceptions to see if it's doing a proper throw.
+// Also check and see if this actually needs to be relaxed.
 TEST(UMLDataRelationshipTest, AddingMultipleCompositions) 
 {
     UMLData data;
@@ -213,9 +264,11 @@ TEST(UMLDataRelationshipTest, AddingMultipleCompositions)
     data.addClass("test2");
     data.addRelationship("test", "test1", 1);
     // Cannot be the destination of multiple compositions
-    ASSERT_ANY_THROW(data.addRelationship("test2", "test1", 1));
+    ERR_CHECK(data.addRelationship("test2", "test1", 1), "Class can not be the destination for more than one composition");
 } 
 
+// Sees if deleting a relationship works. 
+// When a relationship is deleted, it shouldn't be in UMLData's vector.
 TEST(UMLDataRelationshipTest, DeletingRelationshipWorks)
 {
     bool haveRelationship = false;
@@ -244,20 +297,23 @@ TEST(UMLDataRelationshipTest, DeletingRelationshipWorks)
     ASSERT_EQ(rel.size(), std::size_t(0));
 }
 
+// Makes sure that you can't delete a relationship that doesn't exist. 
+// Find some way to read what is thrown for the sake of proper error checking.
 TEST(UMLDataRelationshipTest, DeletingNonexistentRelationship)
 {
     UMLData data;
 
     // Attempt to delete relationship that does not exist
-    ASSERT_ANY_THROW(data.deleteRelationship("test", "test"));
+    ERR_CHECK(data.deleteRelationship("test", "test"), "Class not found");
     
     // Same as above, but with the class existing and two different classes
     data.addClass("test");
     data.addClass("test1");
-    ASSERT_ANY_THROW(data.deleteRelationship("test", "test"));
-    ASSERT_ANY_THROW(data.deleteRelationship("test", "test1"));
+    ERR_CHECK(data.deleteRelationship("test", "test"), "Relationship not found");
+    ERR_CHECK(data.deleteRelationship("test", "test1"), "Relationship not found");
 }
 
+// Sees if getting the proper relationship type works after adding a relationship.
 TEST(UMLDataRelationshipTest, GetRelationshipTypeWorks)
 {
     bool foundRelationship = false;
@@ -281,6 +337,8 @@ TEST(UMLDataRelationshipTest, GetRelationshipTypeWorks)
     ASSERT_EQ(data.getRelationshipType("test", "test1"), "realization");
 }
 
+// Sees if getting a vector of relationships by class works. 
+// Extend test to have a case where the two vectors should NOT be the same.
 TEST(UMLDataRelationshipTest, GetRelationshipByClassWorks)
 {
     UMLData data;
@@ -305,6 +363,7 @@ TEST(UMLDataRelationshipTest, GetRelationshipByClassWorks)
     }
 }
 
+// Sees if changing the relationship type works at all.
 TEST(UMLDataRelationshipTest, ChangeRelationshipTypeWorks)
 {
     UMLData data;
@@ -318,6 +377,9 @@ TEST(UMLDataRelationshipTest, ChangeRelationshipTypeWorks)
     ASSERT_EQ(data.getRelationship("test", "test1").getType(), composition);
 }
 
+// Tests all errors that currently exist for changing a relationship type.
+// Currently only checks to see a throw will happen.
+// Potential update to have readable exceptions instead to find the right error?
 TEST(UMLDataRelationshipTest, ChangeRelationshipTypeErrors)
 {
     UMLData data;
@@ -328,17 +390,15 @@ TEST(UMLDataRelationshipTest, ChangeRelationshipTypeErrors)
 
     data.addRelationship("test", "test1", 0);
     // Test for bounds
-    ASSERT_ANY_THROW(data.changeRelationshipType("test", "test1", 4));
-    ASSERT_ANY_THROW(data.changeRelationshipType("test", "test1", -1));
-    // Test for identical type
-    ASSERT_ANY_THROW(data.changeRelationshipType("test", "test1", 0));
+    ERR_CHECK(data.changeRelationshipType("test", "test1", 4), "Invalid type");
+    ERR_CHECK(data.changeRelationshipType("test", "test1", -1), "Invalid type");
     // Test for self-inheritance
     data.addRelationship("test", "test", 0);
-    ASSERT_ANY_THROW(data.changeRelationshipType("test", "test", 2));
-    ASSERT_ANY_THROW(data.changeRelationshipType("test", "test", 3));
+    ERR_CHECK(data.changeRelationshipType("test", "test", 2), "Cannot have self-relationship of generalizations or realizations");
+    ERR_CHECK(data.changeRelationshipType("test", "test", 3), "Cannot have self-relationship of generalizations or realizations");
     // Test for multiple compositions
     data.addRelationship("test2", "test1", 1);
-    ASSERT_ANY_THROW(data.changeRelationshipType("test", "test1", 1));
+    ERR_CHECK(data.changeRelationshipType("test", "test1", 1), "Class can not be the destination for more than one composition");
 }
 
 TEST(UMLDataJsonTest, ReturnedJSONIsCorrect)
@@ -483,20 +543,23 @@ TEST(UMLRelationshipTest, GetAllTypeTest)
 // Tests for UMLClass.hpp
 // **************************
 
-TEST(UMLClassFileTest, GetNameWorks) 
+// Basic getter test to see if it gets the proper name
+TEST(UMLClassTest, GetNameWorks) 
 {
     UMLClass class1("test");
     ASSERT_EQ(class1.getName(), "test");
 }
 
-TEST(UMLClassFileTest, ChangeNameWorks) 
+// Basic rename test to see if the name is properly changed
+TEST(UMLClassTest, ChangeNameWorks) 
 {
     UMLClass class1("test");
     class1.changeName("newTest");
     ASSERT_EQ(class1.getName(), "newTest");
 }
 
-TEST(UMLClassFileTest, AddAttributeWorks) 
+// Test to see if the proper attribute with the right name is added
+TEST(UMLClassTest, AddAttributeWorks) 
 {
     UMLClass class1("test");
     UMLAttribute attribute("testattribute");
@@ -514,12 +577,13 @@ TEST(UMLClassFileTest, AddAttributeWorks)
     ASSERT_EQ(attrFound, true);
 }
 
-TEST(UMLClassFileTest, ChangeAttributeWorks) 
+// Tests to see if an attribute inside of a class properly gets modified based on name.
+TEST(UMLClassTest, ChangeAttributeNameWorks) 
 {
     UMLClass class1("test");
     UMLAttribute attribute("testattributeOld");
     class1.addAttribute(attribute);
-    class1.changeAttributeName("testattributeOld","testattributeNew");
+    class1.changeAttributeName("testattributeOld", "testattributeNew");
     bool attrFound = false;
 
     for(auto attr : class1.getAttributes())
@@ -543,17 +607,47 @@ TEST(UMLClassFileTest, ChangeAttributeWorks)
     ASSERT_EQ(attrFound, true);
 }
 
-TEST(UMLClassFileTest, DeleteAttributeWorks) 
+// Tests to see if an attribute inside of a class properly gets modified based on an attribute reference.
+TEST(UMLClasstest, ChangeAttributeNameReferenceWorks)
 {
     UMLClass class1("test");
-    UMLAttribute attribute("testattribute");
+    auto attribute = std::make_shared<UMLAttribute>("oldName");
     class1.addAttribute(attribute);
+
+    // See if attribute was changed based on reference modification
+    class1.changeAttributeName(attribute, "newName");
+    ASSERT_EQ(attribute->getAttributeName(), "newName");
+
     bool attrFound = false;
-    class1.deleteAttribute("testattribute");
 
     for(auto attr : class1.getAttributes())
     {
-        if(attr->getAttributeName() == "testattribute")
+        if(attr->getAttributeName() == "newName")
+        {
+            attrFound = true;
+        }
+        else if(attr->getAttributeName() == "oldName" && attrFound)
+        {
+            attrFound = false;
+        }
+    }
+
+    ASSERT_EQ(attrFound, true);
+}
+
+// Checks if deleting attribute based on name works.
+TEST(UMLClassTest, DeleteAttributeWorks) 
+{
+    UMLClass class1("test");
+    UMLAttribute attribute("test");
+    class1.addAttribute(attribute);
+    class1.deleteAttribute("test");
+
+    // See if attribute still exists
+    bool attrFound = false;
+    for(auto attr : class1.getAttributes())
+    {
+        if(attr->getAttributeName() == "test")
         {
             attrFound = true;
         }
@@ -562,19 +656,45 @@ TEST(UMLClassFileTest, DeleteAttributeWorks)
     ASSERT_EQ(attrFound, false);
 }
 
-TEST(UMLClassFileTest, FindAttributeWorks) 
+// Checks if deleting attribute based on its reference works.
+TEST(UMLClassTest, DeleteAttributeReferenceWorks) 
+{
+    UMLClass class1("test");
+    auto attribute = std::make_shared<UMLAttribute>("test");
+    class1.addAttribute(attribute);
+    
+    // Create reference and delete based on it
+    class1.deleteAttribute(attribute);
+
+    // See if attribute still exists
+    bool attrFound = false;
+    for(auto attr : class1.getAttributes())
+    {
+        if(attr->getAttributeName() == "test")
+        {
+            attrFound = true;
+        }
+    }
+
+    ASSERT_EQ(attrFound, false);
+}
+
+// Check if finding attribute based on name works.
+// This test is outdated and must be replaced entirely alongside modifications to UMLClass.cpp.
+TEST(UMLClassTest, FindAttributeWorks) 
 {
     UMLClass class1("test");
     UMLAttribute attribute("testattribute");
     class1.addAttribute(attribute);
     
-
     ASSERT_EQ(class1.getAttribute("testattribute")->getAttributeName(), attribute.getAttributeName());
 }
 
-TEST(UMLClassFileTest, GetAttributesWorks) 
+// Test that sees that adding a test attribute works as intended.
+TEST(UMLClassTest, GetAttributesWorks) 
 {
     UMLClass class1("test");
+    // Basic constructor used as type should not matter
     UMLAttribute attribute("testattribute");
     class1.addAttribute(attribute);
     
@@ -584,6 +704,7 @@ TEST(UMLClassFileTest, GetAttributesWorks)
     bool isEqual = true;
     vector<std::shared_ptr<UMLAttribute>> test2 = class1.getAttributes();
 
+    // Expand test later to check deeper if two attributes are equal
     for(int i = 0; i < test.size(); i++)
     {
         if(test[i].getAttributeName() != test2[i]->getAttributeName())
@@ -627,13 +748,15 @@ TEST(UMLParameterTest, ChangeParameterTypeTest)
 // Tests for UMLMethod
 // **************************
 
-TEST(UMLMethodTest, GetAttributeNameTest) 
+// Basic getter test to see if it gets the proper name
+TEST(UMLMethodTest, GetMethodNameTest) 
 {
     UMLMethod attribute("test", "type", {});
     ASSERT_EQ(attribute.getAttributeName(), "test");
 }
 
-TEST(UMLMethodTest, RenameAttributeNameTest) 
+// Basic rename test to see if the name is properly changed
+TEST(UMLMethodTest, RenameMethodNameTest) 
 {
     UMLMethod attribute("test", "type", {});
     attribute.changeName("test2");
@@ -646,12 +769,14 @@ TEST(UMLMethodTest, RenameAttributeNameTest)
 // Tests for UMLAttribute
 // **************************
 
+// Basic getter test to see if it gets the proper name
 TEST(UMLAttributeTest, GetAttributeNameTest) 
 {
     UMLField attribute("test", "type");
     ASSERT_EQ(attribute.getAttributeName(), "test");
 }
 
+// Basic rename test to see if the name is properly changed
 TEST(UMLAttributeTest, RenameAttributeNameTest) 
 {
     UMLField attribute("test", "type");

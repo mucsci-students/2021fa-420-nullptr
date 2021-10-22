@@ -2,6 +2,9 @@
   Filename   : server.hpp
   Description: Controller for the GUI.
 */
+
+#include <memory>
+#include <string>
 #include "include/UMLAttribute.hpp"
 #include "include/UMLData.hpp"
 #include "include/UMLFile.hpp"

@@ -55,9 +55,9 @@ void UMLData::addClass(const UMLClass& classIn)
 {
     //check if already exists
     if (doesClassExist(classIn))
-        throw "Class name already exists";
+        throw std::runtime_error("Class name already exists");
     if (!isValidName(classIn.getName()))
-        throw "Class name not valid";
+        throw std::runtime_error("Class name not valid");
     classes.push_back(classIn);
 }
 
@@ -78,7 +78,7 @@ void UMLData::addRelationship(string srcName, string destName, int type)
 {
     // Type must be in bounds
     if (type < 0 || type > 3) 
-        throw "Invalid type";
+        throw std::runtime_error("Invalid type");
     addRelationship(UMLRelationship(getClass(srcName), getClass(destName), type));
 }
 
@@ -106,7 +106,7 @@ void UMLData::deleteRelationship(string srcName, string destName)
 {
     int loc = findRelationship(getClass(srcName), getClass(destName));
     if (loc < 0)
-        throw "Relationship not found";
+        throw std::runtime_error("Relationship not found");
     relationships.erase(relationships.begin() + loc);
 }
 
@@ -135,12 +135,12 @@ void UMLData::changeRelationshipType(const string& srcName, const string& destNa
     int oldType = getRelationship(srcName, destName).getType();
     // Type must be in bounds
     if (newType < 0 || newType > 3) {
-        throw "Invalid type";
+        throw std::runtime_error("Invalid type");
     }
     // Generalization/realization check for self relationships
     else if (newType == 2 || newType == 3) {
         if (srcName == destName) {
-            throw "Cannot have self-relationship of generalizations or realizations";
+            throw std::runtime_error("Cannot have self-relationship of generalizations or realizations");
         }
     }
     // Composition check for duplicate destinations
@@ -150,7 +150,7 @@ void UMLData::changeRelationshipType(const string& srcName, const string& destNa
             if (relationship.getDestination().getName() == destName 
             && relationship.getSource().getName() != srcName
             && relationship.getType() == composition) {
-                throw "Class can not be the destination for more than one composition";
+                throw std::runtime_error("Class can not be the destination for more than one composition");
             }
         }
     }
@@ -162,7 +162,7 @@ UMLRelationship& UMLData::getRelationship(string srcName, string destName)
 {
     int loc = findRelationship(getClass(srcName), getClass(destName));
     if (loc < 0)
-        throw "Relationship not found";
+        throw std::runtime_error("Relationship not found");
     return relationships[loc];
 }
 
@@ -171,7 +171,7 @@ UMLRelationship& UMLData::getRelationship(string srcName, string destName)
 void UMLData::deleteClass(string name)
 {
     if (!doesClassExist(name))
-        throw "Class not found";
+        throw std::runtime_error("Class not found");
     
     //delete relationships associated with class
     vector<UMLRelationship> relationshipsFromClass = getRelationshipsByClass(name);
@@ -190,9 +190,9 @@ void UMLData::changeClassName(string oldName, string newName)
 {
     //change class name
     if (doesClassExist(newName))
-        throw "Class name already exists";
+        throw std::runtime_error("Class name already exists");
     if (!isValidName(newName))
-        throw "New class name is not valid";
+        throw std::runtime_error("New class name is not valid");
     getClass(oldName).changeName(newName);
     //change name in relationship
 }
@@ -207,9 +207,9 @@ vector<std::shared_ptr<UMLAttribute>> UMLData::getClassAttributes(string classNa
 void UMLData::addClassAttribute(string className, UMLAttribute attribute)
 {
     if (!isValidName(attribute.getAttributeName()))
-        throw "Attribute name is not valid";
+        throw std::runtime_error("Attribute name is not valid");
     else if (!isValidName(attribute.getType()))
-        throw "Attribute type is not valid";
+        throw std::runtime_error("Attribute type is not valid");
     getClass(className).addAttribute(attribute);
 }
 
@@ -217,15 +217,15 @@ void UMLData::addClassAttribute(string className, UMLAttribute attribute)
 void UMLData::addClassAttribute(string className, std::shared_ptr<UMLAttribute> attribute)
 {
     if (!isValidName(attribute->getAttributeName()))
-        throw "Attribute name is not valid";
+        throw std::runtime_error("Attribute name is not valid");
     else if (!isValidName(attribute->getType()))
-        throw "Attribute type is not valid";
+        throw std::runtime_error("Attribute type is not valid");
     else if (getClass(className).checkAttribute(attribute)) {
         if (attribute->identifier() == "field") {
-            throw "Field cannot be added, conflicts with other attributes";
+            throw std::runtime_error("Field cannot be added, conflicts with other attributes");
         }
         else if (attribute->identifier() == "method") {
-            throw "Method cannot be added, conflicts with other attributes";
+            throw std::runtime_error("Method cannot be added, conflicts with other attributes");
         }
     }
     getClass(className).addAttribute(attribute);
@@ -240,7 +240,7 @@ void UMLData::removeClassAttribute(string className, string attributeName)
             return;
         }
     }
-    throw "Attribute does not exist";
+    throw std::runtime_error("Attribute does not exist");
 }
 
 // Removes className class attribute by smart pointer
@@ -253,9 +253,9 @@ void UMLData::removeClassAttribute(string className, std::shared_ptr<UMLAttribut
 void UMLData::changeAttributeName(string className, string oldAttributeName, string newAttributeName)
 {
     if (findAttribute(newAttributeName, getClassAttributes(className)) >= 0)
-        throw "Attribute name already exists";
+        throw std::runtime_error("Attribute name already exists");
     if (!isValidName(newAttributeName))
-        throw "New attribute name is not valid";
+        throw std::runtime_error("New attribute name is not valid");
     getClass(className).changeAttributeName(oldAttributeName, newAttributeName);
 }
 
@@ -271,14 +271,14 @@ void UMLData::changeAttributeName(string className, std::shared_ptr<UMLAttribute
 
     if (getClass(className).checkAttribute(newAttribute)) {
         if (attribute->identifier() == "field") {
-            throw "Field name cannot be changed due to conflicts with other attributes";
+            throw std::runtime_error("Field name cannot be changed due to conflicts with other attributes");
         }
         else if (attribute->identifier() == "method") {
-            throw "Method name cannot be changed due to conflicts with other attributes";
+            throw std::runtime_error("Method name cannot be changed due to conflicts with other attributes");
         }
     }
     else if (!isValidName(newAttributeName))
-        throw "New attribute name is not valid";
+        throw std::runtime_error("New attribute name is not valid");
     getClass(className).changeAttributeName(attribute, newAttributeName);
 }
 
@@ -286,7 +286,7 @@ void UMLData::changeAttributeName(string className, std::shared_ptr<UMLAttribute
 void UMLData::changeAttributeType(std::shared_ptr<UMLAttribute> attribute, string newTypeName)
 {
     if (!isValidName(newTypeName))
-        throw "New type name is not valid";
+        throw std::runtime_error("New type name is not valid");
     else {
         attribute->changeType(newTypeName);
     }
@@ -296,13 +296,13 @@ void UMLData::changeAttributeType(std::shared_ptr<UMLAttribute> attribute, strin
 void UMLData::addParameter(std::shared_ptr<UMLMethod> method, string paramName, string paramType)
 {
     if (!isValidName(paramName))
-        throw "Parameter name is not valid";
+        throw std::runtime_error("Parameter name is not valid");
     else if (!isValidName(paramType))
-        throw "Parameter type is not valid";
+        throw std::runtime_error("Parameter type is not valid");
     else {
         for (UMLParameter param : method->getParam()) {
             if (param.getName() == paramName) {
-                throw "Parameter already exists";
+                throw std::runtime_error("Parameter already exists");
             }
         }
     }
@@ -386,7 +386,7 @@ UMLClass& UMLData::getClass(string name)
 {
     std::list<UMLClass>::iterator findIter = findClass(name);
     if (findIter == classes.end())
-        throw "Class not found";
+        throw std::runtime_error("Class not found");
     return *findIter;
 }
 
@@ -396,11 +396,11 @@ void UMLData::addRelationship(const UMLRelationship& relIn)
     // Check to see if relationship already exists
     int loc = findRelationship(relIn.getSource(), relIn.getDestination());
     if (loc >= 0)
-        throw "New relationship already exists";
+        throw std::runtime_error("New relationship already exists");
     // Generalization/realization check for self relationships
     else if (relIn.getType() == generalization || relIn.getType() == realization) {
         if (relIn.getSource().getName() == relIn.getDestination().getName()) {
-            throw "Cannot have self-relationship of generalizations or realizations";
+            throw std::runtime_error("Cannot have self-relationship of generalizations or realizations");
         }
     }
     // Composition check for duplicate destinations
@@ -409,7 +409,7 @@ void UMLData::addRelationship(const UMLRelationship& relIn)
             // Need to check for identical destination name and type
             if (relationship.getDestination().getName() == relIn.getDestination().getName()
                 && relationship.getType() == composition) {
-                throw "Class can not be the destination for more than one composition";
+                throw std::runtime_error("Class can not be the destination for more than one composition");
             }
         }
     }
