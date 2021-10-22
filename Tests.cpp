@@ -416,54 +416,6 @@ TEST(UMLDataJsonTest, ReturnedJSONIsCorrect)
   ASSERT_EQ(j, data.getJson());
 }
 
-/*
-TEST(UMLDataAttributeTest, RemovingAttributeWorks) {
-    UMLData data;
-    data.addClass("test");
-    UMLAttribute attribute("hastest");
-    data.addClassAttribute("test", attribute);
-    data.removeClassAttribute("test", attribute);
-    ASSERT_EQ(data.getClassCopy("test").removeClassAttribute("test", attribute), "");
-}
-*/
-
-//Attribute tests
-/*
--Removing an attribute works
--Removing an attribute  that doestn exist should throw an error
--Renaming an attribute should work
--Renaming an attribute to another attribute that already exists should throw an error
-*/
-
-//adds class attribute to specified className
-//void addClassAttribute(string className, UMLAttribute attribute);
-
-/*
-TEST(UMLDataAttributeTest, RemovingAttributeWorks) 
-{
-      
-    bool hasTestGone;
-    hasTestGone == true;
-    
-    UMLData data;
-    data.addClass("test");
-    UMLAttribute attribute("hastest");
-    data.addClassAttribute("test", attribute);
-    data.removeClassAttribute("test", "hastest");
-  
-  
-   for (UMLAttribute attr : data.getClassAttributes("test")) {
-           if(attr.getAttributeName() == "hastest"){
-              hasTestGone == false;
-              
-           
-           }
-       }
-    ASSERT_EQ(hasTestGone, true); 
-*/
-
-// ****************************************************
-
 // Tests for UMLRelationship.hpp
 // **************************
 
