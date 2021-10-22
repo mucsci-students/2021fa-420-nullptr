@@ -480,25 +480,12 @@ bool UMLData::doesClassExist(const UMLClass& uclass)
 
 //***********************************************************************
 //Memento pattern
-class UMLData::UMLDataSnapshot
-{
-    private:
-        friend class UMLData;
-        std::list<UMLClass> classes;
-        std::vector<UMLRelationship> relationships;
-    public:
-        UMLDataSnapshot(const std::list<UMLClass>& classesIn, std::vector<UMLRelationship> relationshipsIn)
-        : classes(classesIn), 
-        relationships(relationshipsIn) 
-        {}
-};
-
-const UMLData::UMLDataSnapshot UMLData::make_snapshot()
+const UMLDataSnapshot UMLData::make_snapshot()
 {
     return UMLDataSnapshot(classes, relationships);
 }
 
-void UMLData::restore(const UMLData::UMLDataSnapshot& snapshot)
+void UMLData::restore(const UMLDataSnapshot& snapshot)
 {
     classes = snapshot.classes;
     relationships = snapshot.relationships;

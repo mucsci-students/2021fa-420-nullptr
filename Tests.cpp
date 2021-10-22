@@ -12,7 +12,7 @@
 #include "include/UMLRelationship.hpp"
 #include "include/UMLParameter.hpp"
 #include "include/CLI.hpp"
-#include "include/State.hpp"
+#include "include/UMLDataHistory.hpp"
 
 #include <memory>
 #include <string>
@@ -660,105 +660,104 @@ TEST(UMLAttributeTest, RenameAttributeNameTest)
 }
 
 // ****************************************************
-
-// Tests for state (UNDO and REDO)
+// Undo and Redo Tests (UMLDataHistory)
 // ****************************************************
-TEST(StateTestUndo, UndoOnceAfterAddClass)
-{
-    //add class
-    UMLData data;
-    State state(data);
-    json stateBeforeUndo = data.getJson();
-    data.addClass("test");
-    state.update(data);
-    //undo
-    data = state.undo();
-    //check that json in data equals what is was before added class
-    ASSERT_EQ(data.getJson(), stateBeforeUndo);
-    ASSERT_ANY_THROW(data.getClassCopy("test"));
-}
 
-TEST(StateTestUndo, UndoOnceAfterAddRelationship)
+TEST(UndoRedoTest, UndoAfterAddOneClassTest)
 {
     UMLData data;
-    State state(data);
-    data.addClass("test");
-    state.update(data);
-    data.addClass("testing");
-    state.update(data);
-    json stateBefore = data.getJson();
-    data.addRelationship("testing", "test", 2);
-    state.update(data);
-
-    //undo
-    data = state.undo();
-
-    ASSERT_EQ(data.getJson(), stateBefore);
-}
-
-TEST(StateTestUndo, UndoOnceAfterAddAttribute)
-{
-    UMLData data;
-    State state(data);
-    data.addClass("test");
-    state.update(data);
-    json stateBefore = data.getJson();
-    data.addClassAttribute("test", std::make_shared<UMLMethod>("test", "string", std::list<UMLParameter>{}));
-    state.update(data);
-
-    data = state.undo();
-
-    ASSERT_EQ(data.getJson(), stateBefore);
-}
-
-TEST(StateTestUndo, UndoOnceAfterAddParameter)
-{
-    UMLData data;
-    State state(data);
-    data.addClass("test");
-    state.update(data);
-    auto m = std::make_shared<UMLMethod>("test", "string", std::list<UMLParameter> {});
-    data.addClassAttribute("test", m);
-    state.update(data);
-    json stateBefore = data.getJson();
-    data.addParameter(m, "param", "int");
-    state.update(data);
+    UMLDataHistory history(data);
     
-    data = state.undo();
+    //collect json object beforre undo for comparison
+    json beforeClassAddUndo = data.getJson();
 
-    ASSERT_EQ(data.getJson(), stateBefore);
+    //save history before change
+    history.save();
+    data.addClass("TestClass");
+
+    //undo change
+    history.undo();
+
+    //collect new json object after undo
+    json afterClassAddUndo = data.getJson();
+
+    ASSERT_EQ(beforeClassAddUndo, afterClassAddUndo);
 }
 
-TEST(StateTestRedo, RedoAfterDeletingClass)
+TEST(UndoRedoTest, UndoAfterAddTwoClassesTest)
 {
     UMLData data;
-    State state(data);
-    data.addClass("test");
-    state.update(data);
-    json stateBefore = data.getJson();
-    data.deleteClass("test");
-    state.update(data);
-    //undo
-    data = state.undo();
+    UMLDataHistory history(data);   
 
-    ASSERT_EQ(data.getJson(), stateBefore);
+    history.save();
+    data.addClass("TestClass");
+
+    //collect json object beforre undo for comparison1
+    json beforeClassAddUndo = data.getJson();
+  
+    history.save();
+    data.addClass("TestClass2");
+
+    //undo change
+    history.undo();
+
+    //collect new json object after undo
+    json afterClassAddUndo = data.getJson();
+
+    ASSERT_EQ(beforeClassAddUndo, afterClassAddUndo);
 }
 
-TEST(StateTestEmpty, CheckIsEmptyWorks)
+TEST(UndoRedoTest, UndoAfterAddClassMethod)
 {
     UMLData data;
-    State state(data);
-    data.addClass("test");
-    state.update(data);
-    json stateBefore = data.getJson();
-    data.deleteClass("test");
-    state.update(data);
-    ASSERT_EQ(state.is_redo_empty(), true);
-    //undo
-    data = state.undo();
-    ASSERT_EQ(state.is_undo_empty(), false);
-    ASSERT_EQ(state.is_redo_empty(), false);
-    data = state.undo();
-    ASSERT_EQ(state.is_undo_empty(), true);
-    ASSERT_EQ(state.is_redo_empty(), false);
+    UMLDataHistory history(data);   
+
+    history.save();
+    data.addClass("TestClass");
+  
+    history.save();
+    data.addClass("TestClass2");
+
+    //collect json object beforre undo for comparison1
+    json beforeClassAddUndo = data.getJson();
+
+    history.save();
+    data.addClassAttribute("TestClass", std::make_shared<UMLMethod>("test", "int", std::list<UMLParameter>{}));
+
+    //undo change
+    history.undo();
+
+    //collect new json object after undo
+    json afterClassAddUndo = data.getJson();
+
+    ASSERT_EQ(beforeClassAddUndo, afterClassAddUndo);
+}
+
+TEST(UndoRedoTest, RedoAfterClassDeletedUndo)
+{
+    UMLData data;
+    UMLDataHistory history(data);   
+
+    history.save();
+    data.addClass("TestClass");
+  
+    history.save();
+    data.addClass("TestClass2");
+
+    history.save();
+    data.deleteClass("TestClass");
+
+    //collect json object beforre undo for comparison1
+    json beforeClassAddUndo = data.getJson();
+
+    //undo change
+    history.undo();
+
+    //redo change
+    history.redo();
+
+    //collect new json object after undo
+    json afterClassAddUndo = data.getJson();
+
+    ASSERT_EQ(beforeClassAddUndo, afterClassAddUndo);
 }

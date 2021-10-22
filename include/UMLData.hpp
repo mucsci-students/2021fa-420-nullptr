@@ -24,6 +24,23 @@ using std::vector;
 using json = nlohmann::json;
 //--------------------------------------------------------------------
 
+//***********************************************************************
+//Memento pattern using seralization
+//holds current state of UMLData 
+class UMLDataSnapshot
+{
+    private:
+        friend class UMLData;
+        std::list<UMLClass> classes;
+        std::vector<UMLRelationship> relationships;
+    public:
+        UMLDataSnapshot(const std::list<UMLClass>& classesIn, std::vector<UMLRelationship> relationshipsIn)
+        : classes(classesIn), 
+        relationships(relationshipsIn) 
+        {}
+};
+//***********************************************************************
+
 class UMLData
 {
     private:
@@ -124,11 +141,7 @@ class UMLData
 
 //***********************************************************************
         //Memento pattern
-        
-        //class to hold snapshot of UMLData for undo/redo
-        class UMLDataSnapshot;
-
-        //returns snapshot of UMLData object
+        //returns const snapshot of UMLData object
         const UMLDataSnapshot make_snapshot();
 
         //restores UMLData object from a snapshot
