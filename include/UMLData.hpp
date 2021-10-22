@@ -122,6 +122,19 @@ class UMLData
         // Generates json file given a set of data
         json getJson();
 
+//***********************************************************************
+        //Memento pattern
+        
+        //class to hold snapshot of UMLData for undo/redo
+        class UMLDataSnapshot;
+
+        //returns snapshot of UMLData object
+        const UMLDataSnapshot make_snapshot();
+
+        //restores UMLData object from a snapshot
+        void restore(const UMLDataSnapshot& snapshot);
+//***********************************************************************
+
     private:
         // Finds class by name and returns iterator within member classes list, returns end() if not found
         std::list<UMLClass>::iterator findClass(string name);
