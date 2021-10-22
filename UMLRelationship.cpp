@@ -64,6 +64,6 @@ void UMLRelationship::setType(int newType) {
     relationshipType = realization;
   }
   else {
-    throw "Invalid type";
+     throw std::runtime_error("Invalid type");
   }
 }

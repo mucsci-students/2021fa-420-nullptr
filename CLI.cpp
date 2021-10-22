@@ -5,13 +5,13 @@
 
 /************************************************************/
 // Catch for functions to protect from invalid inputs
-#define ERR_CATCH(fun)                           \
-    try {                                        \
-        fun;                                     \
-    }                                            \
-    catch (const char* error) {                  \
-        cout << endl << error << endl << endl;   \
-        errorStatus = true;                      \
+#define ERR_CATCH(fun)                                  \
+    try {                                               \
+        fun;                                            \
+    }                                                   \
+    catch (const std::runtime_error& error) {           \
+        cout << endl << error.what() << endl << endl;   \
+        errorStatus = true;                             \
     }
 /************************************************************/
 
