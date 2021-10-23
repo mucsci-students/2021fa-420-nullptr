@@ -25,7 +25,7 @@ using json = nlohmann::json;
 //--------------------------------------------------------------------
 
 //***********************************************************************
-// Memento pattern using serialization
+// Memento design pattern
 // Holds current state of UMLData 
 class UMLDataSnapshot
 {

@@ -1,16 +1,18 @@
+#pragma once
 /*
   Filename   : UMLDataHistory.hpp
-  Description: Serves as caretaker for UMLDataSnapshot objects, when undo or redo is called
-  restores UMLData with previous state
-  in the UML diagram is stored in a JSON file. 
+  Description: Serves as caretaker for UMLDataSnapshot objects.
+  When undo or redo is called, this is used to restore UMLData 
+  to its previous state.
 */
 
-#pragma once
+//--------------------------------------------------------------------
 #include "httplib/httplib.h"
 #include "inja/inja.hpp"
 #include <stack>
 #include "UMLData.hpp"
 #include "UMLFile.hpp"
+//--------------------------------------------------------------------
 
 class UMLDataHistory 
 {
@@ -20,26 +22,27 @@ class UMLDataHistory
         std::stack<UMLDataSnapshot> redos;
 
     public: 
-        //adds the originator to the history
+        // Constructor that adds the originator to the history
         UMLDataHistory(UMLData& data);
-        //saves snapshot in undo stack, call before changes to UMLData
+        
+        // Saves snapshot in undo stack, call before changes to UMLData
         void save();
 
-        //restores from previous snapshot save
+        // Restores from previous snapshot save
         void undo();
 
-        //restores snapshot before last undo
+        // Restores snapshot before last undo
         void redo();
 
-        //returns true if there are no undo snapshots
+        // Returns true if there are no undo snapshots
         bool is_undo_empty();
 
-        //returns true if there are no redo snapshots
+        // Returns true if there are no redo snapshots
         bool is_redo_empty();
 
-        //returns size of undo stack
+        // Returns size of undo stack
         size_t undo_size();
 
-        //returns size of redo stack
+        // Returns size of redo stack
         size_t redo_size();
 };

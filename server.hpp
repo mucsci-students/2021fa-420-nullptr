@@ -22,14 +22,13 @@ using json = nlohmann::json;
 
 // Catch for functions to protect from invalid inputs
 #define ERR_ADD(fun)                           \
-    try {                                        \
-        history.save();                         \
-        fun;                                       \
-    }                                            \
-    catch (const char* error) {                  \
-        errors += error;                         \
-                                                 \
-    }
+    try {                                      \
+        history.save();                        \
+        fun;                                   \
+    }                                          \
+    catch (const std::runtime_error& error) {  \
+        errors += error.what();                \
+    }                                          \
 
 namespace umlserver
 {

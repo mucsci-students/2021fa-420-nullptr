@@ -16,13 +16,13 @@
 #include <filesystem>
 //--------------------------------------------------------------------
 
-// constructor: takes in the name of the file to save
+// Constructor: takes in the name of the file to save
 UMLFile::UMLFile(const string& newpath)
 :path(newpath)
 {
 }
 
-// saving file
+// Saves information from UML diagram to JSON
 void UMLFile::save(UMLData& data)
 {
     json j = data.getJson();
@@ -33,7 +33,7 @@ void UMLFile::save(UMLData& data)
     file.close();
 }
 
-// loads a system file and returns a UML data object
+// Loads a system file and returns a UML data object
 UMLData UMLFile::load() 
 {
     std::ifstream file; 
@@ -49,7 +49,7 @@ UMLData UMLFile::load()
     return data;
 }
 
-// gets the relationships from the json file and adds them to the UMLData object
+// Gets the relationships from the json file and adds them to the UMLData object
 void UMLFile::addClasses(UMLData& data, const json& j)
 {
     for (auto umlclass : j["classes"])
@@ -72,7 +72,7 @@ void UMLFile::addClasses(UMLData& data, const json& j)
     }
 }
 
-// gets the relationships from the json file and adds them to the UMLData object
+// Gets the relationships from the json file and adds them to the UMLData object
 void UMLFile::addRelationships(UMLData& data, const json& j)
 {
     for (auto relationship : j["relationships"])
@@ -83,6 +83,7 @@ void UMLFile::addRelationships(UMLData& data, const json& j)
     }
 }
 
+// Makes a list of all JSON files in the build directory that can be used for loading.
 json UMLFile::listSaves()
 {
     json files = json::array();

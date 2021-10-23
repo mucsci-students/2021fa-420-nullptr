@@ -740,6 +740,7 @@ TEST(UMLAttributeTest, RenameAttributeNameTest)
 // Undo and Redo Tests (UMLDataHistory)
 // ****************************************************
 
+// Test to see if undoing the add of a single class works.
 TEST(UndoRedoTest, UndoAfterAddOneClassTest)
 {
     UMLData data;
@@ -761,6 +762,7 @@ TEST(UndoRedoTest, UndoAfterAddOneClassTest)
     ASSERT_EQ(beforeClassAddUndo, afterClassAddUndo);
 }
 
+// Test to see if undoing the add of a two classes works.
 TEST(UndoRedoTest, UndoAfterAddTwoClassesTest)
 {
     UMLData data;
@@ -769,21 +771,22 @@ TEST(UndoRedoTest, UndoAfterAddTwoClassesTest)
     history.save();
     data.addClass("TestClass");
 
-    //collect json object beforre undo for comparison1
+    // Collect json object beforre undo for comparison1
     json beforeClassAddUndo = data.getJson();
   
     history.save();
     data.addClass("TestClass2");
 
-    //undo change
+    // Undo change
     history.undo();
 
-    //collect new json object after undo
+    // Collect new json object after undo
     json afterClassAddUndo = data.getJson();
 
     ASSERT_EQ(beforeClassAddUndo, afterClassAddUndo);
 }
 
+// Undoing after adding a class should remove the class.
 TEST(UndoRedoTest, UndoAfterAddClassMethod)
 {
     UMLData data;
@@ -795,21 +798,22 @@ TEST(UndoRedoTest, UndoAfterAddClassMethod)
     history.save();
     data.addClass("TestClass2");
 
-    //collect json object beforre undo for comparison1
+    // Collect json object beforre undo for comparison1
     json beforeClassAddUndo = data.getJson();
 
     history.save();
     data.addClassAttribute("TestClass", std::make_shared<UMLMethod>("test", "int", std::list<UMLParameter>{}));
 
-    //undo change
+    // Undo change
     history.undo();
 
-    //collect new json object after undo
+    // Collect new json object after undo
     json afterClassAddUndo = data.getJson();
 
     ASSERT_EQ(beforeClassAddUndo, afterClassAddUndo);
 }
 
+// Undoing then redoing it back should equal the same thing.
 TEST(UndoRedoTest, RedoAfterClassDeletedUndo)
 {
     UMLData data;
@@ -824,16 +828,16 @@ TEST(UndoRedoTest, RedoAfterClassDeletedUndo)
     history.save();
     data.deleteClass("TestClass");
 
-    //collect json object beforre undo for comparison1
+    // Collect json object beforre undo for comparison1
     json beforeClassAddUndo = data.getJson();
 
-    //undo change
+    // Undo change
     history.undo();
 
-    //redo change
+    // Redo change
     history.redo();
 
-    //collect new json object after undo
+    // Collect new json object after undo
     json afterClassAddUndo = data.getJson();
 
     ASSERT_EQ(beforeClassAddUndo, afterClassAddUndo);

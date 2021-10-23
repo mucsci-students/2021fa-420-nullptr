@@ -479,7 +479,7 @@ bool UMLData::doesClassExist(const UMLClass& uclass)
 }
 
 //***********************************************************************
-//Memento pattern
+// Memento pattern - creates snapshots that are able to be restored
 const UMLDataSnapshot UMLData::make_snapshot()
 {
     return UMLDataSnapshot(classes, relationships);
