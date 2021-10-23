@@ -6,6 +6,8 @@
 //--------------------------------------------------------------------
 // System includes
 #include "include/UMLAttribute.hpp"
+#include "include/UMLClass.hpp"
+#include "include/UMLData.hpp"
 #include "include/UMLField.hpp"
 #include "include/UMLFile.hpp"
 #include "include/UMLMethod.hpp"
@@ -475,3 +477,17 @@ bool UMLData::doesClassExist(const UMLClass& uclass)
         return false;
     return true;
 }
+
+//***********************************************************************
+// Memento pattern - creates snapshots that are able to be restored
+const UMLDataSnapshot UMLData::make_snapshot()
+{
+    return UMLDataSnapshot(classes, relationships);
+}
+
+void UMLData::restore(const UMLDataSnapshot& snapshot)
+{
+    classes = snapshot.classes;
+    relationships = snapshot.relationships;
+}
+//***********************************************************************

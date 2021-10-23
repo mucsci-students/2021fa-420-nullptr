@@ -22,9 +22,11 @@
 
 #include "include/UMLData.hpp"
 #include "include/UMLClass.hpp"
+#include "include/UMLMethod.hpp"
 #include "include/UMLRelationship.hpp"
 #include "include/UMLParameter.hpp"
 #include "include/CLI.hpp"
+#include "include/UMLDataHistory.hpp"
 
 #include <memory>
 #include <string>
@@ -399,6 +401,21 @@ TEST(UMLDataRelationshipTest, ChangeRelationshipTypeErrors)
     ERR_CHECK(data.changeRelationshipType("test", "test1", 1), "Class can not be the destination for more than one composition");
 }
 
+TEST(UMLDataJsonTest, ReturnedJSONIsCorrect)
+{
+  json j = "{\"classes\":[{\"fields\":[{\"name\":\"test\",\"type\":\"int\"}],\"methods\":[{\"name\":\"ff\",\"params\":[{\"name\":\"something\",\"type\":\"something\"}],\"return_type\":\"string\"}],\"name\":\"fish2\"},{\"fields\":[],\"methods\":[],\"name\":\"test\"}],\"relationships\":[{\"destination\":\"test\",\"source\":\"fish2\",\"type\":\"aggregation\"}]}"_json;
+  UMLData data;
+  data.addClass("fish2");
+  data.addClass("test");
+  data.addClassAttribute("fish2", std::make_shared<UMLField>("test", "int"));
+  auto m = std::make_shared<UMLMethod>("ff", "string", std::list<UMLParameter>{});
+  data.addClassAttribute("fish2", m);
+  data.addParameter(m, "something", "something");
+  data.addRelationship("fish2", "test", 0);
+
+  ASSERT_EQ(j, data.getJson());
+}
+
 // Tests for UMLRelationship.hpp
 // **************************
 
@@ -720,3 +737,108 @@ TEST(UMLAttributeTest, RenameAttributeNameTest)
 }
 
 // ****************************************************
+// Undo and Redo Tests (UMLDataHistory)
+// ****************************************************
+
+// Test to see if undoing the add of a single class works.
+TEST(UndoRedoTest, UndoAfterAddOneClassTest)
+{
+    UMLData data;
+    UMLDataHistory history(data);
+    
+    //collect json object beforre undo for comparison
+    json beforeClassAddUndo = data.getJson();
+
+    //save history before change
+    history.save();
+    data.addClass("TestClass");
+
+    //undo change
+    history.undo();
+
+    //collect new json object after undo
+    json afterClassAddUndo = data.getJson();
+
+    ASSERT_EQ(beforeClassAddUndo, afterClassAddUndo);
+}
+
+// Test to see if undoing the add of a two classes works.
+TEST(UndoRedoTest, UndoAfterAddTwoClassesTest)
+{
+    UMLData data;
+    UMLDataHistory history(data);   
+
+    history.save();
+    data.addClass("TestClass");
+
+    // Collect json object beforre undo for comparison1
+    json beforeClassAddUndo = data.getJson();
+  
+    history.save();
+    data.addClass("TestClass2");
+
+    // Undo change
+    history.undo();
+
+    // Collect new json object after undo
+    json afterClassAddUndo = data.getJson();
+
+    ASSERT_EQ(beforeClassAddUndo, afterClassAddUndo);
+}
+
+// Undoing after adding a class should remove the class.
+TEST(UndoRedoTest, UndoAfterAddClassMethod)
+{
+    UMLData data;
+    UMLDataHistory history(data);   
+
+    history.save();
+    data.addClass("TestClass");
+  
+    history.save();
+    data.addClass("TestClass2");
+
+    // Collect json object beforre undo for comparison1
+    json beforeClassAddUndo = data.getJson();
+
+    history.save();
+    data.addClassAttribute("TestClass", std::make_shared<UMLMethod>("test", "int", std::list<UMLParameter>{}));
+
+    // Undo change
+    history.undo();
+
+    // Collect new json object after undo
+    json afterClassAddUndo = data.getJson();
+
+    ASSERT_EQ(beforeClassAddUndo, afterClassAddUndo);
+}
+
+// Undoing then redoing it back should equal the same thing.
+TEST(UndoRedoTest, RedoAfterClassDeletedUndo)
+{
+    UMLData data;
+    UMLDataHistory history(data);   
+
+    history.save();
+    data.addClass("TestClass");
+  
+    history.save();
+    data.addClass("TestClass2");
+
+    history.save();
+    data.deleteClass("TestClass");
+
+    // Collect json object beforre undo for comparison1
+    json beforeClassAddUndo = data.getJson();
+
+    // Undo change
+    history.undo();
+
+    // Redo change
+    history.redo();
+
+    // Collect new json object after undo
+    json afterClassAddUndo = data.getJson();
+
+    ASSERT_EQ(beforeClassAddUndo, afterClassAddUndo);
+}
