@@ -25,8 +25,8 @@ using json = nlohmann::json;
 //--------------------------------------------------------------------
 
 //***********************************************************************
-//Memento pattern using seralization
-//holds current state of UMLData 
+// Memento pattern using serialization
+// Holds current state of UMLData 
 class UMLDataSnapshot
 {
     private:
@@ -140,11 +140,11 @@ class UMLData
         json getJson();
 
 //***********************************************************************
-        //Memento pattern
-        //returns const snapshot of UMLData object
+        // Memento pattern
+        // Returns const snapshot of UMLData object
         const UMLDataSnapshot make_snapshot();
 
-        //restores UMLData object from a snapshot
+        // Restores UMLData object from a snapshot
         void restore(const UMLDataSnapshot& snapshot);
 //***********************************************************************
 
