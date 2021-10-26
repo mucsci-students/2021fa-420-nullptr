@@ -27,6 +27,15 @@ using std::shared_ptr;
 using json = nlohmann::json;
 
 
+/********************************/
+// Typedefs
+
+typedef shared_ptr<UMLAttribute> attr_ptr;
+typedef shared_ptr<UMLMethod> method_ptr;
+
+
+
+
 //--------------------------------------------------------------------
 // Memento design pattern
 // Holds current state of UMLData 
@@ -47,12 +56,6 @@ class UMLDataSnapshot
 class UMLData
 {
   private:
-
-    /********************************/
-    // Typedefs
-
-    typedef shared_ptr<UMLAttribute> attr_ptr;
-    typedef shared_ptr<UMLMethod> method_ptr;
     
     /********************************/
     // Global vars
@@ -208,6 +211,9 @@ class UMLData
     // Checks if class exists with classes list (class argument)
     bool doesClassExist(const UMLClass& uclass);
 
+    // Checks to see if relationship exists.
+    bool doesRelationshipExist(string source, string destination);
+
     // Takes in 2 strings (class name and field name) and 
     // checks if field exists in current class
     bool doesFieldExist(string className, string fieldName);
@@ -216,6 +222,8 @@ class UMLData
     // checks to see if the specified parameter exists in
     // the current class.
     bool doesParameterExist(method_ptr methodIter, string paramName);
+
+
 
   private:
     // Finds class by name and returns iterator within member classes list, returns end() if not found
@@ -235,4 +243,11 @@ class UMLData
 
     // Takes in relationship object and adds it to relationship vector
     void addRelationship(const UMLRelationship& relationshipIn);
+
+    /*************************************/
+    //SPRINT 4
+
+    // Checks if overloaded methods have duplicate parameters.
+    //bool are_methods_duplicates(method_ptr method1, method_ptr method2);
+
 };

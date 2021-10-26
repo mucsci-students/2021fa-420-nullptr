@@ -31,24 +31,27 @@
  using std::invalid_argument;
  using std::list;
  using std::shared_ptr;
-//-------------------------------------------------------------------
+//--------------------------------------------------------------------
+
+/********************/
+//Typedefs
+
+typedef shared_ptr<UMLAttribute> attr_ptr;
+typedef shared_ptr<UMLMethod> method_ptr;
+typedef long unsigned int size_t;
 
 class CLI
 {
   private:
-
-    /********************/
-    //Typedefs
     
-    typedef shared_ptr<UMLAttribute> attr_ptr;
-    typedef shared_ptr<UMLMethod> method_ptr;
-    typedef unsigned int size_t;
-
     /********************/
     //Global variables
 
-    UMLData Model;
+    // Error check to prevent 'success' print 
     bool ErrorStatus;
+
+    // Main UML data object storing UML stuff
+    UMLData Model;
 
     /********************/
     //Print-help functions
@@ -94,17 +97,21 @@ class CLI
     void display_class(UMLClass currentClass);
     void display_method(attr_ptr methodIter); 
     void display_relationship(string source, string destination, string rType);
+    
+    /********************/
+    //Input parsing
+
+    size_t user_int_input();
+    string tab_completion();
 
     /********************/
     //Misc.
 
-    size_t user_int_input();
     method_ptr select_method(string className, string methodName);
     attr_ptr select_field(string className, string fieldName);
-    //Tab completion will also go here
 
   public:
-
+    
     // Takes in user input and calls different functions based on
     // what command the user typed.
     void cli_menu();
@@ -152,5 +159,5 @@ class CLI
 
     // Loads a json save file, overwriting the current session.
     void load_uml();
-}
-    
+   
+};

@@ -1,4 +1,3 @@
-
 /*
   Filename   : CLI.cpp
   Author(s)  : Matt Giacoponello
@@ -6,56 +5,27 @@
 */
 
 
-
-
-
 /*
 ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 |**************************************************************|
-|                            NOTES                             |
+|                       NOTES & STARTUP                        |
 |**************************************************************|
 \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////
 
 
-CRITICAL PROBLEMS:
+BUGS & ISSUES:
 
-  
+  - rename_parameter() doesn't rename (UMLData.cpp)
 
-EDGE CASES:
+  - change_parameter() doesn't change type (UMLData.cpp)
 
-  - User can create duplicate relationships.
-
-TEST FOR:
-
-  - User tries to delete a non-existent class, relationship, 
-  field, method, parameter
-
-  - 
-
-REMEMBER TO:
-
-  - Ctrl-F ErrorStatus to make sure I reset it every time it
-  gets used. - DONE!
-
-  - Add the change functions to the field, method, and 
-  parameter editor if statements.
-
-  - Make sure the if statements correspond to the correct 
-  strings.
-
-  - Update the print commands to include the type change
-  option.
+  - Method overloading isn't currently supported (in UMLData.cpp)
 
 */
 
 
-
-
-
-
 /************************************************************/
 // Catch for functions to protect from invalid inputs
-
 #define ERR_CATCH(fun)                                  \
     try {                                               \
         fun;                                            \
@@ -73,6 +43,8 @@ REMEMBER TO:
 #include "include/CLI.hpp"
 //--------------------------------------------------------------------
 
+
+
 /*
 ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 |**************************************************************|
@@ -88,11 +60,13 @@ REMEMBER TO:
  */
 void CLI::cli_menu()
 {
+  ErrorStatus = false;
+
   cout << "Welcome to UML++!\n\n";
   cout << "Type \"help\" to view all available commands.\nType \"quit\" to quit your current session.\n";
 
   string userInput; 
-
+  
   do
   {
     cout << "> ";
@@ -148,8 +122,10 @@ void CLI::cli_menu()
   while(userInput != "quit");
   
   cout << "See ya!\n";
-   
+
+
 }
+
 
 /************************************/
 
@@ -159,7 +135,7 @@ void CLI::cli_menu()
  */
 void CLI::list_classes()
 {
-  list<UMLClass> classList = Model.getClasses;
+  list<UMLClass> classList = Model.getClasses();
 
   //if no classes, error message.
   if (classList.size() == 0)
@@ -168,10 +144,11 @@ void CLI::list_classes()
     return;
   }
   
-  for(auto iter = classList.begin(); iter != classList.end(); iter++)   
-    display_class((*iter).getName());
+  for(auto currentClass : classList)   
+    display_class(currentClass);
   
 }
+
 
 /************************************/
 
@@ -201,7 +178,9 @@ void CLI::list_relationships()
   }
 }
 
+
 /************************************/
+
 
 /**
  * @brief User creates and names a class and may give it any number
@@ -230,22 +209,18 @@ void CLI::create_class()
   }
 
   cout << "Successfully added new class \"" << className << "\".\n";
-  
 
   cout << "How many fields would you like to start with? -> ";
   size_t fieldCount = user_int_input();
-
 
   for(size_t i = 0; i < fieldCount; i++)
   {
     cout << "Field " << (i+1) << ":\n";
     add_field(className);
   }
-  
 
   cout << "How many methods would you like to start with? -> ";
   size_t methodCount = user_int_input();
-
 
   for(int i = 0; i < methodCount; i++)
   {
@@ -259,8 +234,8 @@ void CLI::create_class()
   display_class(newClass);
 }
 
-/************************************/
 
+/************************************/
 
 
 /**
@@ -279,8 +254,6 @@ void CLI::create_relationship()
   string relationshipType;
   string stringType;
   
-  Type rType;
-
   bool srcValid = false;
   bool destValid = false;
   bool relationshipTypeValid = false;
@@ -318,27 +291,23 @@ void CLI::create_relationship()
   } while (!destValid);
 
 
-  /*
+  
   if(Model.doesRelationshipExist(sourceClassName, destinationClassName))
   {
     cout << "A relationship already exists between " << sourceClassName << " and " << destinationClassName << ". Aborting.\n";
     return;
   }
-  */
   
-
-  /***************/
-  //unedited portion
-
   // Loop to grab string of type and convert into integer
   do
   {
-    cout << endl << "Choose the type of relationship:" << endl;
-    cout << "[1] Aggregation" << endl;
-    cout << "[2] Composition" << endl;
-    cout << "[3] Generalization" << endl;
-    cout << "[4] Realization" << endl;
-    cout << endl << "Choice: ";
+    cout << "Choose the type of relationship:\n"
+      << "[1] Aggregation\n"
+      << "[2] Composition\n" 
+      << "[3] Generalization\n"
+      << "[4] Realization\n";
+    
+    cout << "\nChoice: ";
     cin >> stringType;
     if (stringType == "1" || stringType == "2" || stringType == "3" || stringType == "4") 
     {
@@ -364,7 +333,9 @@ void CLI::create_relationship()
   
 }
 
+
 /************************************/
+
 
 /**
  * @brief User will be prompted to type in the class name,
@@ -382,12 +353,14 @@ void CLI::delete_class()
   {
     cout << "Could not find class name \"" << className << "\". Aborting.\n";
     ErrorStatus = false;
-    return
+    return;
   }
   cout << className << " was successfully removed.\n";
 }
 
+
 /************************************/
+
 
 /**
  * @brief User will be prompted to type in the source and destination,
@@ -417,7 +390,9 @@ void CLI::delete_relationship()
   cout << "Relationship was successfully deleted.\n";
 }
 
+
 /************************************/
+
 
 /**
  * @brief User types in the current class name, and then the name
@@ -428,6 +403,7 @@ void CLI::rename_class()
 {
   string oldClassName;
   string newClassName;
+  
 
   cout << "Enter the CURRENT name of the class you\'d like to rename. -> ";
   cin >> oldClassName;
@@ -445,8 +421,9 @@ void CLI::rename_class()
   ERR_CATCH(Model.changeClassName(oldClassName, newClassName));
   if(ErrorStatus)
   {
-    cout << "Name modification failed. Make sure the name you typed is a valid class\nname, and isn\'t the same name as another class.\n";
-    cout << "Aborting...\n";
+    cout << "Name modification failed. Make sure the name you typed is a valid class\n"
+    << "name, and isn\'t the same name as another class.\n"
+    << "Aborting...\n";
     ErrorStatus = false;
     return;
   }
@@ -464,7 +441,45 @@ void CLI::rename_class()
  */
 void CLI::change_relationship()
 {
-  cout << "[feature disabled]\n";
+  string source;
+  string destination;
+  string stringType;
+  int intType;
+
+  cout << "Type in the source of the relationship whose type you\'d like to change. -> ";
+  cin >> source;
+
+  cout << "Type in the destination. -> ";
+  cin >> destination;
+
+  do
+  {
+    cout << endl << "Choose the type of relationship:" << endl;
+    cout << "[1] Aggregation" << endl;
+    cout << "[2] Composition" << endl;
+    cout << "[3] Generalization" << endl;
+    cout << "[4] Realization" << endl;
+    cout << endl << "Choice: ";
+    cin >> stringType;
+    if (stringType == "1" || stringType == "2" || stringType == "3" || stringType == "4") 
+    {
+      // Type is enum starting from 0, so subtract by 1
+      intType = std::stoi(stringType) - 1;
+    }
+    else 
+      cout << endl << "Invalid choice!";
+  
+  }while(intType != 0 && intType != 1 && intType != 2 && intType != 3);
+
+  ERR_CATCH(Model.changeRelationshipType(source, destination, intType));
+  if(ErrorStatus)
+  {
+    cout << "Could not change relationship type.\n";
+    ErrorStatus = false;
+    return;
+  }
+
+  cout << "The relationship\'s type was changed successfully!\n";
 }
 
 
@@ -480,7 +495,6 @@ void CLI::edit_fields()
 {
   string className;
   string input;
-  UMLClass currentClass;
   
   cout << "Enter the name of the class whose fields and/or parameters you\'d like to edit.\n-> ";
   cin >> className;
@@ -491,7 +505,7 @@ void CLI::edit_fields()
     cout << "Returning to main menu.\n";
     return;
   }
-
+  
   cout << "Type \"help\" to view all available editor commands.\n";
   do
   {
@@ -504,7 +518,7 @@ void CLI::edit_fields()
     
     else if(input == "view")
     {
-      currentClass = Model.getClassCopy(className);
+      UMLClass currentClass = Model.getClassCopy(className);
       display_class(currentClass);
     }
     else if(input == "add")
@@ -533,12 +547,11 @@ void CLI::edit_fields()
     }
     else
       cout << "Invadid command! Type \"help\" to view all available field editor commands.\n";
-
-    //For some reason, the display_class wasn't updating unless I did this.
-    currentClass = Model.getClassCopy(className);
+  
   }
   while(1);
 }
+
 
 /************************************/
 
@@ -550,7 +563,7 @@ void CLI::edit_methods()
 {
   string className;
   string input;
-  UMLClass currentClass;
+  
   
   cout << "Enter the name of the class whose methods and/or parameters you\'d like to edit.\n-> ";
   cin >> className;
@@ -561,8 +574,6 @@ void CLI::edit_methods()
     cout << "Returning to main menu.\n";
     return;
   }
-  
-  currentClass = Model.getClassCopy(className);
 
   cout << "Type \"help\" to view all available editor commands.\n";
   do
@@ -575,16 +586,19 @@ void CLI::edit_methods()
       print_method_commands();
     
     else if(input == "view")
+    {
+      UMLClass currentClass = Model.getClassCopy(className);
       display_class(currentClass);
-    
+    }
     else if(input == "add")
       add_method(className);
 
     else if(input == "delete")
       delete_method(className);
 
-    /////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
+    else if(input == "rename")
+      rename_method(className);
+
     else if(input == "change")
       change_method(className);
     
@@ -606,8 +620,6 @@ void CLI::edit_methods()
     else
       cout << "Invadid command! Type \"help\" to view all available method editor commands.\n";
 
-    //For some reason, the display_class wasn't updating unless I did this.
-    currentClass = Model.getClassCopy(className);
   }
   while(1);
 }
@@ -658,6 +670,9 @@ void CLI::edit_parameters(string className)
     else if(input == "delete")
       delete_parameter(methodIter);
     
+    else if(input == "rename")
+      rename_parameter(methodIter);
+
     else if(input == "change")
       change_parameter(methodIter);
     
@@ -678,6 +693,7 @@ void CLI::edit_parameters(string className)
   }
 }
 
+
 /************************************/
 
 /**
@@ -697,6 +713,7 @@ void CLI::save_uml()
 }
 
 /************************************/
+
 
 /**
  * @brief Loads a json save file, overwriting the current session.
@@ -725,7 +742,6 @@ void CLI::load_uml()
 }
 
 
-
 /*
 ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 |**************************************************************|
@@ -735,10 +751,12 @@ void CLI::load_uml()
 */
 
 /**************************************************************/
-//Print-help functions
+//PRINT-HELP FUNCTIONS
+
 
 /**
- * @brief 
+ * @brief Prints commands for the user to type, and explains
+ * what each command does.
  * 
  */
 void CLI::print_main_commands()
@@ -753,6 +771,8 @@ void CLI::print_main_commands()
   << "                      will be no more, but the classes will still exist.\n\n"
   << "rename_class        : User will be prompted to type the existing class name, and then the new\n"
   << "                      name.\n\n"
+  << "change_relationship : User will be prompted to type in source, destination, and the NEW type\n"
+  << "                      of the relationship, and the type will be changed accordingly.\n\n"
   << "edit_fields         : User will be sent to a sub-menu, where they can enter in field editor\n"
   << "                      commands.\n\n"
   << "edit_methods        : User will be sent to a sub-menu, where they can enter in method editor\n"
@@ -767,7 +787,8 @@ void CLI::print_main_commands()
 /************************************/
 
 /**
- * @brief 
+ * @brief Prints commands for the user to type, and explains
+ * what each command does.
  * 
  */
 void CLI::print_field_commands()
@@ -776,7 +797,8 @@ void CLI::print_field_commands()
     << "view         : View the current class with its fields.\n"
     << "add          : Add a new field.\n"
     << "delete       : Delete an existing field.\n"
-    << "change       : Rename an existing field or change its type.\n"
+    << "rename       : Rename an existing field.\n"
+    << "change       : Change the type of an existing field.\n"
     << "switch_class : Allows the user to switch to a different class.\n"
     << "exit         : Quit the field editor and return to the normal interface.\n\n";
 }
@@ -784,7 +806,8 @@ void CLI::print_field_commands()
 /************************************/
 
 /**
- * @brief 
+ * @brief Prints commands for the user to type, and explains
+ * what each command does.
  * 
  */
 void CLI::print_method_commands()
@@ -793,7 +816,8 @@ void CLI::print_method_commands()
     << "view            : View the current class with its methods.\n"
     << "add             : Add a new method.\n"
     << "delete          : Delete an existing method.\n"
-    << "change          : Rename an existing method or change its type.\n"
+    << "rename          : Rename an existing method.\n"
+    << "change          : Change the type of an existing method.\n"
     << "switch_class    : Allows the user to switch to a different class.\n"
     << "edit_parameters : User will be sent to a sub menu to edit a method's parameters.\n"
     << "exit            : Quit the method editor and return to the normal interface.\n\n";
@@ -802,7 +826,8 @@ void CLI::print_method_commands()
 /************************************/
 
 /**
- * @brief 
+ * @brief Prints commands for the user to type, and explains
+ * what each command does.
  * 
  */
 void CLI::print_parameter_commands()
@@ -811,17 +836,18 @@ void CLI::print_parameter_commands()
     << "view          : View the current method with its parameters.\n"
     << "add           : Add a new parameter.\n"
     << "delete        : Delete an existing parameter.\n"
-    << "change        : Rename an existing parameter or change its type.\n"
+    << "rename        : Rename an existing parameter\n"
+    << "change        : Change the type of an existing parameter.\n"
     << "switch_method : Allows the user to switch to a different method.\n"
     << "exit          : Quit the parameter editor and return to the method editor.\n\n";
 }
-
 
 /**************************************************************/
 //ADDING
 
 /**
- * @brief 
+ * @brief User types in the name and type, and the field
+ * is created.
  * 
  * @param className 
  */
@@ -840,6 +866,7 @@ void CLI::add_field(string className)
   }
 
   cout << "What type would you like to give it? -> ";
+  cin >> fieldType;
 
   ERR_CATCH(Model.addClassAttribute(className, std::make_shared<UMLField>(fieldName, fieldType)));
   if (ErrorStatus)
@@ -858,7 +885,9 @@ void CLI::add_field(string className)
 
 
 /**
- * @brief 
+ * @brief User types in the method name and type, and the method 
+ * is created. User can also specify how many parameters to give
+ * it, and they can name and assign types to them accordingly.
  * 
  * @param className 
  */
@@ -900,10 +929,10 @@ void CLI::add_method(string className)
 /*************************/
 
 /**
- * @brief 
+ * @brief User types in parameter name and type, and the
+ * parameter is created accordingly.
  * 
- * @param className 
- * @param methodName 
+ * @param methodIter
  * @return true 
  * @return false 
  */
@@ -915,7 +944,7 @@ bool CLI::add_parameter(method_ptr methodIter)
   cout << "Type a name for your parameter -> ";
   cin >> paramName;
 
-  while(Model.doesParameterExist())
+  while(Model.doesParameterExist(methodIter, paramName))
   {
     cout << "That name is already taken.\nTry a different name. -> ";
     cin >> paramName;
@@ -937,12 +966,12 @@ bool CLI::add_parameter(method_ptr methodIter)
   return true;
 }
 
-
 /**************************************************************/
 //DELETING
 
 /**
- * @brief
+ * @brief User types in the name of the field, and it
+ * gets deleted.
  * 
  * @param className 
  */
@@ -965,10 +994,14 @@ void CLI::delete_field(string className)
   cout << "The field \"" << fieldName << "\" was deleted.\n";
 }
 
+
 /*************************/
 
+
 /**
- * @brief 
+ * @brief User types in the name of the method. If the
+ * method is overloaded, they can specify which one (in
+ * a different function). The method is then deleted.
  * 
  * @param className 
  */
@@ -1000,13 +1033,15 @@ void CLI::delete_method(string className)
   cout << "The method \"" << methodName << "\" was deleted.\n";
 }
 
+
 /*************************/
 
+
 /**
- * @brief 
+ * @brief User types in the name of the parameter and it
+ * gets deleted.
  * 
- * @param className 
- * @param methodName 
+ * @param methodIter
  */
 void CLI::delete_parameter(method_ptr methodIter)
 {
@@ -1025,11 +1060,13 @@ void CLI::delete_parameter(method_ptr methodIter)
 }
 
 
+
 /**************************************************************/
 //RENAMING
 
 /**
- * @brief 
+ * @brief User types in the old name, then the new name, and
+ * then it gets renamed.
  * 
  * @param className 
  */
@@ -1074,7 +1111,10 @@ void CLI::rename_field(string className)
 
 
 /**
- * @brief 
+ * @brief User types in the old name of the method. If the
+ * method is overloaded, they can specify which one (in
+ * a different function). Then they type in the new name,
+ * and it gets renamed.
  * 
  * @param className 
  */
@@ -1114,17 +1154,17 @@ void CLI::rename_method(string className)
 /*************************/
 
 /**
- * @brief 
+ * @brief User types in the old name, then the new name, and
+ * then it gets renamed.
  * 
- * @param className 
- * @param methodName 
+ * @param methodIter
  */
 void CLI::rename_parameter(method_ptr methodIter)
 {
   string paramNameFrom;
   string paramNameTo;
 
-  cout << "Type the name of the parameter you\'d like to rename FROM -> ");
+  cout << "Type the name of the parameter you\'d like to rename FROM -> ";
   cin >> paramNameFrom;
   
   cout << "Type the name of the parameter you\'d like to rename TO -> ";
@@ -1143,12 +1183,12 @@ void CLI::rename_parameter(method_ptr methodIter)
 
 
 
-
 /**************************************************************/
-//TYPE CHANGING
+//TYPE-CHANGING
 
 /**
- * @brief 
+ * @brief User types in the name, and then the new type.
+ * The field's type is then changed accordingly.
  * 
  * @param className 
  */
@@ -1179,7 +1219,10 @@ void CLI::change_field(string className)
 /*************************/
 
 /**
- * @brief 
+ * @brief User types in the name. If the method is overloaded, 
+ * they can specify which one (in a different function). The 
+ * user then types in the new type. The field's type is then
+ * changed accordingly.
  * 
  * @param className 
  */
@@ -1219,7 +1262,8 @@ void CLI::change_method(string className)
 /*************************/
 
 /**
- * @brief 
+ * @brief User types in the name, and then the new type.
+ * The parameter's type is then changed accordingly.
  * 
  * @param methodIter 
  */
@@ -1245,18 +1289,15 @@ void CLI::change_parameter(method_ptr methodIter)
   cout << "The type of your parameter was changed successfully!\n";
 }
 
+
 /**************************************************************/
 //DISPLAY FUNCTIONS
 
 /**
- * @brief A very messy and hard to read function. I hate it
- * with a burning passion, but I need to make do, due to
- * the way our objects are structured.
+ * @brief Takes in a UMLClass object, and displays it in
+ * a format like this:
  * 
- * Takes in a UMLClass object, and displays it in a format 
- * like this:
- * 
- * CLASS: {
+ * CLASS: c1 {
  *   Fields:
  *      int f1
  *      int f2
@@ -1266,7 +1307,6 @@ void CLI::change_parameter(method_ptr methodIter)
  *      int m2()
  *      bool m3(int p1)
  * }
- * 
  * 
  * @param currentClass 
  */
@@ -1290,7 +1330,7 @@ void CLI::display_class(UMLClass currentClass)
   //Methods
   for(auto methodIter : currentClass.getAttributes())
   {
-    display_method(methodIter)
+    display_method(methodIter);
   } 
   
   cout << "}\n";
@@ -1301,7 +1341,9 @@ void CLI::display_class(UMLClass currentClass)
 
 
 /**
- * @brief 
+ * @brief Prints out methods in the following format:
+ * 
+ * void m1(int p1, string p2, bool p3)
  * 
  * @param methodIter 
  */
@@ -1309,7 +1351,8 @@ void CLI::display_method(attr_ptr methodIter)
 {
   if(methodIter->identifier() == "method")
   {
-    cout << "     " << methodIter->getType() << " " << methodIter->getAttributeName() << "(";
+    cout << "     ";
+    cout << methodIter->getType() << " " << methodIter->getAttributeName() << "(";
     
     //Parameters
     size_t paramCount = 0;
@@ -1325,10 +1368,18 @@ void CLI::display_method(attr_ptr methodIter)
   }
 }
 
+
 /*************************/
 
 /**
- * @brief 
+ * @brief Prints out relationships in the following format:
+ * 
+ * TYPE:
+ *   Aggregation
+ * SOURCE:
+ *   C1
+ * DESTINATION:
+ *   C2
  * 
  * @param source 
  * @param destination 
@@ -1342,13 +1393,13 @@ void CLI::display_relationship(string source, string destination, string rType)
 }
 
 
-
-
 /**************************************************************/
 //INPUT PARSING
 
+
 /**
- * @brief 
+ * @brief Takes in user input and makes sure it's
+ * an unsigned int (size_t).
  * 
  * @return size_t 
  */
@@ -1365,13 +1416,41 @@ size_t CLI::user_int_input()
   return num;
 }
 
-/**************************************************************/
-//MISCELLANEOUS
 
+/*************************/
+
+
+/**
+ * @brief Whatever goes on in here, I figured this method could replace
+ * all instances of cin (except for the ones in here, or in user_int_input).
+ * 
+ * If that's not how it works, feel free to delete this function. Because
+ * I currently have no idea
+ * 
+ * @return string 
+ */
+string CLI::tab_completion()
+{
+  string input;
+
+  cin >> input; // Don't assume that this HAS to be above the implementation, or even has to exist at all. 
+  
+  //TODO
+  
+  return input;
+}
+
+
+/**************************************************************/
+//MISC.
 
 
 
 /**
+ * IMPORTANT: In Sprint 4, this function will be split in 2. The part that
+ * takes in user input remain here, and the other portion will be relocated
+ * to UMLData and return a map of unsigned ints and shared method pointers.
+ * 
  * @brief Searches the entire vector of attributes by name.
  * 
  * If there is a match, store the reference in a new vector.
@@ -1400,17 +1479,14 @@ method_ptr CLI::select_method(string className, string methodName)
     }
   }
 
-  //Bad shit happens if this one is true
   if (methodMatches.size() == 0)
   {
     throw std::runtime_error("Couldn't find method.");
     return nullptr;
   }
 
-  //If there's only 1 method with specified name
   else if (methodMatches.size() == 1)
     return methodMatches[0];
-
 
   cout << "This method is overloaded. Which one would you like to choose?\n";
   for(size_t i = 0; i < methodMatches.size(); i++)
@@ -1436,7 +1512,8 @@ method_ptr CLI::select_method(string className, string methodName)
 /*************************/
 
 /**
- * @brief 
+ * @brief Takes in a name and returns the attribute pointer to that
+ * field.
  * 
  * @param className 
  * @param fieldName 
