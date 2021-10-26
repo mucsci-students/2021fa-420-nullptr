@@ -607,17 +607,62 @@ TEST(UMLParameterTest, ChangeParameterTypeTest)
 // Tests for UMLMethod
 // **************************
 
-TEST(UMLMethodTest, GetAttributeNameTest) 
+TEST(UMLMethodTest, GetMethodNameTest) 
 {
-    UMLMethod attribute("test", "type", {});
-    ASSERT_EQ(attribute.getAttributeName(), "test");
+    UMLMethod method("test", "type", {});
+    ASSERT_EQ(method.getAttributeName(), "test");
 }
 
-TEST(UMLMethodTest, RenameAttributeNameTest) 
+TEST(UMLMethodTest, RenameMethodTest) 
 {
-    UMLMethod attribute("test", "type", {});
-    attribute.changeName("test2");
-    ASSERT_EQ(attribute.getAttributeName(), "test2");
+    UMLMethod method("test", "type", {});
+    method.changeName("test2");
+    ASSERT_EQ(method.getAttributeName(), "test2");
+}
+
+TEST(UMLMethodTest, RenameParameterTest) 
+{
+    UMLMethod method("test", "type", {});
+    UMLParameter param("param","type");
+    method.addParam(param);
+    method.changeParameterName("param","newParam");
+    auto paramList = method.getParam();
+    bool test = false;
+    // test if new name is there
+    for(auto param : paramList)
+    {
+        if(param.getName() == "newParam")
+            test = true;
+    }
+    // old name should be gone
+    for(auto param : paramList)
+    {
+        if(param.getName() == "param")
+            test = false;
+    }
+    ASSERT_TRUE(test);
+}
+TEST(UMLMethodTest, ChangeParameterTypeTest) 
+{
+    UMLMethod method("test", "type", {});
+    UMLParameter param("param","type");
+    method.addParam(param);
+    method.changeParameterType("param","newType");
+    auto paramList = method.getParam();
+    bool test = false;
+    // test if new type is there
+    for(auto param : paramList)
+    {
+        if(param.getType() == "newType")
+            test = true;
+    }
+    // old type should be gone
+    for(auto param : paramList)
+    {
+        if(param.getType() == "type")
+            test = false;
+    }
+    ASSERT_TRUE(test);
 }
 
 // ****************************************************
@@ -626,13 +671,13 @@ TEST(UMLMethodTest, RenameAttributeNameTest)
 // Tests for UMLAttribute
 // **************************
 
-TEST(UMLAttributeTest, GetAttributeNameTest) 
+TEST(UMLFieldTest, GetFieldNameTest) 
 {
     UMLField attribute("test", "type");
     ASSERT_EQ(attribute.getAttributeName(), "test");
 }
 
-TEST(UMLAttributeTest, RenameAttributeNameTest) 
+TEST(UMLFieldTest, RenameFieldTest) 
 {
     UMLField attribute("test", "type");
     attribute.changeName("test2");

@@ -64,3 +64,35 @@ void UMLMethod::deleteParameter(string name)
 	throw
 		"Parameter not found.";
 }
+
+// Changes parameter name
+void UMLMethod::changeParameterName(string oldParamName, string newParamName)
+{
+	auto paramIndex = parameterList.begin();
+	for(auto paramIndex = parameterList.begin(); paramIndex != parameterList.end(); ++paramIndex)
+	{
+		if (paramIndex->getName() == oldParamName)
+		{
+			paramIndex->changeName(newParamName);
+			return;
+		}
+	}
+	throw
+		"Parameter not found.";
+}
+
+// Changes parameter's type
+void UMLMethod::changeParameterType(string paramName, string newParamType)
+{
+	auto paramIndex = parameterList.begin();
+	for(auto paramIndex = parameterList.begin(); paramIndex != parameterList.end(); ++paramIndex)
+	{
+		if (paramIndex->getName() == paramName)
+		{
+			paramIndex->changeType(newParamType);
+			return;
+		}
+	}
+	throw
+		"Parameter not found.";
+}

@@ -46,4 +46,10 @@ class UMLMethod : public UMLAttribute
 
 		// Deletes a parameter from the given name
 		void deleteParameter(string name);
+
+		// Changes parameter name
+		void changeParameterName(string oldParamName, string newParamName);
+
+		// Changes parameter's type
+		void changeParameterType(string paramName, string newParamType);
 };
