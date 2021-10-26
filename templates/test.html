@@ -67,16 +67,16 @@
         <h1 style= "font-size: 20px;">Classes:</h1>
         {% for class in classes %}
     </div>
-            <h2 id="{{ class.name }}class"><span>{{ class.name }}</span> <button id="{{ class.name }}classedit">edit</button> <a href="/delete/class/{{ class.name }}">delete</a></h2>
+            <h5 id="{{ class.name }}class"><span>{{ class.name }}</span> <button id="{{ class.name }}classedit">edit</button> <a href="/delete/class/{{ class.name }}">delete</a></h5>
         <div style="margin-left:50px;">    
            
-            <h3>Fields:</h3>
+            <h6>Fields:</h6>
             <div style="margin-left:50px;">  
             {% for field in class.fields %}
                 <h4 id="{{class.name}}{{ field.name }}field">{{ field.type }} {{ field.name }} <button id="{{class.name}}{{ field.name }}fieldedit">edit</button> <a href="/delete/attribute/{{ class.name }}/{{ field.name }}">delete</a></h4>
             {% endfor %}
             </div>
-            <form style="margin-top: 50px;" action="/add/field/{{ class.name }}" method="GET">
+            <form style="margin-top: 20px;" action="/add/field/{{ class.name }}" method="GET">
                 <label for="ftype">Field type:</label>
                 <input type="text" id="ftype" name="ftype">
                 <label for="fname">Field name:</label>
@@ -103,7 +103,7 @@
                 <hr>
             {% endfor %}
             </div>
-            <form style="margin-top: 50px;" action="/add/method/{{ class.name }}" method="GET">
+            <form style="margin-top: 20px;" action="/add/method/{{ class.name }}" method="GET">
                 <label for="mtype">Method type:</label>
                 <input type="text" id="mtype" name="mtype">
                 <label for="mname">Method name:</label>
@@ -112,10 +112,10 @@
             </form>
         </div>
         {% endfor %}
-        <form style="margin-top: 50px;" action="/add/class" method="GET" class= "draggable">
+        <form style="margin-top: 20px;" action="/add/class" method="GET" class= "draggable">
             <label for="cname">Class name:</label>
             <input type="text" id="cname" name="cname">
-            <input type="submit" value="add class">
+            <input type="submit" value="add class" id = "submitB">
         </form>
         <h1 style= "font-size: 20px;">Relationships:</h1>
         {% for relationship in relationships %}
@@ -323,6 +323,7 @@
 
 
 <script>
+
 //dark mode script
  //issue to fix, color reverts when page reloads must find way to perm change class of bkground
 function darkMode() {
@@ -352,7 +353,12 @@ function darkMode() {
         var save = document.getElementById('save1');
         save.setAttribute("class", "btn btn-light");
     
+       // var submitBU = document.getElementById('submitB');
+        //submitBU.setAttribute('style', 'color: red');
+       
 }
+
+
 </script>
 
 
