@@ -709,12 +709,8 @@ TEST(UMLMethodTest, GetMethodNameTest)
     ASSERT_EQ(method.getAttributeName(), "test");
 }
 
-
-TEST(UMLMethodTest, RenameMethodTest) 
-
 // Basic rename test to see if the name is properly changed
 TEST(UMLMethodTest, RenameMethodNameTest) 
-
 {
     UMLMethod method("test", "type", {});
     method.changeName("test2");
