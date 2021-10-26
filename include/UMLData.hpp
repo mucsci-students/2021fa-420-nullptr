@@ -5,7 +5,7 @@
   the primary model for the UML class diagram.
 */
 
-//--------------------------------------------------------------------
+/**************************************************************/
 // System includes
 #include "UMLClass.hpp"
 #include "UMLAttribute.hpp"
@@ -15,26 +15,38 @@
 #include <iostream>
 #include "json/json.hpp"
 #include <list>
-//--------------------------------------------------------------------
 
-//--------------------------------------------------------------------
+
+/**************************************************************/
 // Using declarations
+
 using std::string;
 using std::vector;
+using std::list;
+using std::shared_ptr;
 using json = nlohmann::json;
-//--------------------------------------------------------------------
 
-//***********************************************************************
+
+/********************************/
+// Typedefs
+
+typedef shared_ptr<UMLAttribute> attr_ptr;
+typedef shared_ptr<UMLMethod> method_ptr;
+
+
+
+
+//--------------------------------------------------------------------
 // Memento design pattern
 // Holds current state of UMLData 
 class UMLDataSnapshot
 {
     private:
         friend class UMLData;
-        std::list<UMLClass> classes;
-        std::vector<UMLRelationship> relationships;
+        list<UMLClass> classes;
+        vector<UMLRelationship> relationships;
     public:
-        UMLDataSnapshot(const std::list<UMLClass>& classesIn, std::vector<UMLRelationship> relationshipsIn)
+        UMLDataSnapshot(const list<UMLClass>& classesIn, vector<UMLRelationship> relationshipsIn)
         : classes(classesIn), 
         relationships(relationshipsIn) 
         {}
@@ -43,127 +55,199 @@ class UMLDataSnapshot
 
 class UMLData
 {
-    private:
+  private:
+    
+    /********************************/
+    // Global vars
 
-        std::list<UMLClass> classes;
-        vector<UMLRelationship> relationships;
+    list<UMLClass> classes;
+    vector<UMLRelationship> relationships;
 
-    public: 
-        // Empty constructor
-        UMLData();
+  public: 
 
-        // Constructor that takes in vector of classes 
-        UMLData(const vector<UMLClass>& vclass);
+    /********************************/
+    // Constructors
 
-        // Returns vector of all classes
-        std::list<UMLClass> getClasses() const;
 
-        // Return a single class
-        UMLClass getClassCopy(std::string name);
-   
-        // Returns vector of all relationships
-        vector<UMLRelationship> getRelationships() const;
+    // Empty constructor
+    UMLData();
 
-        // Takes in class and adds it to vector
-        void addClass(const UMLClass& classIn);
+    // Constructor that takes in vector of classes 
+    UMLData(const vector<UMLClass>& vclass);
 
-        // Takes in string name and creates class and adds to classes vector
-        void addClass(string name);
 
-        // Takes in name and vector of attributes and creates class and adds to vector of classes
-        void addClass(string name, vector<UMLAttribute> attributes);
+    /********************************/
+    //Get Collections
 
-        // Takes in src string, dest string, and type int creates relationship and adds to relationships vector
-        void addRelationship(string srcName, string destName, int type);
-        
-        // Takes in className string and returns a vector of all the relationships associated with that class
-        vector<UMLRelationship> getRelationshipsByClass(string className);
 
-        // Deletes relationshp based on two strings
-        void deleteRelationship(string srcName, string destName);
+    // Returns vector of all classes
+    list<UMLClass> getClasses() const;
 
-        // Returns string representation of relationship type
-        string getRelationshipType(const string& srcName, const string& destName);
+    // Returns vector of all relationships
+    vector<UMLRelationship> getRelationships() const;
+    
+    // Takes in className string and returns a vector of all the relationships associated with that class
+    vector<UMLRelationship> getRelationshipsByClass(string className);
 
-        // Modifies relationship type given a new relationship type 
-        void changeRelationshipType(const string& srcName, const string& destName, int newType);
+    // Gets class attributes for a className class and returns them in a vector
+    vector<attr_ptr> getClassAttributes(string className);
 
-        // Gets relationship reference for the given string class names
-        UMLRelationship& getRelationship(string srcName, string destName);
 
-        // Deletes a class by string in the classes vector
-        void deleteClass(string name);
+    /********************************/
+    //Get Data
 
-        // Changes class name from old name and new name
-        void changeClassName(string oldName, string newName);
 
-        // Gets class attributes for a className class and returns them in a vector
-        vector<std::shared_ptr<UMLAttribute>> getClassAttributes(string className);
+    // Return a single class
+    UMLClass getClassCopy(string name);
 
-        // Adds class attribute to specified className
-        void addClassAttribute(string className, UMLAttribute attribute);
+    // Gets relationship reference for the given string class names
+    UMLRelationship& getRelationship(string srcName, string destName);
 
-        // Adds class attribute to specified className using a smart pointer
-        void addClassAttribute(string className, std::shared_ptr<UMLAttribute> attribute);
+    // Generates json file given a set of data
+    json getJson();
 
-        // Removes className class attribute by the name
-        void removeClassAttribute(string className, string attributeName);
+    // Returns string representation of relationship type
+    string getRelationshipType(const string& srcName, const string& destName);
 
-        // Removes className class attribute by smart pointer
-        void removeClassAttribute(string className, std::shared_ptr<UMLAttribute> attr);
+    //---------------------------------------------------
+    // Memento pattern
+    // Returns const snapshot of UMLData object
+    const UMLDataSnapshot make_snapshot();
 
-        // Changes className class attribute by the new attribute name
-        void changeAttributeName(string className, string oldAttributeName, string newAttributeName);
+    // Restores UMLData object from a snapshot
+    void restore(const UMLDataSnapshot& snapshot);
+    //---------------------------------------------------
 
-        // Overload of changeAttributeName to work with a smart pointer
-        void changeAttributeName(string className, std::shared_ptr<UMLAttribute> attribute, string newAttributeName);
 
-        // Changes className class attribute's type by the new type name 
-        void changeAttributeType(std::shared_ptr<UMLAttribute> attribute, string newTypeName);
+    /********************************/
+    //Adding
 
-        // Adds parameter to a given method
-        void addParameter(std::shared_ptr<UMLMethod> method, string paramName, string paramType);
 
-        // Deletes parameter from given method
-        void deleteParameter(std::shared_ptr<UMLMethod> method, string paramName);
+    // Takes in class and adds it to vector
+    void addClass(const UMLClass& classIn);
 
-        // Checks if identifier name is valid
-        bool isValidName(string name);
+    // Takes in string name and creates class and adds to classes vector
+    void addClass(string name);
 
-        // Checks if class exists within classses list (string argument) 
-        bool doesClassExist(const string& name);
+    // Takes in name and vector of attributes and creates class and adds to vector of classes
+    void addClass(string name, vector<UMLAttribute> attributes);
 
-        // Checks if class exists with classes list (class argument)
-        bool doesClassExist(const UMLClass& uclass);
+    // Takes in src string, dest string, and type int creates relationship and adds to relationships vector
+    void addRelationship(string srcName, string destName, int type);
 
-        // Generates json file given a set of data
-        json getJson();
+    // Adds class attribute to specified className
+    void addClassAttribute(string className, UMLAttribute attribute);
 
-//***********************************************************************
-        // Memento pattern
-        // Returns const snapshot of UMLData object
-        const UMLDataSnapshot make_snapshot();
+    // Adds class attribute to specified className using a smart pointer
+    void addClassAttribute(string className, attr_ptr attribute);
 
-        // Restores UMLData object from a snapshot
-        void restore(const UMLDataSnapshot& snapshot);
-//***********************************************************************
+    // Adds parameter to a given method
+    void addParameter(method_ptr method, string paramName, string paramType);
 
-    private:
-        // Finds class by name and returns iterator within member classes list, returns end() if not found
-        std::list<UMLClass>::iterator findClass(string name);
-        
-        // Alternate find class using a reference to a UMLClass object
-        std::list<UMLClass>::iterator findClass(const UMLClass& uclass);
 
-        // Finds attribute by name and returns index within the attribute's vector, returns -1 if not found
-        int findAttribute(string name, const vector<std::shared_ptr<UMLAttribute>>&);
+    /********************************/
+    //Deleting
 
-        // Finds relationship using two UML classes and returns index within member classes vector
-        int findRelationship(const UMLClass& sourceClassIn, const UMLClass& destClassIn);
 
-        // Gets class reference for the given name
-        UMLClass& getClass(string name);
+    // Deletes a class by string in the classes vector
+    void deleteClass(string name);
 
-        // Takes in relationship object and adds it to relationship vector
-        void addRelationship(const UMLRelationship& relationshipIn);
+    // Deletes relationshp based on two strings
+    void deleteRelationship(string srcName, string destName);
+
+    // Removes className class attribute by the name
+    void removeClassAttribute(string className, string attributeName);
+
+    // Removes className class attribute by smart pointer
+    void removeClassAttribute(string className, attr_ptr attr);
+
+    // Deletes parameter from given method
+    void deleteParameter(method_ptr method, string paramName);
+
+
+    /********************************/
+    //Renaming
+    
+
+    // Changes class name from old name to new name
+    void changeClassName(string oldName, string newName);
+
+    // Changes className class attribute by the new attribute name
+    void changeAttributeName(string className, string oldAttributeName, string newAttributeName);
+
+    // Overload of changeAttributeName to work with a smart pointer
+    void changeAttributeName(string className, attr_ptr attribute, string newAttributeName);
+
+    // Takes in a shared method pointer, the name of the old parameter, and the new name, 
+    // and renames the parameter accordingly.
+    void changeParameterName(method_ptr methodIter, string oldParamName, string newParamName);
+    
+
+    /********************************/
+    //Type Changing
+
+
+    // Modifies relationship type given a new relationship type 
+    void changeRelationshipType(const string& srcName, const string& destName, int newType);
+
+    // Changes className class attribute's type by the new type name 
+    void changeAttributeType(attr_ptr attribute, string newTypeName);
+
+    // Takes in a shared method pointer, the name of the parameter, and the new type, 
+    // and changes the parameter's type accordingly.
+    void changeParameterType(method_ptr methodIter, string paramName, string newParamType);
+
+
+    /********************************/
+    //Bools
+
+
+    // Checks if identifier name is valid
+    bool isValidName(string name);
+
+    // Checks if class exists within classses list (string argument) 
+    bool doesClassExist(const string& name);
+
+    // Checks if class exists with classes list (class argument)
+    bool doesClassExist(const UMLClass& uclass);
+
+    // Checks to see if relationship exists.
+    bool doesRelationshipExist(string source, string destination);
+
+    // Takes in 2 strings (class name and field name) and 
+    // checks if field exists in current class
+    bool doesFieldExist(string className, string fieldName);
+
+    // Takes in a shared method pointer and a string, and
+    // checks to see if the specified parameter exists in
+    // the current class.
+    bool doesParameterExist(method_ptr methodIter, string paramName);
+
+
+
+  private:
+    // Finds class by name and returns iterator within member classes list, returns end() if not found
+    std::list<UMLClass>::iterator findClass(string name);
+    
+    // Alternate find class using a reference to a UMLClass object
+    std::list<UMLClass>::iterator findClass(const UMLClass& uclass);
+
+    // Finds attribute by name and returns index within the attribute's vector, returns -1 if not found
+    int findAttribute(string name, const vector<attr_ptr>&);
+
+    // Finds relationship using two UML classes and returns index within member classes vector
+    int findRelationship(const UMLClass& sourceClassIn, const UMLClass& destClassIn);
+
+    // Gets class reference for the given name
+    UMLClass& getClass(string name);
+
+    // Takes in relationship object and adds it to relationship vector
+    void addRelationship(const UMLRelationship& relationshipIn);
+
+    /*************************************/
+    //SPRINT 4
+
+    // Checks if overloaded methods have duplicate parameters.
+    //bool are_methods_duplicates(method_ptr method1, method_ptr method2);
+
 };
