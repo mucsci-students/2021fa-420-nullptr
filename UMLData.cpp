@@ -573,17 +573,9 @@ void UMLData::changeAttributeName(string className, attr_ptr attribute, string n
  */
 void UMLData::changeParameterName(method_ptr methodIter, string oldParamName, string newParamName)
 {
-
-
-  
-
   if(doesParameterExist(methodIter, newParamName))
     throw std::runtime_error("That name is already taken.");
-
-  throw std::runtime_error("Feature disabled");
-  
-  //methodIter->changeParameterName(oldParamName, newParamName);
-
+  methodIter->changeParameterName(oldParamName, newParamName);
 }
 
 /**************************************************************/
@@ -662,8 +654,7 @@ void UMLData::changeAttributeType(attr_ptr attribute, string newTypeName)
  */
 void UMLData::changeParameterType(method_ptr methodIter, string paramName, string newParamType)
 {
-  throw std::runtime_error("Feature disabled");
-  //methodIter->changeParameterType(paramName, newParamType);
+  methodIter->changeParameterType(paramName, newParamType);
 }
 
 /**************************************************************/
@@ -787,8 +778,7 @@ bool UMLData::doesFieldExist(string className, string fieldName)
  */
 bool UMLData::doesParameterExist(method_ptr methodIter, string paramName)
 {
-  std::list parameters = methodIter->getParam();
-
+  std::list<UMLParameter> parameters = methodIter->getParam();
   
   for (UMLParameter element : parameters)
   {

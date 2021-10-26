@@ -99,5 +99,4 @@ void UMLMethod::changeParameterType(string paramName, string newParamType)
 		"Parameter not found.";
 
 	throw std::runtime_error("Parameter not found.");
-
 }
