@@ -768,7 +768,7 @@ TEST(UMLMethodTest, ChangeParameterTypeTest)
 // Tests for UMLAttribute
 // **************************
 
-TEST(UMLFieldTest, GetFieldNameTest) 
+// TEST(UMLFieldTest, GetFieldNameTest) 
 
 // Basic getter test to see if it gets the proper name
 TEST(UMLAttributeTest, GetAttributeNameTest) 
@@ -779,7 +779,7 @@ TEST(UMLAttributeTest, GetAttributeNameTest)
 }
 
 
-TEST(UMLFieldTest, RenameFieldTest) 
+// TEST(UMLFieldTest, RenameFieldTest) 
 
 // Basic rename test to see if the name is properly changed
 TEST(UMLAttributeTest, RenameAttributeNameTest) 
