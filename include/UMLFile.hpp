@@ -31,25 +31,21 @@ class UMLFile
         string path;
 
     public:
-        // constructor: takes in the name of the file to save
+        // Constructor: takes in the name of the file to save
         UMLFile(const string&);
 
-        // saving file
+        // Saves information from UML diagram to JSON
         void save(UMLData& data);
 
-        // loads a system file and returns a UML data object
+        // Loads a system file and returns a UML data object
         UMLData load();  
 
+        // Makes a list of all JSON files in the build directory that can be used for loading.
         static json listSaves();
 
-
-    private:
-         // gets the classes from the json file and adds them to the UMLData object
-        vector<UMLClass> getUMLClassVec();
+        // Gets the classes from the json file and adds them to the UMLData object
+        static void addClasses(UMLData& data, const json& j);
         
-        // gets the classes from the json file and adds them to the UMLData object
-        void addClasses(UMLData& data, const json& j);
-        
-        // gets the relationships from the json file and adds them to the UMLData object
-        void addRelationships(UMLData& data, const json& j);  
+        // Gets the relationships from the json file and adds them to the UMLData object
+        static void addRelationships(UMLData& data, const json& j); 
 };

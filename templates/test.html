@@ -1,26 +1,82 @@
 <html>
     <head>
+    <!--  CSS  Bootstrap Include ------------------------------------------------------------------------------------------------------------------------------  -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+    <!--  CSS  resize Include  ------------------------------------------------------------------------------------------------------------------------------ -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
     </head>
-    <body>
+   
+    <body class = "bg-light" id = "body">
+
+    <!--  Javascript Bootstrap Include ------------------------------------------------------------------------------------------------------------------------------ -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" 
+    integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous">
+    </script>
+    
+
+    <!--  Welcome banner  ------------------------------------------------------------------------------------------------------------------------------ -->
+    <div class=" fixed-bottom badge bg-dark text-wrap" style="width: auto; border:red; border-style: dotted; font-size: medium;">
+     Welcome to UML++   
+    </div>
+    <!-- ---------------------------------------------------------------------------------------------------------------------------------------------------- -->
+
+
+      <!--  Class Menu Options ------------------------------------------------------------------------------------------------------------------------------ -->
+    <div class="btn-group" style="position: absolute; width: 50px; right: 75%;">
+    <button type="button" class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" id ="classButton"  style= "border:red; border-style: dotted; ">
+      Class
+    </button>
+    <a class="btn btn-dark" href="/undo" role="button"  id ="connectedbuttons" style="border:red; border-style: dotted;">Undo</a>
+    <a class="btn btn-dark" href="/redo" role="button"  id ="connectedbuttons1" style="border:red; border-style: dotted;">Redo</a>
+
+    <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="#" id="addClass" onclick="addTextBox()">Add Class</a></li>
+        <li><a class="dropdown-item" href="#" id="removeClass" onclick="removeElement()">Remove Class</a></li>
+        <li><a class="dropdown-item" href="/help" id="displayHelp">Help</a></li>
+        
+    </ul>
+      <!--  Color Theme Options ---------------------------------------------------------------------------------------------------------------------------------------------------- -->
+      <div class="dropdown">
+        <button class="btn btn-dark dropdown-toggle" type="button" id="topButtonsToggle" data-bs-toggle="dropdown" aria-expanded="false" style="border:red; border-style: dotted;">
+          Color Mode
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+          <li><a class="dropdown-item" href="#" id="darkMODE" onclick="darkMode()" aria-expanded="false">Dark</a></li>
+          <li><a class="dropdown-item" href="#">Light</a></li>
+          <li><a class="dropdown-item" href="#">Pretty</a></li>
+          <li><a class="dropdown-item" href="#">Ugly</a></li>
+        </ul>
+      </div>
+    </div>
+    <!-- ---------------------------------------------------------------------------------------------------------------------------------------------------- -->
+  
+         <!-- Error and Success Display  for save/load ---------------------------------------------------------------------------------------------------------------------------------------------------- -->
         {% for error in errors %}
             <p style="color:red; font-size: 30px;">{{ error }}</p>
         {% endfor %}
         {% for succ in success %}
             <p style="color:green;font-size: 30px;">{{ succ }}</p>
         {% endfor %}
-        <a style="font-size: 17px" href="/help">help</a>
-        <h1>Classes:</h1>
+        <!-- ---------------------------------------------------------------------------------------------------------------------------------------------------- -->
+
+
+ <!--  Primary Form for classes ---------------------------------------------------------------------------------------------------------------------------------------------------- -->
+<div id="outerContainer" >
+ <div id="container" style="font-size: 10px; border-width: 10px; border-radius: 20px; border-color: lightcoral;  border-style: solid; width: 30%;">
+    <div id="item" >
+        <h1 style= "font-size: 20px;">Classes:</h1>
         {% for class in classes %}
-        
-            <h2 id="{{ class.name }}class"><span>{{ class.name }}</span> <button id="{{ class.name }}classedit">edit</button> <a href="/delete/class/{{ class.name }}">delete</a></h2>
+    </div>
+            <h5 id="{{ class.name }}class"><span>{{ class.name }}</span> <button id="{{ class.name }}classedit">edit</button> <a href="/delete/class/{{ class.name }}">delete</a></h5>
         <div style="margin-left:50px;">    
-            <h3>Fields:</h3>
+           
+            <h6>Fields:</h6>
             <div style="margin-left:50px;">  
             {% for field in class.fields %}
                 <h4 id="{{class.name}}{{ field.name }}field">{{ field.type }} {{ field.name }} <button id="{{class.name}}{{ field.name }}fieldedit">edit</button> <a href="/delete/attribute/{{ class.name }}/{{ field.name }}">delete</a></h4>
             {% endfor %}
             </div>
-            <form style="margin-top: 50px;" action="/add/field/{{ class.name }}" method="GET">
+            <form style="margin-top: 20px;" action="/add/field/{{ class.name }}" method="GET">
                 <label for="ftype">Field type:</label>
                 <input type="text" id="ftype" name="ftype">
                 <label for="fname">Field name:</label>
@@ -47,7 +103,7 @@
                 <hr>
             {% endfor %}
             </div>
-            <form style="margin-top: 50px;" action="/add/method/{{ class.name }}" method="GET">
+            <form style="margin-top: 20px;" action="/add/method/{{ class.name }}" method="GET">
                 <label for="mtype">Method type:</label>
                 <input type="text" id="mtype" name="mtype">
                 <label for="mname">Method name:</label>
@@ -56,18 +112,18 @@
             </form>
         </div>
         {% endfor %}
-        <form style="margin-top: 50px;" action="/add/class" method="GET">
+        <form style="margin-top: 20px;" action="/add/class" method="GET" class= "draggable">
             <label for="cname">Class name:</label>
             <input type="text" id="cname" name="cname">
-            <input type="submit" value="add class">
+            <input type="submit" value="add class" id = "submitB">
         </form>
-        <h1>Relationships:</h1>
+        <h1 style= "font-size: 20px;">Relationships:</h1>
         {% for relationship in relationships %}
             <h3 id="{{ relationship.destination}}{{ relationship.source }}">{{relationship.source}} -> {{relationship.destination}} type: {{relationship.type}}
                 <button id="{{ relationship.destination}}{{ relationship.source }}edit">edit</button>
                 <a href="/delete/relationship/{{relationship.source}}/{{relationship.destination}}">delete</a></h3>
         {% endfor %}
-        <form action="/add/relationship" method="GET">
+        <form action="/add/relationship" method="GET" >
             <label for="cname">Source:</label>
             <input type="text" id="source" name="source">
             <label for="cname">Destination:</label>
@@ -80,33 +136,133 @@
             </select>
             <input type="submit" value="add relationship">
         </form>
-        <h1>File:</h1>
+
+
+    </div>
+ </div>
+</div>
+ <!-- ---------------------------------------------------------------------------------------------------------------------------------------------------- -->
+
+
+
+       
+<!--  Save function ---------------------------------------------------------------------------------------------------------------------------------------------------- -->
+
         <form action="/save">
-            <label for="save">File Name:</label>
-            <input type="text" name="save" id="save">
-            <input type="submit" value="save">
+           
+            <input type="text" name="save" id="save"  placeholder="Type File Name To Save" style=" position: absolute;  left: 52%; top: 5px; " >
+            <input type="submit" value="Save" style=" position: absolute; left: 47%; top: 0px; border:red; border-style: dotted;" id= "save1" class= "btn btn-dark ">
         </form>
-        <h3>OR</h3>
+    
+    </script>
+<!-- ---------------------------------------------------------------------------------------------------------------------------------------------------- -->
+
+
+ <!--  Load Function ---------------------------------------------------------------------------------------------------------------------------------------------------- -->
+
         <form action="/load" method="GET">
-            <label for="load">File Name:</label>
-            <select name="load" id="load">
+            
+            <select name="load" id="load" style= "position: absolute; left: 72.5%; top: 0px;">
                 {% for file in files %}
                 <option value="{{file}}">{{file }}</option>
+                <option value="" disabled selected hidden>Choose A File To Load!</option>
                 {% endfor %}
             </select>
-            <input type="submit" value="load">
+            <input type="submit" value="Load" style=" position: absolute;  left: 67%; top: 0px; border:red; border-style: dotted;" id= "load1" class= "btn btn-dark">
         </form>
+ <!-- ---------------------------------------------------------------------------------------------------------------------------------------------------- -->
+
+
+ <!--  Drag Functions---------------------------------------------------------------------------------------------------------------------------------------------------- -->
+
+
+        <script>
+            var dragItem = document.querySelector("#container");
+            var container = document.querySelector("#container");
         
+            var active = false;
+            var currentX;
+            var currentY;
+            var initialX;
+            var initialY;
+            var xOffset = 0;
+            var yOffset = 0;
+        
+            container.addEventListener("mousedown", dragStart, false);
+            container.addEventListener("mouseup", dragEnd, false);
+            container.addEventListener("mousemove", drag, false);
+        
+            function dragStart(e) {
+              if (e.type === "touchstart") {
+                initialX = e.touches[0].clientX - xOffset;
+                initialY = e.touches[0].clientY - yOffset;
+              } else {
+                initialX = e.clientX - xOffset;
+                initialY = e.clientY - yOffset;
+              }
+        
+              if (e.target === dragItem) {
+                active = true;
+              }
+            }
+        
+            function dragEnd(e) {
+              initialX = currentX;
+              initialY = currentY;
+        
+              active = false;
+            }
+        
+            function drag(e) {
+              if (active) {
+              
+                e.preventDefault();
+              
+                if (e.type === "touchmove") {
+                  currentX = e.touches[0].clientX - initialX;
+                  currentY = e.touches[0].clientY - initialY;
+                } else {
+                  currentX = e.clientX - initialX;
+                  currentY = e.clientY - initialY;
+                }
+        
+                xOffset = currentX;
+                yOffset = currentY;
+        
+                setTranslate(currentX, currentY, dragItem);
+              }
+            }
+        
+            function setTranslate(xPos, yPos, el) {
+              el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
+            }
+          </script>
+ <!-- ---------------------------------------------------------------------------------------------------------------------------------------------------- -->
+
+
+
     </body>
-    <script>
-        {% for class in classes %}
+   
+   <script>
+       
+      // var holder = document.createElement("div");
+     //  holder.setAttribute('style', 'font-size: 10px; border-width: 10px; border-radius: 10px; border-color: lightcoral;  border-style: solid; width: 30%;');
+      // holder.setAttribute("id", "item");
+       
+       {% for class in classes %}
+       var newDiv = document.createElement("div");
+       document.body.appendChild(newDiv);
+       newDiv.setAttribute("id", "item");
+       newDiv.setAttribute('style', 'height: 35px;  position: relative;  top: 154px;');
+
             element = document.getElementById('{{ class.name }}classedit');
             element.addEventListener("click", () => {
                 document.getElementById("{{ class.name }}class").innerHTML =
-                    "<form action='/edit/class/{{ class.name }}' method='GET'>" + 
-                        "<input type='text' id='cname' name='cname' value='{{ class.name }}'>" +
+                    "<form  id = 'thisone' action='/edit/class/{{ class.name }}'  method='GET'>" + 
+                        "<input type='text' id='cname' name='cname' style= 'color: coral;' value='{{ class.name }}'>" +
                         "<input type='submit' value='edit class'>"
                     "</form>";
+                    //element.appendChild(item);
             });
             {% for method in class.methods %}
             element = document.getElementById('{{class.name}}{{ method.index }}edit');
@@ -156,5 +312,66 @@
                     "</form>";
             });
         {% endfor %}
+        
     </script>
+
+
+
+
+
+
+
+
+<script>
+
+//dark mode script
+ //issue to fix, color reverts when page reloads must find way to perm change class of bkground
+function darkMode() {
+        // get body color, set it to bootstrap dark
+        var bgColor = document.getElementById('body');
+        bgColor.setAttribute("class", "bg-dark");
+        //text color gray
+        document.body.style.color = "gray";
+        
+        //set buttons to color
+        var buttonColor = document.getElementById('topButtonsToggle');
+        buttonColor.setAttribute("class", "btn btn-light dropdown-toggle");
+        
+        var classButtonColor = document.getElementById('classButton');
+        classButtonColor.setAttribute("class", "btn btn-light dropdown-toggle");
+
+        //set menu to color
+        var undoButton = document.getElementById('connectedbuttons');
+        undoButton.setAttribute("class", "btn btn-light");
+
+        var redoButton = document.getElementById('connectedbuttons1');
+        redoButton.setAttribute("class", "btn btn-light");
+
+        var load = document.getElementById('load1');
+        load.setAttribute("class", "btn btn-light");
+
+        var save = document.getElementById('save1');
+        save.setAttribute("class", "btn btn-light");
+    
+       // var submitBU = document.getElementById('submitB');
+        //submitBU.setAttribute('style', 'color: red');
+       
+}
+
+
+</script>
+
+
+
+
+
+
+<!-- Whole page style options-->
+<style>
+   /* Adjust padding in order to never overlap welcome banner*/
+    body{ 
+        padding-bottom: 15px;   
+    }
+</style>
+
 </html>

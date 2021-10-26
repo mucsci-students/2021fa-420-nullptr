@@ -5,6 +5,7 @@
 
 //--------------------------------------------------------------------
 // System includes
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include <list>
@@ -61,6 +62,7 @@ void UMLMethod::deleteParameter(string name)
 			return;
 		}
 	}
+
 	throw
 		"Parameter not found.";
 }
@@ -95,4 +97,7 @@ void UMLMethod::changeParameterType(string paramName, string newParamType)
 	}
 	throw
 		"Parameter not found.";
+
+	throw std::runtime_error("Parameter not found.");
+
 }

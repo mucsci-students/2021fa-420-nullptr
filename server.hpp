@@ -2,6 +2,9 @@
   Filename   : server.hpp
   Description: Controller for the GUI.
 */
+
+#include <memory>
+#include <string>
 #include "include/UMLAttribute.hpp"
 #include "include/UMLData.hpp"
 #include "include/UMLFile.hpp"
@@ -10,6 +13,7 @@
 #include "include/inja/inja.hpp"
 #include "include/UMLField.hpp"
 #include "include/UMLMethod.hpp"
+#include "include/UMLDataHistory.hpp"
 #include <memory>
 #include <string>
 
@@ -18,13 +22,13 @@ using json = nlohmann::json;
 
 // Catch for functions to protect from invalid inputs
 #define ERR_ADD(fun)                           \
-    try {                                        \
-        fun;                                     \
-    }                                            \
-    catch (const char* error) {                  \
-        errors += error;                         \
-                                                 \
-    }
+    try {                                      \
+        history.save();                        \
+        fun;                                   \
+    }                                          \
+    catch (const std::runtime_error& error) {  \
+        errors += error.what();                \
+    }                                          \
 
 namespace umlserver
 {
@@ -34,6 +38,7 @@ namespace umlserver
     {
         httplib::Server svr;
         UMLData data;
+        UMLDataHistory history(data);
         json errors = json::array();
         json success = json::array();
 
@@ -201,6 +206,15 @@ namespace umlserver
             res.set_redirect("/");
         });
 
+         svr.Get("/undo", [&](const httplib::Request& req, httplib::Response& res) {
+            history.undo();
+            res.set_redirect("/");
+        });
+
+        svr.Get("/redo", [&](const httplib::Request& req, httplib::Response& res) {
+            history.redo();
+            res.set_redirect("/");
+        });
 
         std::cout << "running at http:://localhost:8080/" << std::endl;
 
