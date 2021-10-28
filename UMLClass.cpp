@@ -10,6 +10,11 @@
 #include "include/UMLMethod.hpp"
 //--------------------------------------------------------------------
 
+//--------------------------------------------------------------------
+// Using declarations 
+using std::list;
+//--------------------------------------------------------------------
+
 // Constructor for class object without attributes
 UMLClass::UMLClass(string newClass) 
 :className(newClass)
@@ -121,36 +126,48 @@ bool UMLClass::checkAttribute(std::shared_ptr<UMLAttribute> attribute)
 		return false;
 	}
 	else if (attribute->identifier() == "method") {
+		// Booolean to check status of parameters when checking 2 methods
+		// When true, the current observed types of the param signature are identical
+		bool equalParameter = false;
+		
 		for (int i = 0; i < classAttributes.size(); ++i) {
 			// If they share the same name but the other one is a field, then the attribute cannot exist
 			if (classAttributes[i]->getAttributeName() == attribute->getAttributeName() && classAttributes[i]->identifier() == "field") {
 				return true;
 			}
+			// If they share the same name but the other one is a field, check parameters
 			else if (classAttributes[i]->getAttributeName() == attribute->getAttributeName() && classAttributes[i]->identifier() == "method"){
-				bool containsParameter = false;
-				auto params1 = std::dynamic_pointer_cast<UMLMethod>(classAttributes[i])->getParam();
-				auto params2 = std::dynamic_pointer_cast<UMLMethod>(attribute)->getParam();
-				
-				// Compare each parameter in params1 to each parameter in params2 
+				list<UMLParameter> params1 = std::dynamic_pointer_cast<UMLMethod>(classAttributes[i])->getParam();
+				list<UMLParameter> params2 = std::dynamic_pointer_cast<UMLMethod>(attribute)->getParam();
+				auto param2 = params2.begin();
+
+				if (params1.size() == 0 && params2.size () == 0) {
+					// Cannot overload a method with no parameters with another with no parameters
+					return true;
+				}
+
+				// Compare parameters in params1 with param2 iterator 
 				for (UMLParameter param : params1) {
-					for (UMLParameter param2 : params2) {
-						if (param.getType() == param2.getType()) {
-							containsParameter = true;
-						}
-					}
-					if (!containsParameter) {
-						// Method does not break identitical attribute rules
-						return false;
+					if (param2 == params2.end() || param.getType() != param2->getType()) {
+						// Param1 has more parameters, or the types are not identical.
+						// Therefore, overload rules are being followed.
+						equalParameter = false;
+						break;
 					}
 					else {
-						containsParameter = false;
+						// Iterate through param2 if params are equal at this stage
+						equalParameter = true;
+						param2 = std::next(param2);
 					}
 				}
-				// If loop completes, parameters are identical, so the rules are broken
-				return true;
+				// If true, both methods have identical parameter types. Rules are broken
+				if (equalParameter) {
+					return true;
+				}
+				// Otherwise, loop through attributes continues
 			}
 		}
-		// Method does not break identitical attribute rules
+		// If reached, no attributes share names with this attribute, so no rules are broken
 		return false;
 	}
 	// Attribute shouldn't break rules by default
