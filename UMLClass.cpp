@@ -135,7 +135,7 @@ bool UMLClass::checkAttribute(std::shared_ptr<UMLAttribute> attribute)
 			if (classAttributes[i]->getAttributeName() == attribute->getAttributeName() && classAttributes[i]->identifier() == "field") {
 				return true;
 			}
-			// If they share the same name but the other one is a field, check parameters
+			// If they share the same name but they are both methods, check parameters
 			else if (classAttributes[i]->getAttributeName() == attribute->getAttributeName() && classAttributes[i]->identifier() == "method"){
 				list<UMLParameter> params1 = std::dynamic_pointer_cast<UMLMethod>(classAttributes[i])->getParam();
 				list<UMLParameter> params2 = std::dynamic_pointer_cast<UMLMethod>(attribute)->getParam();
