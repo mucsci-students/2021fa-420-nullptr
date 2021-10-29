@@ -32,18 +32,467 @@
 #include <string>
 #include <iostream>
 
-// Test Format
-// **************************
-// Describe what the point of the test is in a comment.
-// TEST(TestSuiteName, TestName) 
-// {
-//   ... test body ...
-// }
-// **************************
+/* 
+**************************
+Test Format
+**************************
+Describe what the point of the test is in a comment.
+TEST(TestSuiteName, TestName) 
+{
+  ... test body ...
+}
+************************** 
+*/
+
+/*
+**************************
+Ordering of Tests
+**************************
+UMLClass
+UMLAttribute
+UMLField 
+UMLMethod
+UMLParameter
+UMLRelationship
+UMLFile (## WIP ##)
+UMLData - Classes
+UMLData - Methods/Fields
+UMLData - Relationships
+UMLDataHistory
+CLI (## WIP ##)
+Server (## WIP ##)
+*/
 
 // ****************************************************
 
-// Tests for UMLData.hpp involing classes
+// Tests for UMLClass
+// **************************
+
+// Basic getter test to see if it gets the proper name
+TEST(UMLClassTest, GetNameWorks) 
+{
+    UMLClass class1("test");
+    ASSERT_EQ(class1.getName(), "test");
+}
+
+// Basic rename test to see if the name is properly changed
+TEST(UMLClassTest, ChangeNameWorks) 
+{
+    UMLClass class1("test");
+    class1.changeName("newTest");
+    ASSERT_EQ(class1.getName(), "newTest");
+}
+
+// Test to see if the proper attribute with the right name is added
+TEST(UMLClassTest, AddAttributeWorks) 
+{
+    UMLClass class1("test");
+    UMLAttribute attribute("testattribute");
+    class1.addAttribute(attribute);
+    bool attrFound = false;
+
+    for(auto attr : class1.getAttributes())
+    {
+        if(attr->getAttributeName() == "testattribute")
+        {
+            attrFound = true;
+        }
+    }
+
+    ASSERT_EQ(attrFound, true);
+}
+
+// Tests to see if an attribute inside of a class properly gets modified based on name.
+TEST(UMLClassTest, ChangeAttributeNameWorks) 
+{
+    UMLClass class1("test");
+    UMLAttribute attribute("testattributeOld");
+    class1.addAttribute(attribute);
+    class1.changeAttributeName("testattributeOld", "testattributeNew");
+    bool attrFound = false;
+
+    for(auto attr : class1.getAttributes())
+    {
+        if(attr->getAttributeName() == "testattributeNew")
+        {
+            attrFound = true;
+        }
+    }
+
+    ASSERT_EQ(attrFound, true);
+
+    for(auto attr : class1.getAttributes())
+    {
+        if(attr->getAttributeName() == "testattributeOld")
+        {
+            attrFound = false;
+        }
+    }
+
+    ASSERT_EQ(attrFound, true);
+}
+
+// Tests to see if an attribute inside of a class properly gets modified based on an attribute reference.
+TEST(UMLClasstest, ChangeAttributeNameReferenceWorks)
+{
+    UMLClass class1("test");
+    auto attribute = std::make_shared<UMLAttribute>("oldName");
+    class1.addAttribute(attribute);
+
+    // See if attribute was changed based on reference modification
+    class1.changeAttributeName(attribute, "newName");
+    ASSERT_EQ(attribute->getAttributeName(), "newName");
+
+    bool attrFound = false;
+
+    for(auto attr : class1.getAttributes())
+    {
+        if(attr->getAttributeName() == "newName")
+        {
+            attrFound = true;
+        }
+        else if(attr->getAttributeName() == "oldName" && attrFound)
+        {
+            attrFound = false;
+        }
+    }
+
+    ASSERT_EQ(attrFound, true);
+}
+
+// Checks if deleting attribute based on name works.
+TEST(UMLClassTest, DeleteAttributeWorks) 
+{
+    UMLClass class1("test");
+    UMLAttribute attribute("test");
+    class1.addAttribute(attribute);
+    class1.deleteAttribute("test");
+
+    // See if attribute still exists
+    bool attrFound = false;
+    for(auto attr : class1.getAttributes())
+    {
+        if(attr->getAttributeName() == "test")
+        {
+            attrFound = true;
+        }
+    }
+
+    ASSERT_EQ(attrFound, false);
+}
+
+// Checks if deleting attribute based on its reference works.
+TEST(UMLClassTest, DeleteAttributeReferenceWorks) 
+{
+    UMLClass class1("test");
+    auto attribute = std::make_shared<UMLAttribute>("test");
+    class1.addAttribute(attribute);
+    
+    // Create reference and delete based on it
+    class1.deleteAttribute(attribute);
+
+    // See if attribute still exists
+    bool attrFound = false;
+    for(auto attr : class1.getAttributes())
+    {
+        if(attr->getAttributeName() == "test")
+        {
+            attrFound = true;
+        }
+    }
+
+    ASSERT_EQ(attrFound, false);
+}
+
+// Check if finding attribute based on name works.
+// This test is outdated and must be replaced entirely alongside modifications to UMLClass.cpp.
+TEST(UMLClassTest, FindAttributeWorks) 
+{
+    UMLClass class1("test");
+    UMLAttribute attribute("testattribute");
+    class1.addAttribute(attribute);
+    
+    ASSERT_EQ(class1.getAttribute("testattribute")->getAttributeName(), attribute.getAttributeName());
+}
+
+// Test that sees that adding a test attribute works as intended.
+TEST(UMLClassTest, GetAttributesWorks) 
+{
+    UMLClass class1("test");
+    // Basic constructor used as type should not matter
+    UMLAttribute attribute("testattribute");
+    class1.addAttribute(attribute);
+    
+    vector<UMLAttribute> test;
+    test.push_back(attribute);
+    
+    bool isEqual = true;
+    vector<std::shared_ptr<UMLAttribute>> test2 = class1.getAttributes();
+
+    // Expand test later to check deeper if two attributes are equal
+    for(int i = 0; i < test.size(); i++)
+    {
+        if(test[i].getAttributeName() != test2[i]->getAttributeName())
+        {
+            isEqual = false;
+        }
+    }
+    ASSERT_EQ(isEqual, true);
+}
+
+// ****************************************************
+
+// Tests for UMLAttribute
+// **************************
+
+// TEST(UMLFieldTest, GetFieldNameTest) 
+
+// Basic getter test to see if it gets the proper name
+TEST(UMLAttributeTest, GetAttributeNameTest) 
+{
+    UMLAttribute attribute("test", "type");
+    ASSERT_EQ(attribute.getAttributeName(), "test");
+}
+
+
+// Basic getter test to see if it gets the proper type
+TEST(UMLAttributeTest, GetAttributeTypeTest) 
+{
+    UMLAttribute attribute("test", "type");
+    ASSERT_EQ(attribute.getType(), "type");
+}
+
+// Basic getter test to see if it gets the proper identifier
+TEST(UMLAttributeTest, GetAttributeIdentifierTest) 
+{
+    UMLAttribute attribute("test", "type");
+    ASSERT_EQ(attribute.identifier(), "attribute");
+}
+
+// Basic rename test to see if the name is properly changed
+TEST(UMLAttributeTest, RenameAttributeNameTest) 
+{
+    UMLAttribute attribute("test", "type");
+    attribute.changeName("test2");
+    ASSERT_EQ(attribute.getAttributeName(), "test2");
+}
+
+// ****************************************************
+
+// Tests for UMLField
+// **************************
+
+// Basic getter test to see if it gets the proper name
+TEST(UMLFieldTest, GetFieldNameTest) 
+{
+    UMLField field("test", "type");
+    ASSERT_EQ(field.getAttributeName(), "test");
+}
+
+// Basic getter test to see if it gets the proper type
+TEST(UMLFieldTest, GetFieldTypeTest) 
+{
+    UMLField field("test", "type");
+    ASSERT_EQ(field.getType(), "type");
+}
+
+// Basic getter test to see if it gets the proper identifier
+TEST(UMLFieldTest, GetFieldIdentifierTest) 
+{
+    UMLField field("test", "type");
+    ASSERT_EQ(field.identifier(), "field");
+}
+
+// Basic rename test to see if the name is properly changed
+TEST(UMLFieldTest, RenameFieldNameTest) 
+{
+    UMLField field("test", "type");
+    field.changeName("test2");
+    ASSERT_EQ(field.getAttributeName(), "test2");
+}
+
+// ****************************************************
+
+// Tests for UMLMethod
+// **************************
+
+// Basic getter test to see if it gets the proper name
+TEST(UMLMethodTest, GetMethodNameTest) 
+{
+    UMLMethod method("test", "type", {});
+    ASSERT_EQ(method.getAttributeName(), "test");
+}
+
+// Basic rename test to see if the name is properly changed
+TEST(UMLMethodTest, RenameMethodNameTest) 
+{
+    UMLMethod method("test", "type", {});
+    method.changeName("test2");
+    ASSERT_EQ(method.getAttributeName(), "test2");
+}
+
+// Basic getter test to see if it gets the proper identifier
+TEST(UMLFieldTest, GetMethodIdentifierTest) 
+{
+    UMLMethod method("test", "type", {});
+    ASSERT_EQ(method.identifier(), "method");
+}
+
+// Checks to see if renaming a parameter works properly
+TEST(UMLMethodTest, RenameParameterTest) 
+{
+    UMLMethod method("test", "type", {});
+    UMLParameter param("param","type");
+    method.addParam(param);
+    method.changeParameterName("param","newParam");
+    auto paramList = method.getParam();
+    bool test = false;
+    // test if new name is there
+    for(auto param : paramList)
+    {
+        if(param.getName() == "newParam")
+            test = true;
+    }
+    // old name should be gone
+    for(auto param : paramList)
+    {
+        if(param.getName() == "param")
+            test = false;
+    }
+    ASSERT_TRUE(test);
+}
+
+// Checks to see if changing a parameter type works properly
+TEST(UMLMethodTest, ChangeParameterTypeTest) 
+{
+    UMLMethod method("test", "type", {});
+    UMLParameter param("param","type");
+    method.addParam(param);
+    method.changeParameterType("param","newType");
+    auto paramList = method.getParam();
+    bool test = false;
+    // test if new type is there
+    for(auto param : paramList)
+    {
+        if(param.getType() == "newType")
+            test = true;
+    }
+    // old type should be gone
+    for(auto param : paramList)
+    {
+        if(param.getType() == "type")
+            test = false;
+    }
+    ASSERT_TRUE(test);
+}
+
+// ****************************************************
+
+// Tests for UMLParameter
+// **************************
+
+// Tests creation of a Parameter and getting it's name and type works
+TEST(UMLParameterTest, GetParameterNameTest) 
+{
+    UMLParameter parameter("name","type");
+    ASSERT_EQ(parameter.getName(), "name");
+    ASSERT_EQ(parameter.getType(), "type");
+}
+
+// Tests renaming Parameter works
+TEST(UMLParameterTest, RenameParameterNameTest) 
+{
+    UMLParameter parameter("name","type");
+    parameter.changeName("name2");
+    ASSERT_EQ(parameter.getName(), "name2");
+}
+// Tests changing Parameter type works
+TEST(UMLParameterTest, ChangeParameterTypeTest) 
+{
+    UMLParameter parameter("name","type");
+    parameter.changeType("type2");
+    ASSERT_EQ(parameter.getType(), "type2");
+}
+
+// ****************************************************
+
+// Tests for UMLRelationship
+// **************************
+
+// Test to check if constructing a generic relationship works at all
+TEST(UMLRelationshipTest, ConstructorTest) 
+{
+    UMLClass class1("class1");
+    UMLClass class2("class2");
+    ASSERT_NO_THROW(UMLRelationship relate(class1, class2, 0));
+}
+
+// Test to check if getting a source works at all
+TEST(UMLRelationshipTest, GetSourceTest) 
+{
+    UMLClass class1("class1");
+    UMLClass class2("class2");
+    // Relationship type doesn't matter for this test
+    UMLRelationship relate(class1, class2, 0);
+    ASSERT_EQ(&relate.getSource(), &class1);
+}
+
+// Test to check if getting a destination works at all
+TEST(UMLRelationshipTest, GetDestinationTest) 
+{
+    UMLClass class1("class1");
+    UMLClass class2("class2");
+    // Relationship type doesn't matter for this test
+    UMLRelationship relate(class1, class2, 0);
+    ASSERT_EQ(&relate.getDestination(), &class2);
+}
+
+// Test to see if the destination was simultaneously set as the source
+TEST(UMLRelationshipTest, GetDestinationTest2) 
+{
+    UMLClass class1("class1");
+    UMLClass class2("class2");
+    // Relationship type doesn't matter for this test
+    UMLRelationship relate(class1, class2, 0);
+    bool test = &relate.getDestination() == &class1;
+    ASSERT_EQ(test, false);
+}
+
+// Test to check if getting a type works at all
+TEST(UMLRelationshipTest, GetTypeTest) {
+    UMLClass class1("class1");
+    UMLClass class2("class2");
+    UMLRelationship relate(class1, class2, 0);
+    ASSERT_EQ(relate.getType() == aggregation, true);
+}
+
+// Test to check if setting a type works at all
+TEST(UMLRelationshipTest, SetTypeTest) {
+    UMLClass class1("class1");
+    UMLClass class2("class2");
+    UMLRelationship relate(class1, class2, 0);
+    relate.setType(composition);
+    ASSERT_EQ(relate.getType() == composition, true);
+}
+
+// Make and set relationships of each type and see if they hold the correct type
+TEST(UMLRelationshipTest, GetAllTypeTest) 
+{
+    UMLClass class1("class1");
+    UMLClass class2("class2");
+    UMLRelationship relate(class1, class2, 0);
+    ASSERT_EQ(relate.getType() == aggregation, true);
+    relate.setType(composition);
+    ASSERT_EQ(relate.getType() == composition, true);
+    relate.setType(generalization);
+    ASSERT_EQ(relate.getType() == generalization, true);
+    relate.setType(realization);
+    ASSERT_EQ(relate.getType() == realization, true);
+}
+
+// ****************************************************
+
+// Tests for UMLData involving classes
 // **************************
 
 // Checks to see if getting a copy of a class has the same name
@@ -94,7 +543,7 @@ TEST(UMLDataRenameClassTest, RenameClassIntoClassThatAlreadyExists)
 
 // ****************************************************
 
-// Tests for UMLData.hpp involving attributes (method/field)
+// Tests for UMLData involving attributes (method/field)
 // **************************
 
 // Checks to see if adding method in UMLData works. 
@@ -190,7 +639,7 @@ TEST(UMLDataAttributeTest, RemovingNonExistantAttribute)
 
 // ****************************************************
 
-// Tests for UMLData.hpp involving relationships
+// Tests for UMLData involving relationships
 // **************************
 
 // Basic check to see if adding a relationship to the data model works.
@@ -416,383 +865,10 @@ TEST(UMLDataJsonTest, ReturnedJSONIsCorrect)
   ASSERT_EQ(j, data.getJson());
 }
 
-// Tests for UMLRelationship.hpp
+// ****************************************************
+
+// Tests for undo and redo (UMLDataHistory)
 // **************************
-
-// Test to check if constructing a generic relationship works at all
-TEST(UMLRelationshipTest, ConstructorTest) 
-{
-    UMLClass class1("class1");
-    UMLClass class2("class2");
-    ASSERT_NO_THROW(UMLRelationship relate(class1, class2, 0));
-}
-
-// Test to check if getting a source works at all
-TEST(UMLRelationshipTest, GetSourceTest) 
-{
-    UMLClass class1("class1");
-    UMLClass class2("class2");
-    // Relationship type doesn't matter for this test
-    UMLRelationship relate(class1, class2, 0);
-    ASSERT_EQ(&relate.getSource(), &class1);
-}
-
-// Test to check if getting a destination works at all
-TEST(UMLRelationshipTest, GetDestinationTest) 
-{
-    UMLClass class1("class1");
-    UMLClass class2("class2");
-    // Relationship type doesn't matter for this test
-    UMLRelationship relate(class1, class2, 0);
-    ASSERT_EQ(&relate.getDestination(), &class2);
-}
-
-// Test to see if the destination was simultaneously set as the source
-TEST(UMLRelationshipTest, GetDestinationTest2) 
-{
-    UMLClass class1("class1");
-    UMLClass class2("class2");
-    // Relationship type doesn't matter for this test
-    UMLRelationship relate(class1, class2, 0);
-    bool test = &relate.getDestination() == &class1;
-    ASSERT_EQ(test, false);
-}
-
-// Test to check if getting a type works at all
-TEST(UMLRelationshipTest, GetTypeTest) {
-    UMLClass class1("class1");
-    UMLClass class2("class2");
-    UMLRelationship relate(class1, class2, 0);
-    ASSERT_EQ(relate.getType() == aggregation, true);
-}
-
-// Test to check if setting a type works at all
-TEST(UMLRelationshipTest, SetTypeTest) {
-    UMLClass class1("class1");
-    UMLClass class2("class2");
-    UMLRelationship relate(class1, class2, 0);
-    relate.setType(composition);
-    ASSERT_EQ(relate.getType() == composition, true);
-}
-
-// Make and set relationships of each type and see if they hold the correct type
-TEST(UMLRelationshipTest, GetAllTypeTest) 
-{
-    UMLClass class1("class1");
-    UMLClass class2("class2");
-    UMLRelationship relate(class1, class2, 0);
-    ASSERT_EQ(relate.getType() == aggregation, true);
-    relate.setType(composition);
-    ASSERT_EQ(relate.getType() == composition, true);
-    relate.setType(generalization);
-    ASSERT_EQ(relate.getType() == generalization, true);
-    relate.setType(realization);
-    ASSERT_EQ(relate.getType() == realization, true);
-}
-
-// ****************************************************
-
-// Tests for UMLClass.hpp
-// **************************
-
-// Basic getter test to see if it gets the proper name
-TEST(UMLClassTest, GetNameWorks) 
-{
-    UMLClass class1("test");
-    ASSERT_EQ(class1.getName(), "test");
-}
-
-// Basic rename test to see if the name is properly changed
-TEST(UMLClassTest, ChangeNameWorks) 
-{
-    UMLClass class1("test");
-    class1.changeName("newTest");
-    ASSERT_EQ(class1.getName(), "newTest");
-}
-
-// Test to see if the proper attribute with the right name is added
-TEST(UMLClassTest, AddAttributeWorks) 
-{
-    UMLClass class1("test");
-    UMLAttribute attribute("testattribute");
-    class1.addAttribute(attribute);
-    bool attrFound = false;
-
-    for(auto attr : class1.getAttributes())
-    {
-        if(attr->getAttributeName() == "testattribute")
-        {
-            attrFound = true;
-        }
-    }
-
-    ASSERT_EQ(attrFound, true);
-}
-
-// Tests to see if an attribute inside of a class properly gets modified based on name.
-TEST(UMLClassTest, ChangeAttributeNameWorks) 
-{
-    UMLClass class1("test");
-    UMLAttribute attribute("testattributeOld");
-    class1.addAttribute(attribute);
-    class1.changeAttributeName("testattributeOld", "testattributeNew");
-    bool attrFound = false;
-
-    for(auto attr : class1.getAttributes())
-    {
-        if(attr->getAttributeName() == "testattributeNew")
-        {
-            attrFound = true;
-        }
-    }
-
-    ASSERT_EQ(attrFound, true);
-
-    for(auto attr : class1.getAttributes())
-    {
-        if(attr->getAttributeName() == "testattributeOld")
-        {
-            attrFound = false;
-        }
-    }
-
-    ASSERT_EQ(attrFound, true);
-}
-
-// Tests to see if an attribute inside of a class properly gets modified based on an attribute reference.
-TEST(UMLClasstest, ChangeAttributeNameReferenceWorks)
-{
-    UMLClass class1("test");
-    auto attribute = std::make_shared<UMLAttribute>("oldName");
-    class1.addAttribute(attribute);
-
-    // See if attribute was changed based on reference modification
-    class1.changeAttributeName(attribute, "newName");
-    ASSERT_EQ(attribute->getAttributeName(), "newName");
-
-    bool attrFound = false;
-
-    for(auto attr : class1.getAttributes())
-    {
-        if(attr->getAttributeName() == "newName")
-        {
-            attrFound = true;
-        }
-        else if(attr->getAttributeName() == "oldName" && attrFound)
-        {
-            attrFound = false;
-        }
-    }
-
-    ASSERT_EQ(attrFound, true);
-}
-
-// Checks if deleting attribute based on name works.
-TEST(UMLClassTest, DeleteAttributeWorks) 
-{
-    UMLClass class1("test");
-    UMLAttribute attribute("test");
-    class1.addAttribute(attribute);
-    class1.deleteAttribute("test");
-
-    // See if attribute still exists
-    bool attrFound = false;
-    for(auto attr : class1.getAttributes())
-    {
-        if(attr->getAttributeName() == "test")
-        {
-            attrFound = true;
-        }
-    }
-
-    ASSERT_EQ(attrFound, false);
-}
-
-// Checks if deleting attribute based on its reference works.
-TEST(UMLClassTest, DeleteAttributeReferenceWorks) 
-{
-    UMLClass class1("test");
-    auto attribute = std::make_shared<UMLAttribute>("test");
-    class1.addAttribute(attribute);
-    
-    // Create reference and delete based on it
-    class1.deleteAttribute(attribute);
-
-    // See if attribute still exists
-    bool attrFound = false;
-    for(auto attr : class1.getAttributes())
-    {
-        if(attr->getAttributeName() == "test")
-        {
-            attrFound = true;
-        }
-    }
-
-    ASSERT_EQ(attrFound, false);
-}
-
-// Check if finding attribute based on name works.
-// This test is outdated and must be replaced entirely alongside modifications to UMLClass.cpp.
-TEST(UMLClassTest, FindAttributeWorks) 
-{
-    UMLClass class1("test");
-    UMLAttribute attribute("testattribute");
-    class1.addAttribute(attribute);
-    
-    ASSERT_EQ(class1.getAttribute("testattribute")->getAttributeName(), attribute.getAttributeName());
-}
-
-// Test that sees that adding a test attribute works as intended.
-TEST(UMLClassTest, GetAttributesWorks) 
-{
-    UMLClass class1("test");
-    // Basic constructor used as type should not matter
-    UMLAttribute attribute("testattribute");
-    class1.addAttribute(attribute);
-    
-    vector<UMLAttribute> test;
-    test.push_back(attribute);
-    
-    bool isEqual = true;
-    vector<std::shared_ptr<UMLAttribute>> test2 = class1.getAttributes();
-
-    // Expand test later to check deeper if two attributes are equal
-    for(int i = 0; i < test.size(); i++)
-    {
-        if(test[i].getAttributeName() != test2[i]->getAttributeName())
-        {
-            isEqual = false;
-        }
-    }
-    ASSERT_EQ(isEqual, true);
-}
-
-// ****************************************************
-
-// Tests for UMLParameter.hpp
-// **************************
-
-// Tests creation of a Parameter and getting it's name and type works
-TEST(UMLParameterTest, GetParameterNameTest) 
-{
-    UMLParameter parameter("name","type");
-    ASSERT_EQ(parameter.getName(), "name");
-    ASSERT_EQ(parameter.getType(), "type");
-}
-
-// Tests renaming Parameter works
-TEST(UMLParameterTest, RenameParameterNameTest) 
-{
-    UMLParameter parameter("name","type");
-    parameter.changeName("name2");
-    ASSERT_EQ(parameter.getName(), "name2");
-}
-// Tests changing Parameter type works
-TEST(UMLParameterTest, ChangeParameterTypeTest) 
-{
-    UMLParameter parameter("name","type");
-    parameter.changeType("type2");
-    ASSERT_EQ(parameter.getType(), "type2");
-}
-
-// ****************************************************
-
-// Tests for UMLMethod
-// **************************
-
-
-// Basic getter test to see if it gets the proper name
-
-TEST(UMLMethodTest, GetMethodNameTest) 
-{
-    UMLMethod method("test", "type", {});
-    ASSERT_EQ(method.getAttributeName(), "test");
-}
-
-// Basic rename test to see if the name is properly changed
-TEST(UMLMethodTest, RenameMethodNameTest) 
-{
-    UMLMethod method("test", "type", {});
-    method.changeName("test2");
-    ASSERT_EQ(method.getAttributeName(), "test2");
-}
-
-TEST(UMLMethodTest, RenameParameterTest) 
-{
-    UMLMethod method("test", "type", {});
-    UMLParameter param("param","type");
-    method.addParam(param);
-    method.changeParameterName("param","newParam");
-    auto paramList = method.getParam();
-    bool test = false;
-    // test if new name is there
-    for(auto param : paramList)
-    {
-        if(param.getName() == "newParam")
-            test = true;
-    }
-    // old name should be gone
-    for(auto param : paramList)
-    {
-        if(param.getName() == "param")
-            test = false;
-    }
-    ASSERT_TRUE(test);
-}
-TEST(UMLMethodTest, ChangeParameterTypeTest) 
-{
-    UMLMethod method("test", "type", {});
-    UMLParameter param("param","type");
-    method.addParam(param);
-    method.changeParameterType("param","newType");
-    auto paramList = method.getParam();
-    bool test = false;
-    // test if new type is there
-    for(auto param : paramList)
-    {
-        if(param.getType() == "newType")
-            test = true;
-    }
-    // old type should be gone
-    for(auto param : paramList)
-    {
-        if(param.getType() == "type")
-            test = false;
-    }
-    ASSERT_TRUE(test);
-}
-
-// ****************************************************
-
-
-// Tests for UMLAttribute
-// **************************
-
-// TEST(UMLFieldTest, GetFieldNameTest) 
-
-// Basic getter test to see if it gets the proper name
-TEST(UMLAttributeTest, GetAttributeNameTest) 
-
-{
-    UMLField attribute("test", "type");
-    ASSERT_EQ(attribute.getAttributeName(), "test");
-}
-
-
-// TEST(UMLFieldTest, RenameFieldTest) 
-
-// Basic rename test to see if the name is properly changed
-TEST(UMLAttributeTest, RenameAttributeNameTest) 
-
-{
-    UMLField attribute("test", "type");
-    attribute.changeName("test2");
-    ASSERT_EQ(attribute.getAttributeName(), "test2");
-}
-
-// ****************************************************
-// Undo and Redo Tests (UMLDataHistory)
-// ****************************************************
 
 // Test to see if undoing the add of a single class works.
 TEST(UndoRedoTest, UndoAfterAddOneClassTest)
