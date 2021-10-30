@@ -46,7 +46,7 @@ void UMLAttribute::changeType(string newType)
 }
 
 // Placeholder to identifiy what type an attribute is
-string UMLAttribute::identifier()
+string UMLAttribute::identifier() const
 {
 	return "attribute";
 }

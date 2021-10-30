@@ -7,6 +7,7 @@
 // System includes
 #include "include/UMLClass.hpp"
 #include "include/UMLAttribute.hpp"
+#include "include/UMLField.hpp"
 #include "include/UMLMethod.hpp"
 //--------------------------------------------------------------------
 
@@ -43,10 +44,19 @@ void UMLClass::changeName(string newClassName)
 	className = newClassName;
 }
 
-// Adds attribute to attribute vector
+// Adds attribute to attribute vector. ONLY works if raw attribute.
 void UMLClass::addAttribute(const UMLAttribute& newAttribute) 
 {
-	addAttribute(std::make_shared<UMLAttribute>(newAttribute));
+	// Workaround solution with errors until better one is found
+	if(newAttribute.identifier() == "method") {
+		throw std::runtime_error("Cannot directly add method without smart_ptr");
+	}
+	else if (newAttribute.identifier() == "field") {
+		throw std::runtime_error("Cannot directly add field without smart_ptr");
+	}
+	else {
+		addAttribute(std::make_shared<UMLAttribute>(newAttribute));
+	}
 }
 
 // Adds attribute to attribute vector with a smart pointer
@@ -141,7 +151,7 @@ bool UMLClass::checkAttribute(std::shared_ptr<UMLAttribute> attribute)
 				list<UMLParameter> params2 = std::dynamic_pointer_cast<UMLMethod>(attribute)->getParam();
 				auto param2 = params2.begin();
 
-				if (params1.size() == 0 && params2.size () == 0) {
+				if (params1.empty() && params2.empty()) {
 					// Cannot overload a method with no parameters with another with no parameters
 					return true;
 				}

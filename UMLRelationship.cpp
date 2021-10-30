@@ -34,6 +34,7 @@ Type UMLRelationship::getType() const
   return relationshipType;
 }
 
+// Converts inserted string to proper type enum
 Type UMLRelationship::string_to_type(const std::string& typeIn)
 {
     if (typeIn == "aggregation")

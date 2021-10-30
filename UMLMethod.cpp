@@ -45,7 +45,7 @@ void UMLMethod::addParam(UMLParameter newParam)
 }
 
 // Identifies this attribute as a method
-string UMLMethod::identifier()
+string UMLMethod::identifier() const
 {
 	return "method";
 }
@@ -62,9 +62,7 @@ void UMLMethod::deleteParameter(string name)
 			return;
 		}
 	}
-
-	throw
-		"Parameter not found.";
+	throw std::runtime_error("Parameter not found.");
 }
 
 // Changes parameter name
@@ -79,8 +77,7 @@ void UMLMethod::changeParameterName(string oldParamName, string newParamName)
 			return;
 		}
 	}
-	throw
-		"Parameter not found.";
+	throw std::runtime_error("Parameter not found.");
 }
 
 // Changes parameter's type
@@ -95,8 +92,5 @@ void UMLMethod::changeParameterType(string paramName, string newParamType)
 			return;
 		}
 	}
-	throw
-		"Parameter not found.";
-
 	throw std::runtime_error("Parameter not found.");
 }

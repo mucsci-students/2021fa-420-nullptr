@@ -28,5 +28,5 @@ class UMLField : public UMLAttribute
 		UMLField(string newName, string newType);
 
 		// Identifies this attribute as a field
-		string identifier();
+		string identifier() const;
 };
