@@ -42,8 +42,15 @@ class UMLRelationship
 		// Grab type of relationship
 		Type getType() const;
 
+		// Converts inserted string to proper type enum
 		static Type string_to_type(const std::string&);
 
 		// Set type of relationship
 		void setType(int newType);
+
+		// Equals operator
+		bool operator==(const UMLRelationship& other) {
+			return (this->getSource().getName() == other.getSource().getName() 
+			&& this->getDestination().getName() == other.getDestination().getName()
+			&& this->getType() == other.getType());}
 };
