@@ -506,6 +506,7 @@ TEST (UMLParameterTest, RenameParameterNameTest)
   parameter.changeName ("name2");
   ASSERT_EQ (parameter.getName(), "name2");
 }
+
 // Tests changing Parameter type works
 TEST (UMLParameterTest, ChangeParameterTypeTest)
 {
@@ -1172,3 +1173,10 @@ TEST (UndoRedoTest, RedoAfterClassDeletedUndo)
 
   ASSERT_EQ (beforeClassAddUndo, afterClassAddUndo);
 }
+
+// ****************************************************
+
+// Tests for CLI (CLI.CPP)
+// **************************
+
+// Need a way to grab the stream of characters.
