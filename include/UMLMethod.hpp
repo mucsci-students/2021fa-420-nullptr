@@ -42,7 +42,7 @@ class UMLMethod : public UMLAttribute
 		void addParam(UMLParameter newParam);
 
 		// Identifies this attribute as a method
-		string identifier();
+		string identifier() const;
 
 		// Deletes a parameter from the given name
 		void deleteParameter(string name);

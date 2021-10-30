@@ -45,5 +45,5 @@ class UMLAttribute
 		void changeType(string newType);
         
 		// Placeholder to identifiy what type an attribute is
-		virtual string identifier();
+		virtual string identifier() const;
 };

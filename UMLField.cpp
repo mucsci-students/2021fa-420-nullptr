@@ -21,7 +21,7 @@ UMLField::UMLField(string newName, string newType)
 }
 
 // Identifies this attribute as a field
-string UMLField::identifier()
+string UMLField::identifier() const
 {
 	return "field";
 }
