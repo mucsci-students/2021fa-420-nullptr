@@ -6,13 +6,16 @@
 
 /************************************************************/
 // Error checking macro for functions with expected errors
-#define ERR_CHECK(fun, errorString)                        \
-  EXPECT_THROW (                                           \
-    try { fun; } catch (const std::runtime_error& error) { \
-      EXPECT_STREQ (errorString, error.what());           \
-      throw;                                               \
-    },                                                     \
-    std::runtime_error);                                   \
+#define ERR_CHECK(fun, errorString)                     \
+  EXPECT_THROW (                                        \
+    try {                                               \
+        fun;                                            \
+    }                                                   \
+    catch (const std::runtime_error& error) {           \
+        EXPECT_STREQ(errorString, error.what());        \
+        throw;                                          \
+    },                                                  \
+  std::runtime_error);                                  \
 /************************************************************/
 
 #include <gtest/gtest.h>
