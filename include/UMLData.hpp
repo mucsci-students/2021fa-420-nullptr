@@ -21,9 +21,11 @@
 // Using declarations
 
 using std::string;
+using std::cout;
 using std::vector;
 using std::list;
 using std::shared_ptr;
+using std::map;
 using json = nlohmann::json;
 
 
@@ -39,18 +41,16 @@ typedef shared_ptr<UMLMethod> method_ptr;
 //--------------------------------------------------------------------
 // Memento design pattern
 // Holds current state of UMLData 
-class UMLDataSnapshot
-{
-    private:
-        friend class UMLData;
-        list<UMLClass> classes;
-        vector<UMLRelationship> relationships;
-    public:
-        UMLDataSnapshot(const list<UMLClass>& classesIn, vector<UMLRelationship> relationshipsIn)
-        : classes(classesIn), 
-        relationships(relationshipsIn) 
-        {}
-};
+// class UMLDataSnapshot
+// {
+//     private:
+//         friend class UMLData;
+//         json data;
+//     public:
+//         UMLDataSnapshot(const json& dataIn)
+//         : data(dataIn)
+//         {}
+// };
 //***********************************************************************
 
 class UMLData
@@ -112,10 +112,10 @@ class UMLData
     //---------------------------------------------------
     // Memento pattern
     // Returns const snapshot of UMLData object
-    const UMLDataSnapshot make_snapshot();
+    //const UMLDataSnapshot make_snapshot();
 
     // Restores UMLData object from a snapshot
-    void restore(const UMLDataSnapshot& snapshot);
+    //void restore(const UMLDataSnapshot& snapshot);
     //---------------------------------------------------
 
 
@@ -142,7 +142,7 @@ class UMLData
     void addClassAttribute(string className, attr_ptr attribute);
 
     // Adds parameter to a given method
-    void addParameter(method_ptr method, string paramName, string paramType);
+    void addParameter(string classname, method_ptr method, string paramName, string paramType);
 
 
     /********************************/
@@ -162,7 +162,7 @@ class UMLData
     void removeClassAttribute(string className, attr_ptr attr);
 
     // Deletes parameter from given method
-    void deleteParameter(method_ptr method, string paramName);
+    void deleteParameter(string className, method_ptr method, string paramName);
 
 
     /********************************/
@@ -195,15 +195,11 @@ class UMLData
 
     // Takes in a shared method pointer, the name of the parameter, and the new type, 
     // and changes the parameter's type accordingly.
-    void changeParameterType(method_ptr methodIter, string paramName, string newParamType);
+    void changeParameterType(string className, method_ptr methodIter, string paramName, string newParamType);
 
 
     /********************************/
     //Bools
-
-
-    // Checks if identifier name is valid
-    bool isValidName(string name);
 
     // Checks if class exists within classses list (string argument) 
     bool doesClassExist(const string& name);
@@ -225,6 +221,21 @@ class UMLData
 
     // Gets class reference for the given name
     UMLClass& getClass(string name);
+    // Checks if identifier name is valid
+    bool isValidName(string name);
+
+    /********************************/
+    //To be deleted
+    
+    //DO NOT USE THIS VERSION!
+    void addParameter(method_ptr method, string paramName, string paramType);
+
+    //DO NOT USE THIS VERSION!
+    void deleteParameter(method_ptr method, string paramName);
+
+    // Checks if overloaded methods have duplicate parameters.
+    //bool compareMethods(method_ptr method1, method_ptr method2);
+
 
   private:
     // Finds class by name and returns iterator within member classes list, returns end() if not found
@@ -241,11 +252,5 @@ class UMLData
 
     // Takes in relationship object and adds it to relationship vector
     void addRelationship(const UMLRelationship& relationshipIn);
-
-    /*************************************/
-    //SPRINT 4
-
-    // Checks if overloaded methods have duplicate parameters.
-    //bool are_methods_duplicates(method_ptr method1, method_ptr method2);
 
 };

@@ -1,9 +1,9 @@
-
 /*
   Filename   : UMLData.cpp
   Author(s)  : Matt Giacoponello, Others(Not sure which group members wrote this)
   Description: Implementation of the data storage model.
 */
+
 
 /**************************************************************/
 //SYSTEM INCLUDES
@@ -19,7 +19,6 @@
 #include <algorithm>
 #include <list>
 #include <memory>
-
 
 
 
@@ -41,6 +40,7 @@ UMLData::UMLData()
 {
 }
 
+
 // Constructor that takes in vector of classes 
 UMLData::UMLData(const vector<UMLClass>& vclass)
 {
@@ -49,6 +49,7 @@ UMLData::UMLData(const vector<UMLClass>& vclass)
     addClass(uclass);
   }
 }
+
 
 /**************************************************************/
 //GET COLLECTIONS
@@ -64,7 +65,9 @@ list<UMLClass> UMLData::getClasses() const
   return classes;
 }
 
+
 /************************************/
+
 
 /**
  * @brief Returns vector of all relationships.
@@ -120,7 +123,6 @@ vector<attr_ptr> UMLData::getClassAttributes(string className)
 {
   return getClass(className).getAttributes();
 }
-
 
 
 /**************************************************************/
@@ -238,7 +240,9 @@ json UMLData::getJson()
   return jsonObj;
 }
 
+
 /************************************/
+
 
 //-----------------------------------------------------------------------
 // Memento pattern - creates snapshots that are able to be restored
@@ -248,23 +252,25 @@ json UMLData::getJson()
  * 
  * @return const UMLDataSnapshot 
  */
-const UMLDataSnapshot UMLData::make_snapshot()
-{
-  return UMLDataSnapshot(classes, relationships);
-}
+// const UMLDataSnapshot UMLData::make_snapshot()
+// {
+//   return UMLDataSnapshot(classes, relationships);
+// }
+
 
 /************************************/
+
 
 /**
  * @brief Overwrites current model with a snapshot.
  * 
  * @param snapshot 
  */
-void UMLData::restore(const UMLDataSnapshot& snapshot)
-{
-  classes = snapshot.classes;
-  relationships = snapshot.relationships;
-}
+// void UMLData::restore(const UMLDataSnapshot& snapshot)
+// {
+//   classes = snapshot.classes;
+//   relationships = snapshot.relationships;
+// }
 //-----------------------------------------------------------------------
 
 
@@ -290,6 +296,7 @@ void UMLData::addClass(const UMLClass& classIn)
 
 /************************************/
 
+
 /**
  * @brief Takes in string name and creates class and adds to classes
  * vector.
@@ -301,7 +308,9 @@ void UMLData::addClass(string name)
   addClass(UMLClass(name));
 }
 
+
 /************************************/
+
 
 /**
  * @brief Takes in name and vector of attributes and creates class 
@@ -315,7 +324,9 @@ void UMLData::addClass(string name, vector<UMLAttribute> attributes)
   addClass(UMLClass(name, attributes));
 }
 
+
 /************************************/
+
 
 /**
  * @brief Takes in src string, dest string, and type int creates
@@ -333,7 +344,9 @@ void UMLData::addRelationship(string srcName, string destName, int type)
   addRelationship(UMLRelationship(getClass(srcName), getClass(destName), type));
 }
 
+
 /************************************/
+
 
 /**
  * @brief Adds class attribute to specified className.
@@ -350,7 +363,9 @@ void UMLData::addClassAttribute(string className, UMLAttribute attribute)
   getClass(className).addAttribute(attribute);
 }
 
+
 /************************************/
+
 
 /**
  * @brief Adds class attribute to specified className using a smart pointer.
@@ -375,7 +390,9 @@ void UMLData::addClassAttribute(string className, attr_ptr attribute)
   getClass(className).addAttribute(attribute);
 }
 
+
 /************************************/
+
 
 /**
  * @brief Adds parameter to a given method.
@@ -384,22 +401,45 @@ void UMLData::addClassAttribute(string className, attr_ptr attribute)
  * @param paramName 
  * @param paramType 
  */
-void UMLData::addParameter(method_ptr method, string paramName, string paramType)
+void UMLData::addParameter(string className, method_ptr method, string paramName, string paramType)
 {
   if (!isValidName(paramName))
     throw std::runtime_error("Parameter name is not valid");
+
   else if (!isValidName(paramType))
     throw std::runtime_error("Parameter type is not valid");
+  
   else 
   {
     for (UMLParameter param : method->getParam()) { 
-      if (param.getName() == paramName) {
+      if (param.getName() == paramName) 
         throw std::runtime_error("Parameter already exists");
-      }
     }
   }
+ 
+  method_ptr testAttribute = std::make_shared<UMLMethod>(method->getAttributeName(), method->getType(), 
+    std::dynamic_pointer_cast<UMLMethod>(method)->getParam());
+
+  testAttribute->addParam(UMLParameter(paramName, paramType));
+  
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+  // cout << "\nAdd parameter test:\n";
+  // cout << testAttribute->getAttributeName();
+  // auto testParamList = testAttribute->getParam() << ": ";
+
+  // for (auto iter : testParamList)
+  // {
+  //   cout << *iter << ",";
+  // }
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+  if (getClass(className).checkAttribute(testAttribute)) {
+    throw std::runtime_error("This parameter cannot be created, as this would create duplicate methods.");
+  }
+ 
   method->addParam(UMLParameter(paramName, paramType));
 }
+
 
 /**************************************************************/
 //DELETING
@@ -427,7 +467,9 @@ void UMLData::deleteClass(string name)
   classes.erase(findClass(name));
 }
 
+
 /************************************/
+
 
 /**
  * @brief Deletes relationshp based on two strings.
@@ -443,7 +485,9 @@ void UMLData::deleteRelationship(string srcName, string destName)
   relationships.erase(relationships.begin() + location);
 }
 
+
 /************************************/
+
 
 /**
  * @brief Removes className class attribute by the name.
@@ -462,7 +506,9 @@ void UMLData::removeClassAttribute(string className, string attributeName)
   throw std::runtime_error("Attribute does not exist");
 }
 
+
 /************************************/
+
 
 /**
  * @brief Removes className class attribute by smart pointer.
@@ -475,7 +521,9 @@ void UMLData::removeClassAttribute(string className, attr_ptr attr)
   getClass(className).deleteAttribute(attr); // Error handing in UMLClass
 }
 
+
 /************************************/
+
 
 /**
  * @brief Deletes parameter from given method
@@ -483,8 +531,17 @@ void UMLData::removeClassAttribute(string className, attr_ptr attr)
  * @param method 
  * @param paramName 
  */
-void UMLData::deleteParameter(method_ptr method, string paramName) 
+void UMLData::deleteParameter(string className, method_ptr method, string paramName) 
 {
+  method_ptr testAttribute = std::make_shared<UMLMethod>(method->getAttributeName(), method->getType(), 
+    std::dynamic_pointer_cast<UMLMethod>(method)->getParam());
+
+  testAttribute->deleteParameter(paramName);
+
+  if (getClass(className).checkAttribute(testAttribute)) {
+    throw std::runtime_error("This parameter cannot be deleted now, as it would cause duplicate methods to exist.");
+  }
+
   method->deleteParameter(paramName);
 }
 
@@ -510,7 +567,9 @@ void UMLData::changeClassName(string oldName, string newName)
   //change name in relationship
 }
 
+
 /************************************/
+
 
 /**
  * @brief Changes class attribute by the new attribute name.
@@ -528,7 +587,9 @@ void UMLData::changeAttributeName(string className, string oldAttributeName, str
   getClass(className).changeAttributeName(oldAttributeName, newAttributeName);
 }
 
+
 /************************************/
+
 
 /**
  * @brief Overload of changeAttributeName to work with a smart pointer.
@@ -563,6 +624,7 @@ void UMLData::changeAttributeName(string className, attr_ptr attribute, string n
 
 /************************************/
 
+
 /**
  * @brief Takes in a shared method pointer, the name of the old parameter, 
  * and the new name, and renames the parameter accordingly.
@@ -577,6 +639,7 @@ void UMLData::changeParameterName(method_ptr methodIter, string oldParamName, st
     throw std::runtime_error("That name is already taken.");
   methodIter->changeParameterName(oldParamName, newParamName);
 }
+
 
 /**************************************************************/
 //TYPE CHANGING
@@ -645,20 +708,145 @@ void UMLData::changeAttributeType(attr_ptr attribute, string newTypeName)
 
 
 /**
- * @brief Takes in a shared method pointer, the name of the parameter, 
+ * @brief Takes in the class name (string), a shared method pointer, the name of the parameter, 
  * and the new type, and changes the parameter's type accordingly.
  * 
+ * @param className
  * @param methodIter 
  * @param oldParamType 
  * @param newParamType 
  */
-void UMLData::changeParameterType(method_ptr methodIter, string paramName, string newParamType)
+void UMLData::changeParameterType(string className, method_ptr methodIter, string paramName, string newParamType)
 {
-  methodIter->changeParameterType(paramName, newParamType);
+  method_ptr testAttribute = std::make_shared<UMLMethod>(methodIter->getAttributeName(), methodIter->getType(), 
+    std::dynamic_pointer_cast<UMLMethod>(methodIter)->getParam());
+
+  testAttribute->changeParameterType(paramName, newParamType);
+
+  if (getClass(className).checkAttribute(testAttribute)) {
+    throw std::runtime_error("Parameter type cannot be changed due to conflicts with other overloads");
+  }
+
+  else if (!isValidName(newParamType))
+    throw std::runtime_error("New attribute name is not valid");
+
+  methodIter->changeParameterType(paramName, newParamType); 
 }
+
 
 /**************************************************************/
 //BOOLS
+
+
+/**
+ * @brief Checks if class exists within classses list (string argument).
+ * 
+ * @param name 
+ * @return true 
+ * @return false 
+ */
+bool UMLData::doesClassExist(const string& name)
+{
+  list<UMLClass>::iterator findIter = findClass(name);
+  if (findIter == classes.end())
+    return false;
+  return true;
+}
+
+
+/************************************/
+
+
+/**
+ * @brief Checks if class exists with classes list (class argument)
+ * 
+ * @param uclass 
+ * @return true 
+ * @return false 
+ */
+bool UMLData::doesClassExist(const UMLClass& uclass)
+{
+  list<UMLClass>::iterator findIter = findClass(uclass);
+  if (findIter == classes.end())
+    return false;
+  return true;
+}
+
+
+/************************************/
+
+
+/**
+ * @brief Checks to see if relationship exists.
+ * 
+ * @param source 
+ * @param destination 
+ * @return true 
+ * @return false 
+ */
+bool UMLData::doesRelationshipExist(string source, string destination)
+{
+  int location = findRelationship(getClass(source), getClass(destination));
+  if (location < 0)
+    return false;
+  
+  return true;
+}
+
+
+/************************************/
+
+
+/**
+ * @brief Takes in 2 strings (class name and field name) and 
+ * checks if field exists in current class.
+ * 
+ * @param className 
+ * @param fieldName 
+ * @return true 
+ * @return false 
+ */
+bool UMLData::doesFieldExist(string className, string fieldName)
+{
+  UMLClass currentClass = getClassCopy(className);
+  
+  for(auto iter : currentClass.getAttributes())
+  {
+    if(iter->identifier() == "field" && iter->getAttributeName() == fieldName)
+      return true;
+  }
+  return false;
+}
+
+
+/************************************/
+
+
+/**
+ * @brief Takes in a shared method pointer and a string, and
+ * checks to see if the specified parameter exists in the 
+ * current class.
+ * 
+ * @param methodIter 
+ * @param paramName 
+ * @return true 
+ * @return false 
+ */
+bool UMLData::doesParameterExist(method_ptr methodIter, string paramName)
+{
+  std::list<UMLParameter> parameters = methodIter->getParam();
+  
+  for (UMLParameter element : parameters)
+  {
+    if(paramName == element.getName())
+      return true;
+  }
+  return false;
+}
+
+
+/************************************/
+
 
 /**
  * @brief Checks if identiifier name is valid.
@@ -688,107 +876,104 @@ bool UMLData::isValidName(string name)
   return true;
 }
 
-/************************************/
+
+/**************************************************************/
+//TO BE DELETED
 
 /**
- * @brief Checks if class exists within classses list (string argument).
+ * @brief Adds parameter to a given method.
  * 
- * @param name 
- * @return true 
- * @return false 
- */
-bool UMLData::doesClassExist(const string& name)
-{
-  list<UMLClass>::iterator findIter = findClass(name);
-  if (findIter == classes.end())
-    return false;
-  return true;
-}
-
-/************************************/
-
-/**
- * @brief Checks if class exists with classes list (class argument)
- * 
- * @param uclass 
- * @return true 
- * @return false 
- */
-bool UMLData::doesClassExist(const UMLClass& uclass)
-{
-  list<UMLClass>::iterator findIter = findClass(uclass);
-  if (findIter == classes.end())
-    return false;
-  return true;
-}
-
-/************************************/
-
-/**
- * @brief Checks to see if relationship exists.
- * 
- * @param source 
- * @param destination 
- * @return true 
- * @return false 
- */
-bool UMLData::doesRelationshipExist(string source, string destination)
-{
-  int location = findRelationship(getClass(source), getClass(destination));
-  if (location < 0)
-    return false;
-  
-  return true;
-}
-
-/************************************/
-
-/**
- * @brief Takes in 2 strings (class name and field name) and 
- * checks if field exists in current class.
- * 
- * @param className 
- * @param fieldName 
- * @return true 
- * @return false 
- */
-bool UMLData::doesFieldExist(string className, string fieldName)
-{
-  UMLClass currentClass = getClassCopy(className);
-  
-  for(auto iter : currentClass.getAttributes())
-  {
-    if(iter->identifier() == "field" && iter->getAttributeName() == fieldName)
-      return true;
-  }
-  return false;
-}
-
-/************************************/
-
-/**
- * @brief Takes in a shared method pointer and a string, and
- * checks to see if the specified parameter exists in the 
- * current class.
- * 
- * @param methodIter 
+ * @param method 
  * @param paramName 
- * @return true 
- * @return false 
+ * @param paramType 
  */
-bool UMLData::doesParameterExist(method_ptr methodIter, string paramName)
+void UMLData::addParameter(method_ptr method, string paramName, string paramType)
 {
-  std::list<UMLParameter> parameters = methodIter->getParam();
-  
-  for (UMLParameter element : parameters)
+  if (!isValidName(paramName))
+    throw std::runtime_error("Parameter name is not valid");
+  else if (!isValidName(paramType))
+    throw std::runtime_error("Parameter type is not valid");
+  else 
   {
-    if(paramName == element.getName())
-      return true;
+    for (UMLParameter param : method->getParam()) { 
+      if (param.getName() == paramName) {
+        throw std::runtime_error("Parameter already exists");
+      }
+    }
   }
-  return false;
+  method->addParam(UMLParameter(paramName, paramType));
 }
 
+/************************************/
 
+/**
+ * @brief Deletes parameter from given method
+ * 
+ * @param method 
+ * @param paramName 
+ */
+void UMLData::deleteParameter(method_ptr method, string paramName) 
+{
+  method->deleteParameter(paramName);
+}
+
+/************************************/
+
+/**
+ * @brief Used for comparing overloaded methods to see
+ * if they're valid. Takes in 2 method pointers, and 
+ * compares their parameters by type. Returns false if 
+ * the methods are EXACT duplicates, or if their return 
+ * types are different.
+ * 
+ * Returns false:
+ * 
+ * void method(int param1, string param2, bool param3)
+ * void method(int param1, string param2, bool param3)
+ * ---------------------------------------------------
+ * void method(int param1)
+ * string method()
+ * ---------------------------------------------------
+ * void method(int param1, string param2, bool param3)
+ * void method(int paramOne, string bloop, bool thingy)
+ * 
+ * Returns true:
+ * 
+ * void method(int param1, bool param2, string param3)
+ * void method(string param1, int param2, bool param3)
+ * ---------------------------------------------------
+ * void method(int param1, string param2, bool param3)
+ * void method(int param1, string param2)
+ * 
+ * @param method1 
+ * @param method2 
+ * @return true 
+ * @return false 
+ *
+bool UMLData::compareMethods(method_ptr method1, method_ptr method2)
+{
+
+  if(method1->getType() != method2->getType())
+    return false;
+
+  list paramList1 = method1->getParam();
+  list paramList2 = method2->getParam();
+
+  if(paramList1.size() != paramList2.size())
+    return true;
+
+  auto param2 = paramList2.begin();
+  for(auto param1 = paramList1.begin(); param1 == paramList1.end(); ++param1)
+  {
+    if(param1->getType() != param2->getType())
+      return true;
+
+    ++param2;
+  }
+
+  return false; 
+}
+*/
 
 
 /*
@@ -922,62 +1107,3 @@ void UMLData::addRelationship(const UMLRelationship& relIn)
   }
   relationships.push_back(relIn); 
 }
-
-
-/************************************/
-
-/**
- * IMPORTANT: This function will be used in sprint 4. Right now,
- * it goes against what some of our other code does, and there's
- * not enough time to change all that other stuff at the moment.
- * So this will be used in sprint 4 instead.
- * 
- * @brief Used for comparing overloaded methods. Takes in 2
- * method pointers, and compares their parameters by name and
- * type. Returns true if the methods are EXACT duplicates.
- * 
- * Returns true:
- * 
- * void method(int param1, string param2, bool param3)
- * void method(int param1, string param2, bool param3)
- * 
- * 
- * Returns false:
- * 
- * void method(int param1, string param2, double param3)
- * void method(string param1, string param2, double param3)
- * 
- * void method(int param1, string param2, bool param3)
- * 
- * 
- * @param method1 
- * @param method2 
- * @return true 
- * @return false 
- *
-bool UMLData::are_methods_duplicates(method_ptr method1, method_ptr method2)
-{
-  list paramList1 = method1->getParam();
-  list paramList2 = method2->getParam();
-
-  if(paramList1.size() != paramList2.size())
-    return false;
-
-  auto param2 = paramList2.begin();
-  for(auto param1 = paramList1.begin(); param1 == paramList1.end(); ++param1)
-  {
-    
-    if(param1->getName() != param2->getName())
-      return false;
-
-    if(param1->getType() != param2->getType())
-      return false;
-
-    ++param2;
-  }
-
-  return;
-}
-
-
-*/
