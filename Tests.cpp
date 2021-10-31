@@ -642,7 +642,7 @@ TEST (UMLFileTest, AddComponentsTest)
   auto m =
     std::make_shared<UMLMethod> ("ff", "string", std::list<UMLParameter>{});
   data2.addClassAttribute ("fish2", m);
-  data2.addParameter (m, "something", "something");
+  data2.addParameter ("fish2", m, "something", "something");
   data2.addRelationship ("fish2", "test", 0);
 
   // Check for identical classes
@@ -1058,7 +1058,7 @@ TEST (UMLDataJsonTest, ReturnedJSONIsCorrect)
   auto m =
     std::make_shared<UMLMethod> ("ff", "string", std::list<UMLParameter>{});
   data.addClassAttribute ("fish2", m);
-  data.addParameter (m, "something", "something");
+  data.addParameter ("fish2", m, "something", "something");
   data.addRelationship ("fish2", "test", 0);
 
   ASSERT_EQ (j, data.getJson());
@@ -1079,11 +1079,11 @@ TEST (UndoRedoTest, UndoAfterAddOneClassTest)
   json beforeClassAddUndo = data.getJson();
 
   //save history before change
-  history.save();
+  history.save(data);
   data.addClass ("TestClass");
 
   //undo change
-  history.undo();
+  data = history.undo();
 
   //collect new json object after undo
   json afterClassAddUndo = data.getJson();
@@ -1097,17 +1097,18 @@ TEST (UndoRedoTest, UndoAfterAddTwoClassesTest)
   UMLData data;
   UMLDataHistory history (data);
 
-  history.save();
   data.addClass ("TestClass");
+  history.save(data);
 
   // Collect json object beforre undo for comparison1
   json beforeClassAddUndo = data.getJson();
 
-  history.save();
+ 
   data.addClass ("TestClass2");
+  history.save(data);
 
   // Undo change
-  history.undo();
+  data = history.undo();
 
   // Collect new json object after undo
   json afterClassAddUndo = data.getJson();
@@ -1121,22 +1122,21 @@ TEST (UndoRedoTest, UndoAfterAddClassMethod)
   UMLData data;
   UMLDataHistory history (data);
 
-  history.save();
   data.addClass ("TestClass");
+  history.save(data);
 
-  history.save();
   data.addClass ("TestClass2");
+  history.save(data);
 
   // Collect json object beforre undo for comparison1
   json beforeClassAddUndo = data.getJson();
 
-  history.save();
   data.addClassAttribute (
     "TestClass",
     std::make_shared<UMLMethod> ("test", "int", std::list<UMLParameter>{}));
-
+  history.save(data);
   // Undo change
-  history.undo();
+  data = history.undo();
 
   // Collect new json object after undo
   json afterClassAddUndo = data.getJson();
@@ -1150,23 +1150,23 @@ TEST (UndoRedoTest, RedoAfterClassDeletedUndo)
   UMLData data;
   UMLDataHistory history (data);
 
-  history.save();
   data.addClass ("TestClass");
+  history.save(data);
 
-  history.save();
   data.addClass ("TestClass2");
+  history.save(data);
 
-  history.save();
   data.deleteClass ("TestClass");
+  history.save(data);
 
   // Collect json object beforre undo for comparison1
   json beforeClassAddUndo = data.getJson();
 
   // Undo change
-  history.undo();
+  data = history.undo();
 
   // Redo change
-  history.redo();
+  data = history.redo();
 
   // Collect new json object after undo
   json afterClassAddUndo = data.getJson();
