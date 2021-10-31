@@ -222,9 +222,9 @@ namespace umlserver
             std::string className = req.matches[1].str();
             int x = std::stoi(req.matches[2].str()); 
             int y = std::stoi(req.matches[3].str()); 
-            history.save();
             data.getClass(className).setX(x);
             data.getClass(className).setY(y);
+            history.save(data);
             res.set_redirect("/");
         });
 
