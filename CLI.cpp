@@ -106,10 +106,10 @@ void CLI::cli_menu()
       edit_methods();
     
     else if(userInput == "load")
-      save_uml();
+      load_uml();
     
     else if(userInput == "save")
-      load_uml();
+      save_uml();
     
     else if (userInput == "quit")
       cout << "\n";
