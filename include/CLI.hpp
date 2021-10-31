@@ -31,6 +31,7 @@
  using std::invalid_argument;
  using std::list;
  using std::shared_ptr;
+ using std::map;
 //--------------------------------------------------------------------
 
 /********************/
@@ -64,9 +65,9 @@ class CLI
     /********************/
     //Adding
 
-    void add_field(string className);
-    void add_method(string className);
-    bool add_parameter(method_ptr methodIter);
+    bool add_field(string className);
+    bool add_method(string className);
+    bool add_parameter(string className, method_ptr methodIter);
 
 
     /********************/
@@ -74,7 +75,7 @@ class CLI
     
     void delete_field(string className);
     void delete_method(string className);
-    void delete_parameter(method_ptr methodIter);
+    void delete_parameter(string className, method_ptr methodIter);
 
 
     /********************/
@@ -89,7 +90,7 @@ class CLI
 
     void change_field(string className);
     void change_method(string className);
-    void change_parameter(method_ptr methodIter);
+    void change_parameter(string className, method_ptr methodIter);
 
     /********************/
     //Display functions
