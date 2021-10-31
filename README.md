@@ -30,22 +30,17 @@ cd 2021fa-420-nullptr
 ```
 3. Create and move to build folder.
 ```
-mkdir build
-cd build
+cmake -B build ..
 ```
-4. Create make file within build folder.
+4. Build the project.
 ```
-cmake ..
+cmake --build build --parallel
 ```
-5. Run make to build program.
-```
-make project
-```
-6. For CLI, use "--cli argument." The interface will open in your command line.
+5. For CLI, use "--cli argument." The interface will open in your command line.
 ```
 ./project --cli
 ```
-7. For GUI, provide no argument. Open port 8080 and enter interface in your browser through localhost:8080.
+6. For GUI, provide no argument. Open port 8080 and enter interface in your browser through localhost:8080.
 ```
 ./project
 ```

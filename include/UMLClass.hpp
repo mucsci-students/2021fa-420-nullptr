@@ -73,5 +73,5 @@ class UMLClass
 		// Returns vector pointer of attributes 
 		vector<std::shared_ptr<UMLAttribute>> getAttributes() const;
 
-		bool operator==(const UMLClass& other) {return (this->getName() == other.getName());}
+		bool operator==(const UMLClass& other) const {return (this->getName() == other.getName());}
 };

@@ -13,8 +13,9 @@
 #include "UMLRelationship.hpp"
 #include <vector>
 #include <iostream>
-#include "json/json.hpp"
 #include <list>
+
+#include <nlohmann/json.hpp>
 
 
 /**************************************************************/

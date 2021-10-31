@@ -5,17 +5,17 @@
 
 #include <memory>
 #include <string>
-#include "include/UMLAttribute.hpp"
-#include "include/UMLData.hpp"
-#include "include/UMLFile.hpp"
-#include "include/httplib/httplib.h"
-#include "include/json/json.hpp"
-#include "include/inja/inja.hpp"
-#include "include/UMLField.hpp"
-#include "include/UMLMethod.hpp"
-#include "include/UMLDataHistory.hpp"
-#include <memory>
-#include <string>
+
+#include "UMLAttribute.hpp"
+#include "UMLData.hpp"
+#include "UMLFile.hpp"
+#include "UMLField.hpp"
+#include "UMLMethod.hpp"
+#include "UMLDataHistory.hpp"
+
+#include <httplib.h>
+#include <inja/inja.hpp>
+#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
