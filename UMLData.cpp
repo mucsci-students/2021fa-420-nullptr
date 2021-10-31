@@ -252,10 +252,10 @@ json UMLData::getJson()
  * 
  * @return const UMLDataSnapshot 
  */
-const UMLDataSnapshot UMLData::make_snapshot()
-{
-  return UMLDataSnapshot(classes, relationships);
-}
+// const UMLDataSnapshot UMLData::make_snapshot()
+// {
+//   return UMLDataSnapshot(classes, relationships);
+// }
 
 
 /************************************/
@@ -266,11 +266,11 @@ const UMLDataSnapshot UMLData::make_snapshot()
  * 
  * @param snapshot 
  */
-void UMLData::restore(const UMLDataSnapshot& snapshot)
-{
-  classes = snapshot.classes;
-  relationships = snapshot.relationships;
-}
+// void UMLData::restore(const UMLDataSnapshot& snapshot)
+// {
+//   classes = snapshot.classes;
+//   relationships = snapshot.relationships;
+// }
 //-----------------------------------------------------------------------
 
 
