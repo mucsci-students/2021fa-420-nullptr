@@ -2,37 +2,29 @@ cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# set the project name
+# Set the project name
 project(project C CXX)
 
-add_subdirectory(include/json)
-add_subdirectory(include/httplib)
-add_subdirectory(include/inja)
+# Add executables here
 
-# add executables here
+# Main executable, to be used by the client
+add_executable(project main.cpp)
 
-add_executable(project main.cpp UMLClass.cpp UMLAttribute.cpp UMLRelationship.cpp UMLData.cpp UMLFile.cpp UMLParameter.cpp UMLMethod.cpp UMLField.cpp CLI.cpp UMLDataHistory.cpp)
+# Local Libraries
 
-# add threads for http library
+# Make constant cpp files into static library
+add_library(local-library STATIC UMLClass.cpp UMLAttribute.cpp 
+UMLRelationship.cpp UMLData.cpp UMLFile.cpp UMLParameter.cpp UMLMethod.cpp 
+UMLField.cpp CLI.cpp UMLDataHistory.cpp)
+
+# External Libraries
+
+# Add and link threads for http library and local-library
 find_package (Threads REQUIRED)
+target_link_libraries(project PUBLIC Threads::Threads local-library)
 
-target_link_libraries(project PUBLIC Threads::Threads)
-
-target_link_libraries(project PUBLIC json)
-
-target_link_libraries(project PUBLIC http)
-
-target_link_libraries(project PUBLIC inja)
-
-
-target_link_libraries(project PUBLIC http)
-
-target_include_directories(project PUBLIC
-                          "${PROJECT_BINARY_DIR}"
-                          "${PROJECT_SOURCE_DIR}/include/json"
-                          "${PROJECT_SOURCE_DIR}/include/http"
-                          "${PROJECT_SOURCE_DIR}/include/inja"
-                          )
+# Include hpp files, don't add
+target_include_directories(project INTERFACE include/)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -45,8 +37,15 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(Tests Tests.cpp UMLClass.cpp UMLAttribute.cpp UMLRelationship.cpp UMLData.cpp UMLFile.cpp UMLParameter.cpp UMLMethod.cpp UMLField.cpp CLI.cpp UMLDataHistory.cpp)
+# Test executable, to be used by the client
+add_executable(Tests Tests.cpp)
 
-target_link_libraries(Tests gtest_main)
+# Add and link threads for http library
+find_package (Threads REQUIRED)
+target_link_libraries(Tests PUBLIC Threads::Threads local-library gtest_main)
+
+# Include hpp files, don't add
+target_include_directories(Tests INTERFACE include/)
+
 include(GoogleTest)
 gtest_discover_tests(Tests)

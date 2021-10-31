@@ -200,3 +200,27 @@ vector<std::shared_ptr<UMLAttribute>> UMLClass::getAttributes() const
 {
 	return classAttributes;
 }
+
+//sets the x value
+void UMLClass::setX(int val)
+{
+	x = val;
+}
+
+//sets the y value
+void UMLClass::setY(int val)
+{
+	y = val;
+}
+
+//gets the x value
+int UMLClass::getX()
+{
+	return x;
+}
+
+//gets the y value
+int UMLClass::getY()
+{
+	return y;
+}
