@@ -170,6 +170,12 @@ bool UMLClass::checkAttribute(std::shared_ptr<UMLAttribute> attribute)
 						param2 = std::next(param2);
 					}
 				}
+
+        // Params2 is bigger, so the params lists aren't duplicates.
+        if (param2 != params2.end()) {
+          equalParameter = false;
+        } 
+
 				// If true, both methods have identical parameter types. Rules are broken
 				if (equalParameter) {
 					return true;

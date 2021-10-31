@@ -934,18 +934,18 @@ bool CLI::add_method(string className)
   }
 
   cout << "You have added the method \"" << methodName << "\" to the class \"" << className << "\".\n";
-  // cout << "How many parameters would you like to give this method? -> ";
-  // size_t parameterCount = user_int_input();
+  cout << "How many parameters would you like to give this method? -> ";
+  size_t parameterCount = user_int_input();
 
-  // for(int i = 0; i < parameterCount; i++)
-  // {
-  //   cout << "Parameter " << (i+1) << ":\n";
-  //   if(!add_parameter(className, newMethod))
-  //     i--;
-  // }
+  for(int i = 0; i < parameterCount; i++)
+  {
+    cout << "Parameter " << (i+1) << ":\n";
+    if(!add_parameter(className, newMethod))
+      i--;
+  }
 
-  // cout << "Overview:\n";
-  // display_method(newMethod);
+  cout << "Overview:\n";
+  display_method(newMethod);
   return true;
 }
 
