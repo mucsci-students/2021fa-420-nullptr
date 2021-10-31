@@ -642,7 +642,7 @@ TEST (UMLFileTest, AddComponentsTest)
   auto m =
     std::make_shared<UMLMethod> ("ff", "string", std::list<UMLParameter>{});
   data2.addClassAttribute ("fish2", m);
-  data2.addParameter (m, "something", "something");
+  data2.addParameter ("fish2", m, "something", "something");
   data2.addRelationship ("fish2", "test", 0);
 
   // Check for identical classes
@@ -1058,7 +1058,7 @@ TEST (UMLDataJsonTest, ReturnedJSONIsCorrect)
   auto m =
     std::make_shared<UMLMethod> ("ff", "string", std::list<UMLParameter>{});
   data.addClassAttribute ("fish2", m);
-  data.addParameter (m, "something", "something");
+  data.addParameter ("fish2", m, "something", "something");
   data.addRelationship ("fish2", "test", 0);
 
   ASSERT_EQ (j, data.getJson());
