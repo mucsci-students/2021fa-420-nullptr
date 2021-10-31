@@ -62,11 +62,11 @@ void UMLClass::addAttribute(const UMLAttribute& newAttribute)
 // Adds attribute to attribute vector with a smart pointer
 void UMLClass::addAttribute(std::shared_ptr<UMLAttribute> newAttribute) 
 {
-	for(auto attribute : classAttributes)
-	{
-		if(attribute->getAttributeName() == newAttribute->getAttributeName())
-			throw std::runtime_error("No duplicate attributes");
-	}
+	// for(auto attribute : classAttributes)
+	// {
+	// 	if(attribute->getAttributeName() == newAttribute->getAttributeName())
+	// 		throw std::runtime_error("No duplicate attributes");
+	// }
 	classAttributes.push_back(newAttribute); // NEW POINTER VECTOR
 }
 
@@ -177,7 +177,7 @@ bool UMLClass::checkAttribute(std::shared_ptr<UMLAttribute> attribute)
 				// Otherwise, loop through attributes continues
 			}
 		}
-		// If reached, no attributes share names with this attribute, so no rules are broken
+		// If reached, the overloaded methods are valid overloads.
 		return false;
 	}
 	// Attribute shouldn't break rules by default

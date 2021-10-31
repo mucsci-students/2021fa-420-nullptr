@@ -15,11 +15,7 @@
 
 BUGS & ISSUES:
 
-  - rename_parameter() doesn't rename (UMLData.cpp)
-
-  - change_parameter() doesn't change type (UMLData.cpp)
-
-  - Method overloading isn't currently supported (in UMLData.cpp)
+  - 
 
 */
 
@@ -42,8 +38,11 @@ BUGS & ISSUES:
 #include <list>
 #include "include/CLI.hpp"
 //--------------------------------------------------------------------
-
-
+// strcasecmp Windows support
+#if defined(_WIN64)
+    #define strcasecmp _stricmp
+#endif
+//--------------------------------------------------------------------
 
 /*
 ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -216,16 +215,18 @@ void CLI::create_class()
   for(size_t i = 0; i < fieldCount; i++)
   {
     cout << "Field " << (i+1) << ":\n";
-    add_field(className);
+    if(!add_field(className))
+      i--;
   }
 
   cout << "How many methods would you like to start with? -> ";
   size_t methodCount = user_int_input();
 
-  for(int i = 0; i < methodCount; i++)
+  for(size_t i = 0; i < methodCount; i++)
   {
     cout << "Method " << (i+1) << ":\n";
-    add_method(className);
+    if(!add_method(className))
+    i--;
   }
 
   UMLClass newClass = Model.getClassCopy(className);
@@ -251,44 +252,33 @@ void CLI::create_relationship()
 
   string sourceClassName;
   string destinationClassName;
-  string relationshipType;
-  string stringType;
+  string relshipType;
+  int typeIndex = -1;
   
-  bool srcValid = false;
-  bool destValid = false;
-  bool relationshipTypeValid = false;
-  
-  int intType;
 
-  do
+  while(1)
   {
     cout << "Type in a class name you\'d like to use for the source -> ";
     cin >> sourceClassName;
 
     if(!Model.doesClassExist(sourceClassName))
-    {
       cout << "The class \"" << sourceClassName << "\" does not exist.\n";
-    }
-    else
-    {
-      srcValid = true;
-    }
 
-  } while (!srcValid);
-  
-  do
+    else
+      break;
+  }
+
+  while(1)
   {
     cout << "Type in a class name you\'d like to use for the destination -> ";
     cin >> destinationClassName;
+
     if(!Model.doesClassExist(destinationClassName))
-    {
       cout << "The class \"" << destinationClassName << "\" does not exist.\n";
-    }
+    
     else
-    {
-      destValid = true;
-    }
-  } while (!destValid);
+      break;
+  }
 
 
   
@@ -302,25 +292,33 @@ void CLI::create_relationship()
   do
   {
     cout << "Choose the type of relationship:\n"
-      << "[1] Aggregation\n"
-      << "[2] Composition\n" 
-      << "[3] Generalization\n"
-      << "[4] Realization\n";
+      << "\'A\' or \'Aggregation\'\n" 
+      << "\'C\' or \'Composition\'\n" 
+      << "\'G\' or \'Generalization\'\n" 
+      << "\'R\' or \'Realization\'\n"; 
     
     cout << "\nChoice: ";
-    cin >> stringType;
-    if (stringType == "1" || stringType == "2" || stringType == "3" || stringType == "4") 
-    {
-      // Type is enum starting from 0, so subtract by 1
-      intType = std::stoi(stringType) - 1;
-    }
-    else 
-      cout << endl << "Invalid choice!";
-  
-  }while (intType != 0 && intType != 1 && intType != 2 && intType != 3);
+    cin >> relshipType;
+    
+    if(!strcasecmp(relshipType.c_str(), "A") || !strcasecmp(relshipType.c_str(), "Aggregation"))
+      typeIndex = 0;
+
+    else if(!strcasecmp(relshipType.c_str(), "C") || !strcasecmp(relshipType.c_str(), "Composition"))
+      typeIndex = 1;
+
+    else if(!strcasecmp(relshipType.c_str(), "G") || !strcasecmp(relshipType.c_str(), "Generalization"))
+      typeIndex = 2;
+
+    else if(!strcasecmp(relshipType.c_str(), "R") || !strcasecmp(relshipType.c_str(), "Realization"))
+      typeIndex = 3;
+
+    else
+      cout << "Invalid type!\n";
+     
+  }while(typeIndex < 0 || typeIndex > 3);
 
 
-  ERR_CATCH(Model.addRelationship(sourceClassName, destinationClassName, intType));
+  ERR_CATCH(Model.addRelationship(sourceClassName, destinationClassName, typeIndex));
   if(ErrorStatus)
   {
     cout << "Error! Could not add new relationship.\n";
@@ -443,35 +441,57 @@ void CLI::change_relationship()
 {
   string source;
   string destination;
-  string stringType;
-  int intType;
+  string relshipType;
+  int typeIndex = -1;
 
   cout << "Type in the source of the relationship whose type you\'d like to change. -> ";
   cin >> source;
+  if (!Model.doesClassExist(source))
+  {
+    cout << "Error! The class you typed does not exist.\n";
+    return;
+  }
 
   cout << "Type in the destination. -> ";
   cin >> destination;
 
+  if (!Model.doesClassExist(destination))
+  {
+    cout << "Error! The class you typed does not exist.\n";
+    return;
+  }
+
+  
   do
   {
-    cout << endl << "Choose the type of relationship:" << endl;
-    cout << "[1] Aggregation" << endl;
-    cout << "[2] Composition" << endl;
-    cout << "[3] Generalization" << endl;
-    cout << "[4] Realization" << endl;
-    cout << endl << "Choice: ";
-    cin >> stringType;
-    if (stringType == "1" || stringType == "2" || stringType == "3" || stringType == "4") 
-    {
-      // Type is enum starting from 0, so subtract by 1
-      intType = std::stoi(stringType) - 1;
-    }
-    else 
-      cout << endl << "Invalid choice!";
-  
-  }while(intType != 0 && intType != 1 && intType != 2 && intType != 3);
+    cout << "Choose the type of relationship:\n"
+      << "\'A\' or \'Aggregation\'\n" 
+      << "\'C\' or \'Composition\'\n" 
+      << "\'G\' or \'Generalization\'\n" 
+      << "\'R\' or \'Realization\'\n"; 
+    
+    cout << "\nChoice: ";
+    cin >> relshipType;
+    
+    if(!strcasecmp(relshipType.c_str(), "A") || !strcasecmp(relshipType.c_str(), "Aggregation"))
+      typeIndex = 0;
 
-  ERR_CATCH(Model.changeRelationshipType(source, destination, intType));
+    else if(!strcasecmp(relshipType.c_str(), "C") || !strcasecmp(relshipType.c_str(), "Composition"))
+      typeIndex = 1;
+
+    else if(!strcasecmp(relshipType.c_str(), "G") || !strcasecmp(relshipType.c_str(), "Generalization"))
+      typeIndex = 2;
+
+    else if(!strcasecmp(relshipType.c_str(), "R") || !strcasecmp(relshipType.c_str(), "Realization"))
+      typeIndex = 3;
+
+    else
+      cout << "Invalid type!\n";
+     
+  }while(typeIndex < 0 || typeIndex > 3);
+
+
+  ERR_CATCH(Model.changeRelationshipType(source, destination, typeIndex));
   if(ErrorStatus)
   {
     cout << "Could not change relationship type.\n";
@@ -665,16 +685,16 @@ void CLI::edit_parameters(string className)
       display_method(methodIter);
     }
     else if(input == "add")
-      add_parameter(methodIter); 
+      add_parameter(className, methodIter); 
     
     else if(input == "delete")
-      delete_parameter(methodIter);
+      delete_parameter(className, methodIter);
     
     else if(input == "rename")
       rename_parameter(methodIter);
 
     else if(input == "change")
-      change_parameter(methodIter);
+      change_parameter(className, methodIter);
     
     else if(input == "switch_method")
     {
@@ -851,7 +871,7 @@ void CLI::print_parameter_commands()
  * 
  * @param className 
  */
-void CLI::add_field(string className)
+bool CLI::add_field(string className)
 {
   string fieldName;
   string fieldType;
@@ -871,12 +891,13 @@ void CLI::add_field(string className)
   ERR_CATCH(Model.addClassAttribute(className, std::make_shared<UMLField>(fieldName, fieldType)));
   if (ErrorStatus)
   {
-    cout << "Error! Failed to add class. Aborting...\n";
+    cout << "Failed to add field.\n";
     ErrorStatus = false;
-    return;
+    return false;
   }
 
   cout << "You have added the field \"" << fieldName << "\" to the class \"" << className << "\".\n";
+  return true;
 }
 
 
@@ -891,7 +912,7 @@ void CLI::add_field(string className)
  * 
  * @param className 
  */
-void CLI::add_method(string className)
+bool CLI::add_method(string className)
 {
   string methodName;
   string methodType;
@@ -909,21 +930,23 @@ void CLI::add_method(string className)
   {
     cout << "Error! Could not add new method.\n";
     ErrorStatus = false;
-    return;
+    return false;
   }
 
   cout << "You have added the method \"" << methodName << "\" to the class \"" << className << "\".\n";
-  cout << "How many parameters would you like to give this method? -> ";
-  size_t parameterCount = user_int_input();
-  
-  for(int i = 0; i < parameterCount; i++)
-  {
-    cout << "Parameter " << (i+1) << ":\n";
-    if(!add_parameter(newMethod))
-      i--;
-  }
+  // cout << "How many parameters would you like to give this method? -> ";
+  // size_t parameterCount = user_int_input();
 
-  cout << "Complete!\n";
+  // for(int i = 0; i < parameterCount; i++)
+  // {
+  //   cout << "Parameter " << (i+1) << ":\n";
+  //   if(!add_parameter(className, newMethod))
+  //     i--;
+  // }
+
+  // cout << "Overview:\n";
+  // display_method(newMethod);
+  return true;
 }
 
 /*************************/
@@ -936,7 +959,7 @@ void CLI::add_method(string className)
  * @return true 
  * @return false 
  */
-bool CLI::add_parameter(method_ptr methodIter)
+bool CLI::add_parameter(string className, method_ptr methodIter)
 {
   string paramName;
   string paramType;
@@ -954,7 +977,7 @@ bool CLI::add_parameter(method_ptr methodIter)
   cin >> paramType;
   
 
-  ERR_CATCH(Model.addParameter(methodIter, paramName, paramType));
+  ERR_CATCH(Model.addParameter(className, methodIter, paramName, paramType));
   if(ErrorStatus)
   {
     cout << "Error! The parameter \"" << paramName << "\" could not be created.\n";
@@ -1043,13 +1066,13 @@ void CLI::delete_method(string className)
  * 
  * @param methodIter
  */
-void CLI::delete_parameter(method_ptr methodIter)
+void CLI::delete_parameter(string className, method_ptr methodIter)
 {
   string paramName;
   cout << "Type the name of the parameter you\'d like to delete. -> ";
   cin >> paramName;
 
-  ERR_CATCH(Model.deleteParameter(methodIter, paramName))
+  ERR_CATCH(Model.deleteParameter(className, methodIter, paramName))
   if(ErrorStatus)
   {
     cout << "Error! Couldn't find parameter.\n";
@@ -1208,7 +1231,7 @@ void CLI::change_field(string className)
   ERR_CATCH(Model.changeAttributeType(fieldIter, newFieldType));
   if(ErrorStatus)
   {
-    cout << "Couldn't change type.\n";
+    cout << "Couldn\'t change type.\n";
     ErrorStatus = false;
     return;
   }
@@ -1241,7 +1264,7 @@ void CLI::change_method(string className)
   ERR_CATCH(methodIter = select_method(className, methodName));
   if(ErrorStatus)
   {
-    cout << "Method couldn't be found.\n";
+    cout << "Method couldn\'t be found.\n";
     ErrorStatus = false;
     return;
   }
@@ -1251,7 +1274,7 @@ void CLI::change_method(string className)
   ERR_CATCH(Model.changeAttributeType(attIter, newMethodType));
   if (ErrorStatus)
   {
-    cout << "Couldn't change method.\n";
+    cout << "Couldn\'t change method.\n";
     ErrorStatus = false;
     return;
   }
@@ -1267,7 +1290,7 @@ void CLI::change_method(string className)
  * 
  * @param methodIter 
  */
-void CLI::change_parameter(method_ptr methodIter)
+void CLI::change_parameter(string className, method_ptr methodIter)
 {
   string paramName;
   string newParamType;
@@ -1278,10 +1301,10 @@ void CLI::change_parameter(method_ptr methodIter)
   cout << "Enter the NEW type you want to give it. -> ";
   cin >> newParamType;
 
-  ERR_CATCH(Model.changeParameterType(methodIter, paramName, newParamType));
+  ERR_CATCH(Model.changeParameterType(className, methodIter, paramName, newParamType));
   if (ErrorStatus)
   {
-    cout << "Couldn't change parameter type.\n";
+    cout << "Couldn\'t change parameter type.\n";
     ErrorStatus = false;
     return;
   }
@@ -1374,12 +1397,9 @@ void CLI::display_method(attr_ptr methodIter)
 /**
  * @brief Prints out relationships in the following format:
  * 
- * TYPE:
- *   Aggregation
- * SOURCE:
- *   C1
- * DESTINATION:
- *   C2
+ * TYPE        : Aggregation
+ * SOURCE      : C1
+ * DESTINATION : C2
  * 
  * @param source 
  * @param destination 
@@ -1387,9 +1407,9 @@ void CLI::display_method(attr_ptr methodIter)
  */
 void CLI::display_relationship(string source, string destination, string rType)
 {
-  cout << "TYPE: \n\t" << rType << "\n";
-  cout << "SOURCE: \n\t" << source << "\n";
-  cout << "DESTINATION: \n\t" << destination << "\n";
+  cout << "TYPE        : " << rType << "\n";
+  cout << "SOURCE      : " << source << "\n";
+  cout << "DESTINATION : " << destination << "\n";
 }
 
 
@@ -1421,7 +1441,7 @@ size_t CLI::user_int_input()
 
 
 /**
- * @brief Whatever goes on in here, I figured this method could replace
+ * @brief (Sprint 4) Whatever goes on in here, I figured this method could replace
  * all instances of cin (except for the ones in here, or in user_int_input).
  * 
  * If that's not how it works, feel free to delete this function. Because
@@ -1465,9 +1485,9 @@ string CLI::tab_completion()
  */
 method_ptr CLI::select_method(string className, string methodName)
 {
-  vector<attr_ptr> allAttributes = Model.getClassAttributes(className);
   vector<method_ptr> methodMatches;
 
+  vector<attr_ptr> allAttributes = Model.getClassAttributes(className);
 
   //Search the entire attribute vector and put matches in methodMatches
   for(auto attributeIter : allAttributes)
@@ -1481,7 +1501,7 @@ method_ptr CLI::select_method(string className, string methodName)
 
   if (methodMatches.size() == 0)
   {
-    throw std::runtime_error("Couldn't find method.");
+    throw std::runtime_error("Couldn\'t find method.");
     return nullptr;
   }
 
@@ -1493,6 +1513,7 @@ method_ptr CLI::select_method(string className, string methodName)
   {
     cout << "[" << i+1 << "] ";
     display_method(methodMatches[i]);
+    cout << "\n";
   }
  
   while(1)
@@ -1529,6 +1550,6 @@ attr_ptr CLI::select_field(string className, string fieldName)
       return iter;
   }
 
-  throw std::runtime_error("Couldn't find field.");
+  throw std::runtime_error("Couldn\'t find field.");
   return nullptr;
 }
