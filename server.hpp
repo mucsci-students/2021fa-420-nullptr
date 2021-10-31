@@ -23,8 +23,8 @@ using json = nlohmann::json;
 // Catch for functions to protect from invalid inputs
 #define ERR_ADD(fun)                           \
     try {                                      \
-        history.save();                        \
         fun;                                   \
+        history.save(data);                    \
     }                                          \
     catch (const std::runtime_error& error) {  \
         errors += error.what();                \
@@ -207,12 +207,12 @@ namespace umlserver
         });
 
          svr.Get("/undo", [&](const httplib::Request& req, httplib::Response& res) {
-            history.undo();
+            data = history.undo();
             res.set_redirect("/");
         });
 
         svr.Get("/redo", [&](const httplib::Request& req, httplib::Response& res) {
-            history.redo();
+            data = history.redo();
             res.set_redirect("/");
         });
 
