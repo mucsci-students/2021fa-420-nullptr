@@ -34,7 +34,7 @@ SVG.on(document, 'DOMContentLoaded', function() {
 function createClassBox(draw, uclass, x, y)
 {
   var nested = draw.nested();
-  nested.rect(200,200).attr({ fill: 'pink' });
+  nested.rect(200,200).attr({ fill: '#f00', opacity: 0.3, width: 150, height: 150  });
   var text_y = 20;
   var text_x = 15;
   nested.text(uclass["name"]).dy(text_y).dx(text_x);
