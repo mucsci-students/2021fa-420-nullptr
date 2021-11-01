@@ -228,7 +228,7 @@ namespace umlserver
             res.set_redirect("/");
         });
 
-        std::cout << "running at http:://localhost:8080/" << std::endl;
+        std::cout << "running at http:://localhost:60555/" << std::endl;
 
         svr.listen("localhost", port);
     }
