@@ -22,6 +22,11 @@ void UMLDataHistory::save(UMLData& data)
         return;
     undos.push(current);
     current = data.getJson();
+
+    for(size_t i = 0; i < redo_size(); i++)
+    {
+      redos.pop();
+    }
 }
 
 // Returns from previous snapshot save
