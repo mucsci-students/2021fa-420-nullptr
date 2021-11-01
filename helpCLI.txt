@@ -92,7 +92,8 @@ create_relationship : User will be prompted to type in a source class and a dest
 
 
         Requirements: Must enter existing class names.
-                      Cannot have two relationships between the same source and destination.
+                      Invalid relationships are a class can only the the destination for one composition.
+                      For generalization and realizations a class cannot be the same source and destination.
 
 -----------------------------------------------------------------------------------------------------------
 delete_class        : User will be prompted to type the name of the class they'd like to delete.
@@ -154,6 +155,7 @@ change_relationship : User will be prompted to type in source, destination, and 
                         The relationship's type was changed successfully!
 
         Requirements: Must input source and destination class names that have an existing relationship.
+                      Relationship must be valid.
 
 -----------------------------------------------------------------------------------------------------------
 
@@ -365,6 +367,22 @@ edit_methods        : User will be sent to a sub-menu, where they can enter in m
             Arguments: None
 
          Requirements: None
+
+-----------------------------------------------------------------------------------------------------------
+
+undo                : Undo the most recent thing you've done.
+
+           Arguemnts: None
+
+        Requirements: None
+
+-----------------------------------------------------------------------------------------------------------
+
+redo                : Undoes your most recent undo.
+
+           Arguemnts: None
+
+        Requirements: None
 
 -----------------------------------------------------------------------------------------------------------
 
