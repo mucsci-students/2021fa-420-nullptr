@@ -2,29 +2,37 @@ cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Set the project name
+# set the project name
 project(project C CXX)
 
-# Add executables here
+add_subdirectory(include/json)
+add_subdirectory(include/httplib)
+add_subdirectory(include/inja)
 
-# Main executable, to be used by the client
-add_executable(project main.cpp)
+# add executables here
 
-# Local Libraries
+add_executable(project main.cpp UMLClass.cpp UMLAttribute.cpp UMLRelationship.cpp UMLData.cpp UMLFile.cpp UMLParameter.cpp UMLMethod.cpp UMLField.cpp CLI.cpp UMLDataHistory.cpp)
 
-# Make constant cpp files into static library
-add_library(local-library STATIC UMLClass.cpp UMLAttribute.cpp 
-UMLRelationship.cpp UMLData.cpp UMLFile.cpp UMLParameter.cpp UMLMethod.cpp 
-UMLField.cpp CLI.cpp UMLDataHistory.cpp)
-
-# External Libraries
-
-# Add and link threads for http library and local-library
+# add threads for http library
 find_package (Threads REQUIRED)
-target_link_libraries(project PUBLIC Threads::Threads local-library)
 
-# Include hpp files, don't add
-target_include_directories(project INTERFACE include/)
+target_link_libraries(project PUBLIC Threads::Threads)
+
+target_link_libraries(project PUBLIC json)
+
+target_link_libraries(project PUBLIC http)
+
+target_link_libraries(project PUBLIC inja)
+
+
+target_link_libraries(project PUBLIC http)
+
+target_include_directories(project PUBLIC
+                          "${PROJECT_BINARY_DIR}"
+                          "${PROJECT_SOURCE_DIR}/include/json"
+                          "${PROJECT_SOURCE_DIR}/include/http"
+                          "${PROJECT_SOURCE_DIR}/include/inja"
+                          )
 
 include(FetchContent)
 FetchContent_Declare(
@@ -37,15 +45,8 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-# Test executable, to be used by the client
-add_executable(Tests Tests.cpp)
+add_executable(Tests Tests.cpp UMLClass.cpp UMLAttribute.cpp UMLRelationship.cpp UMLData.cpp UMLFile.cpp UMLParameter.cpp UMLMethod.cpp UMLField.cpp CLI.cpp UMLDataHistory.cpp)
 
-# Add and link threads for http library
-find_package (Threads REQUIRED)
-target_link_libraries(Tests PUBLIC Threads::Threads local-library gtest_main)
-
-# Include hpp files, don't add
-target_include_directories(Tests INTERFACE include/)
-
+target_link_libraries(Tests gtest_main)
 include(GoogleTest)
 gtest_discover_tests(Tests)
