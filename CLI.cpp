@@ -25,6 +25,7 @@ BUGS & ISSUES:
 #define ERR_CATCH(fun)                                  \
     try {                                               \
         fun;                                            \
+        History.save(Model);                            \
     }                                                   \
     catch (const std::runtime_error& error) {           \
         cout << endl << error.what() << endl << endl;   \
@@ -103,7 +104,13 @@ void CLI::cli_menu()
     
     else if(userInput == "edit_methods")
       edit_methods();
-    
+
+    else if(userInput == "undo")
+      undo();
+
+    else if(userInput == "redo")
+      redo();
+
     else if(userInput == "load")
       load_uml();
     
@@ -553,6 +560,12 @@ void CLI::edit_fields()
     else if(input == "change")
       change_field(className);
 
+    else if (input == "undo")
+      undo();
+    
+    else if (input == "redo")
+      redo();
+
     else if (input == "switch_class")
     {
       //recursive call
@@ -621,6 +634,12 @@ void CLI::edit_methods()
 
     else if(input == "change")
       change_method(className);
+    
+    else if (input == "undo")
+      undo();
+    
+    else if (input == "redo")
+      redo();
     
     else if (input == "edit_parameters")
       edit_parameters(className);
@@ -695,7 +714,13 @@ void CLI::edit_parameters(string className)
 
     else if(input == "change")
       change_parameter(className, methodIter);
+
+    else if (input == "undo")
+      undo();
     
+    else if (input == "redo")
+      redo();
+
     else if(input == "switch_method")
     {
       //recursive call
@@ -797,6 +822,8 @@ void CLI::print_main_commands()
   << "                      commands.\n\n"
   << "edit_methods        : User will be sent to a sub-menu, where they can enter in method editor\n"
   << "                      commands (including a parameter editor sub-sub-menu).\n\n" 
+  << "undo                : Undo the most recent thing you\'ve done.\n\n"
+  << "redo                : Undoes your most recent undo.\n\n"
   << "load                : User will be prompted to type the name of the json file, and then it loads\n"
   << "                      the model from that file. WARNING! Existing progress will be overwritten!\n\n" 
   << "save                : User will be prompted to name the JSON file, which will contain their\n"
@@ -819,6 +846,8 @@ void CLI::print_field_commands()
     << "delete       : Delete an existing field.\n"
     << "rename       : Rename an existing field.\n"
     << "change       : Change the type of an existing field.\n"
+    << "undo         : Undo the most recent thing you\'ve done.\n"
+    << "redo         : Undoes your most recent undo.\n"
     << "switch_class : Allows the user to switch to a different class.\n"
     << "exit         : Quit the field editor and return to the normal interface.\n\n";
 }
@@ -838,6 +867,8 @@ void CLI::print_method_commands()
     << "delete          : Delete an existing method.\n"
     << "rename          : Rename an existing method.\n"
     << "change          : Change the type of an existing method.\n"
+    << "undo            : Undo the most recent thing you\'ve done.\n"
+    << "redo            : Undoes your most recent undo.\n"
     << "switch_class    : Allows the user to switch to a different class.\n"
     << "edit_parameters : User will be sent to a sub menu to edit a method's parameters.\n"
     << "exit            : Quit the method editor and return to the normal interface.\n\n";
@@ -858,6 +889,8 @@ void CLI::print_parameter_commands()
     << "delete        : Delete an existing parameter.\n"
     << "rename        : Rename an existing parameter\n"
     << "change        : Change the type of an existing parameter.\n"
+    << "undo          : Undo the most recent thing you\'ve done.\n"
+    << "redo          : Undoes your most recent undo.\n"
     << "switch_method : Allows the user to switch to a different method.\n"
     << "exit          : Quit the parameter editor and return to the method editor.\n\n";
 }
@@ -1461,9 +1494,30 @@ string CLI::tab_completion()
 }
 
 
+
+/**************************************************************/
+//UNDO/REDO
+
+
+
+void CLI::undo()
+{
+  Model = History.undo();
+  cout << "You\'ve undone your last action.\n";
+}
+
+/*************************/
+
+void CLI::redo()
+{
+  Model = History.redo();
+  cout << "You\'ve redone your last undo.\n";
+}
+
+
+
 /**************************************************************/
 //MISC.
-
 
 
 /**
