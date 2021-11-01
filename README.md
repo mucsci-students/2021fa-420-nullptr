@@ -1,6 +1,4 @@
-![workflow](https://github.com/mucsci-students/2021fa-420-nullptr/actions/workflows/cmake.yml/badge.svg)
-
-# 2021fa-420-nullptr
+# 2021fa-420-nullptr ![workflow](https://github.com/mucsci-students/2021fa-420-nullptr/actions/workflows/cmake.yml/badge.svg)
 
 UML++ is a C++ editor of UML class diagrams.
 
@@ -36,7 +34,12 @@ cmake -B build ..
 ```
 cmake --build build --parallel
 ```
-5. For CLI, use "--cli argument." The interface will open in your command line.
+5. Run make to build program.
+```
+make project
+```
+6. For CLI, use "--cli argument." The interface will open in your command line. 
+For a user guide, access helpCLI.txt within the cloned repository to see expanded information on different commands.
 ```
 ./project --cli
 ```

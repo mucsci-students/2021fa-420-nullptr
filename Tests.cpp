@@ -625,7 +625,7 @@ TEST (UMLFileTest, AddComponentsTest)
 {
   // Start with JSON string, add classes and relationships based on the JSON
   json j =
-    "{\"classes\":[{\"fields\":[{\"name\":\"test\",\"type\":\"int\"}],\"methods\":[{\"name\":\"ff\",\"params\":[{\"name\":\"something\",\"type\":\"something\"}],\"return_type\":\"string\"}],\"name\":\"fish2\"},{\"fields\":[],\"methods\":[],\"name\":\"test\"}],\"relationships\":[{\"destination\":\"test\",\"source\":\"fish2\",\"type\":\"aggregation\"}]}"_json;
+        "{\"classes\":[{\"fields\":[{\"name\":\"test\",\"type\":\"int\"}],\"methods\":[{\"name\":\"ff\",\"params\":[{\"name\":\"something\",\"type\":\"something\"}],\"return_type\":\"string\"}],\"name\":\"fish2\",\"position_x\":0,\"position_y\":0},{\"fields\":[],\"methods\":[],\"name\":\"test\",\"position_x\":0,\"position_y\":0}],\"relationships\":[{\"destination\":\"test\",\"source\":\"fish2\",\"type\":\"aggregation\"}]}"_json;
   UMLData data;
   UMLFile file ("test.json");
   file.addClasses (data, j);
@@ -1050,7 +1050,7 @@ TEST (UMLDataRelationshipTest, ChangeRelationshipTypeErrors)
 TEST (UMLDataJsonTest, ReturnedJSONIsCorrect)
 {
   json j =
-    "{\"classes\":[{\"fields\":[{\"name\":\"test\",\"type\":\"int\"}],\"methods\":[{\"name\":\"ff\",\"params\":[{\"name\":\"something\",\"type\":\"something\"}],\"return_type\":\"string\"}],\"name\":\"fish2\"},{\"fields\":[],\"methods\":[],\"name\":\"test\"}],\"relationships\":[{\"destination\":\"test\",\"source\":\"fish2\",\"type\":\"aggregation\"}]}"_json;
+    "{\"classes\":[{\"fields\":[{\"name\":\"test\",\"type\":\"int\"}],\"methods\":[{\"name\":\"ff\",\"params\":[{\"name\":\"something\",\"type\":\"something\"}],\"return_type\":\"string\"}],\"name\":\"fish2\",\"position_x\":0,\"position_y\":0},{\"fields\":[],\"methods\":[],\"name\":\"test\",\"position_x\":0,\"position_y\":0}],\"relationships\":[{\"destination\":\"test\",\"source\":\"fish2\",\"type\":\"aggregation\"}]}"_json;
   UMLData data;
   data.addClass ("fish2");
   data.addClass ("test");
@@ -1079,11 +1079,11 @@ TEST (UndoRedoTest, UndoAfterAddOneClassTest)
   json beforeClassAddUndo = data.getJson();
 
   //save history before change
-  history.save();
+  history.save(data);
   data.addClass ("TestClass");
 
   //undo change
-  history.undo();
+  data = history.undo();
 
   //collect new json object after undo
   json afterClassAddUndo = data.getJson();
@@ -1097,17 +1097,18 @@ TEST (UndoRedoTest, UndoAfterAddTwoClassesTest)
   UMLData data;
   UMLDataHistory history (data);
 
-  history.save();
   data.addClass ("TestClass");
+  history.save(data);
 
   // Collect json object beforre undo for comparison1
   json beforeClassAddUndo = data.getJson();
 
-  history.save();
+ 
   data.addClass ("TestClass2");
+  history.save(data);
 
   // Undo change
-  history.undo();
+  data = history.undo();
 
   // Collect new json object after undo
   json afterClassAddUndo = data.getJson();
@@ -1121,22 +1122,21 @@ TEST (UndoRedoTest, UndoAfterAddClassMethod)
   UMLData data;
   UMLDataHistory history (data);
 
-  history.save();
   data.addClass ("TestClass");
+  history.save(data);
 
-  history.save();
   data.addClass ("TestClass2");
+  history.save(data);
 
   // Collect json object beforre undo for comparison1
   json beforeClassAddUndo = data.getJson();
 
-  history.save();
   data.addClassAttribute (
     "TestClass",
     std::make_shared<UMLMethod> ("test", "int", std::list<UMLParameter>{}));
-
+  history.save(data);
   // Undo change
-  history.undo();
+  data = history.undo();
 
   // Collect new json object after undo
   json afterClassAddUndo = data.getJson();
@@ -1150,23 +1150,23 @@ TEST (UndoRedoTest, RedoAfterClassDeletedUndo)
   UMLData data;
   UMLDataHistory history (data);
 
-  history.save();
   data.addClass ("TestClass");
+  history.save(data);
 
-  history.save();
   data.addClass ("TestClass2");
+  history.save(data);
 
-  history.save();
   data.deleteClass ("TestClass");
+  history.save(data);
 
   // Collect json object beforre undo for comparison1
   json beforeClassAddUndo = data.getJson();
 
   // Undo change
-  history.undo();
+  data = history.undo();
 
   // Redo change
-  history.redo();
+  data = history.redo();
 
   // Collect new json object after undo
   json afterClassAddUndo = data.getJson();

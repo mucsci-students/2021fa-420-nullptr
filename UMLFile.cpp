@@ -57,6 +57,10 @@ void UMLFile::addClasses(UMLData& data, const json& j)
         std::string className = umlclass["name"];
         data.addClass(className);
 
+        //set x and y for gui
+        data.getClass(className).setX(umlclass["position_x"]);
+        data.getClass(className).setY(umlclass["position_y"]);
+
         for (auto field : umlclass["fields"])
         {
             data.addClassAttribute(className, std::make_shared<UMLField>(field["name"], field["type"]));

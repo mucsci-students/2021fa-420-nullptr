@@ -42,18 +42,16 @@ typedef shared_ptr<UMLMethod> method_ptr;
 //--------------------------------------------------------------------
 // Memento design pattern
 // Holds current state of UMLData 
-class UMLDataSnapshot
-{
-    private:
-        friend class UMLData;
-        list<UMLClass> classes;
-        vector<UMLRelationship> relationships;
-    public:
-        UMLDataSnapshot(const list<UMLClass>& classesIn, vector<UMLRelationship> relationshipsIn)
-        : classes(classesIn), 
-        relationships(relationshipsIn) 
-        {}
-};
+// class UMLDataSnapshot
+// {
+//     private:
+//         friend class UMLData;
+//         json data;
+//     public:
+//         UMLDataSnapshot(const json& dataIn)
+//         : data(dataIn)
+//         {}
+// };
 //***********************************************************************
 
 class UMLData
@@ -115,10 +113,10 @@ class UMLData
     //---------------------------------------------------
     // Memento pattern
     // Returns const snapshot of UMLData object
-    const UMLDataSnapshot make_snapshot();
+    //const UMLDataSnapshot make_snapshot();
 
     // Restores UMLData object from a snapshot
-    void restore(const UMLDataSnapshot& snapshot);
+    //void restore(const UMLDataSnapshot& snapshot);
     //---------------------------------------------------
 
 
@@ -222,6 +220,8 @@ class UMLData
     // the current class.
     bool doesParameterExist(method_ptr methodIter, string paramName);
 
+    // Gets class reference for the given name
+    UMLClass& getClass(string name);
     // Checks if identifier name is valid
     bool isValidName(string name);
 
@@ -250,9 +250,6 @@ class UMLData
 
     // Finds relationship using two UML classes and returns index within member classes vector
     int findRelationship(const UMLClass& sourceClassIn, const UMLClass& destClassIn);
-
-    // Gets class reference for the given name
-    UMLClass& getClass(string name);
 
     // Takes in relationship object and adds it to relationship vector
     void addRelationship(const UMLRelationship& relationshipIn);

@@ -6,38 +6,48 @@
 //--------------------------------------------------------------------
 // System includes
 #include "include/UMLDataHistory.hpp"
+#include "include/UMLFile.hpp"
 //--------------------------------------------------------------------
 
 // Constructor that adds the originator to the history
 UMLDataHistory::UMLDataHistory(UMLData& data)
-:originator(&data) 
-{   
+{ 
+    current = data.getJson();
 }
 
 // Saves snapshot in undo stack, call before changes to UMLData
-void UMLDataHistory::save()
+void UMLDataHistory::save(UMLData& data)
 {
-    undos.push(originator->make_snapshot());
+    if (data.getJson() == current)
+        return;
+    undos.push(current);
+    current = data.getJson();
 }
 
-// Restores from previous snapshot save
-void UMLDataHistory::undo()
+// Returns from previous snapshot save
+UMLData UMLDataHistory::undo()
 {
-    if (is_undo_empty())
-        return;
-    redos.push(originator->make_snapshot());
-    originator->restore(undos.top());
-    undos.pop();
+    if (!is_undo_empty())
+    {
+        redos.push(current);
+        current = undos.top();
+        undos.pop();
+    }
+
+    return load_current();
 }
 
-// Restores snapshot before last undo
-void UMLDataHistory::redo()
+// Returns snapshot before last undo
+UMLData UMLDataHistory::redo()
 {
-    if (is_redo_empty())
-        return;
-    undos.push(originator->make_snapshot());
-    originator->restore(redos.top());
-    redos.pop();
+    if (!is_redo_empty())
+    {
+        undos.push(current);
+        current = redos.top();
+        redos.pop();
+    }
+
+    return load_current();
 }
 
 // Returns true if there are no undo snapshots
@@ -58,4 +68,13 @@ size_t UMLDataHistory::undo_size() {
 // Returns size of redo stack
 size_t UMLDataHistory::redo_size() { 
     return redos.size(); 
+}
+
+UMLData UMLDataHistory::load_current()
+{
+    UMLData data;
+    UMLFile::addClasses(data, current);
+    UMLFile::addRelationships(data , current);
+
+    return data;
 }

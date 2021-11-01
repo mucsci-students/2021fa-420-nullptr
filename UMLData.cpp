@@ -224,7 +224,7 @@ json UMLData::getJson()
         jsonattr["methods"] += {{"name", uattr->getAttributeName()}, {"return_type", uattr->getType()}, {"params", jsonparams}};
       }
     } 
-    jsonObj["classes"] += { {"name", uclass.getName()}, {"fields", jsonattr["fields"]}, {"methods", jsonattr["methods"]} };
+    jsonObj["classes"] += { {"name", uclass.getName()}, {"position_x", uclass.getX()}, {"position_y", uclass.getY()}, {"fields", jsonattr["fields"]}, {"methods", jsonattr["methods"]} };
   }
 
   jsonObj["relationships"] = json::array();
@@ -252,10 +252,11 @@ json UMLData::getJson()
  * 
  * @return const UMLDataSnapshot 
  */
-const UMLDataSnapshot UMLData::make_snapshot()
-{
-  return UMLDataSnapshot(classes, relationships);
-}
+// const UMLDataSnapshot UMLData::make_snapshot()
+// {
+//   return UMLDataSnapshot(classes, relationships);
+// }
+
 
 
 /************************************/
@@ -266,11 +267,11 @@ const UMLDataSnapshot UMLData::make_snapshot()
  * 
  * @param snapshot 
  */
-void UMLData::restore(const UMLDataSnapshot& snapshot)
-{
-  classes = snapshot.classes;
-  relationships = snapshot.relationships;
-}
+// void UMLData::restore(const UMLDataSnapshot& snapshot)
+// {
+//   classes = snapshot.classes;
+//   relationships = snapshot.relationships;
+// }
 //-----------------------------------------------------------------------
 
 

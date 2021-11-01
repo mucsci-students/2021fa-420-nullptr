@@ -19,22 +19,22 @@
 class UMLDataHistory 
 {
     private: 
-        UMLData* originator = nullptr;
-        std::stack<UMLDataSnapshot> undos;
-        std::stack<UMLDataSnapshot> redos;
+        std::stack<json> undos;
+        std::stack<json> redos;
+        json current;
 
     public: 
         // Constructor that adds the originator to the history
         UMLDataHistory(UMLData& data);
         
         // Saves snapshot in undo stack, call before changes to UMLData
-        void save();
+        void save(UMLData& data);
 
         // Restores from previous snapshot save
-        void undo();
+        UMLData undo();
 
         // Restores snapshot before last undo
-        void redo();
+        UMLData redo();
 
         // Returns true if there are no undo snapshots
         bool is_undo_empty();
@@ -47,4 +47,7 @@ class UMLDataHistory
 
         // Returns size of redo stack
         size_t redo_size();
+
+        //loads current json as UMLData
+        UMLData load_current();
 };
