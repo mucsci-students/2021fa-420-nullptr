@@ -1,66 +1,395 @@
-UML++ serves as an editor for an implementation of a UML class diagram.
+## CLI User Guide
+The Command Line Interface (CLI) is the alternative way to use the UML editor. It operates using commands entered into a terminal. 
 
-The program's command interface is operated by inputting numbers into the 
-console that correspond to a given command. For example, to go through
-operations for Class, input a 0 and press Enter to enter it.
+Upon running the CLI editor, you will be presented with an empty terminal to enter commands. 
 
-UML++ has the following hierarchy for its command-line interface:
+    [(computername) build]$ ./project --cli
+    Welcome to UML++!
 
-- [1] Class: Lists operations for modifying classes.
-    - [1] Add: Prompts for a class name. If the class does not already exist
-               and is valid, the class will be inserted into the diagram.
-    - [2] Remove: Prompts for a class name. If the class exists, the class will
-                  be removed from the UML class diagram.
-    - [3] Rename: Prompts for a class name. If the class exists and the new 
-                  name is valid, the class will have its name modified to the
-                  new name prompted.
-    - [4] Back: Returns back to the main set of commands.
-    
-- [2] Attribute: Lists operations for modifying attributes. UML++ supports two
-                 types of attributes: fields and methods. Fields only have a
-                 name and type, while methods can have parameters with their 
-                 own types.
-    - [1] Add: Prompts for a class which will hold the attribute, and then 
-               ask for the type of attribute that will be inserted. If a 
-               method is inserted, it will allow you to insert as many 
-               parameters as you would like to it.
-    - [2] Remove: Prompts for a class and an attribute. If the class 
-                  exists alongside the attribute, the attribute will be 
-                  removed.
-    - [3] Change: Prompts for a class and an attribute. Allows you to change 
-                  the name, type, and if the attribute is a method, modify 
-                  the parameters that exist within the method. Parameter
-                  modifications include adding, deleting, and replacing 
-                  parameters.
-    - [4] Back: Returns back to the main set of commands.
-    
-- [3] Relationship: Lists operations for modifying relationships.
-    - [1] Add: Prompts for a source class and a destination class, alongside a
-               type. If there is not already a relationship with this source
-               destination combination and no relationship type rules are being
-               broken, a new relationship will be made.
-    - [2] Remove: Prompts for a source class and a destination class. If the 
-                relationship exists, it will be removed.
-    - [3] Modify Type: Prompts for a source class and a destination class,
-                       alongside a new type. Changes the relationship to have 
-                       the new type, given that this does not cause any errors.
-    - [4] Back: Returns back to the main set of commands.
-    
-- [4] List: Lists operations for viewing information within the diagram.
-    - [1] Class: Prompts for a class name. If the class exists, information 
-                 about the class, its attributes, and its relationships will 
-                 be displayed.
-    - [2] Diagram: Displays all information for all classes, alongside their 
-                   attributes and relationships.
-    - [3] Back: Returns back to the main set of commands.
-    
-- [5] Save: Saves your UML diagram to a JSON file in the same directory as the
-            executable.
+    Type "help" to view all available commands.
+    Type "quit" to quit your current session.
+    > 
 
-- [6] Load: Prompts for a directory. If the directory exists, a UML diagram 
-            made previously by this program will be loaded for modification.
+Running the "help" command will present a list of commands that the editor accepts. Entering "quit" will close the UML editor. 
+Some commands require no arguments, while others have a series of extra input to be entered. The list of commands in the user guide 
+contains all commands and extended documentation regarding their input and what input is valid.
 
-- [7] Help: Loads this help file into the console.
+The CLI has the same functionality as the GUI and supports all operations needed to create any UML Diagram. The diagram can be saved
+to a file in JSON format and a file can be loaded into the program.
 
-- [8] Exit: Exits the program. If the UML class diagram is not saved 
-            beforehand, data will be lost.
+List of commands:
+-----------------
+list_classes        : Lists all classes the user has created, as well as their attributes.
+
+           Arguemnts: None
+
+        Requirements: If there are no classes, list_classes will print out "You have no classes."
+                    
+-----------------------------------------------------------------------------------------------------------
+list_relationships  : Lists all relationships created by the user. (e.g. [source -> destination])
+
+           Arguemnts: None
+
+        Requirements: If there are no relationships, list_relationships will print out "You have no relationships."
+
+-----------------------------------------------------------------------------------------------------------
+create_class        : User will be prompted to name the class, and then it'll be created.
+
+           Arguemnts: Takes input for the name of the class.
+                    
+                         > create_class
+                         Choose a name for your class -> className
+                         Successfully added new class "className".
+                    
+                      Next is number of fields to add and their names and types.
+                    
+                         How many fields would you like to start with? -> 1
+                         Field 1:
+                         Type a name for the field you'd like to add. -> fieldName
+                         What type would you like to give it? -> int
+                         You have added the field "fieldName" to the class "className".
+                    
+                      Next is number of methods to add and their names, types, and parameters.
+
+                         How many methods would you like to start with? -> 1
+                         Method 1:
+                         Type a name for the method you'd like to add. -> methodName
+                         What type would you like to give it? -> int
+                         You have added the method "methodName" to the class "className".
+                         How many parameters would you like to give this method? -> 1
+                         Parameter 1:
+                         Type a name for your parameter -> parameterName
+                         What type would you like to give it? -> int
+                         The parameter "parameterName" was successfully created!
+
+                      After entering all input, the class will be displayed to the user.
+
+        Requirements: Must have a valid name for Classes, Methods, and Fields 
+                        i.e. must start with a letter, must contain valid characters (letters, numbers, and underscore)
+                      Cannot create a class with an existing name.
+                      Cannot have two fields with the same name
+                      Methods must have different type signature
+                        i.e. different parameters
+
+-----------------------------------------------------------------------------------------------------------
+create_relationship : User will be prompted to type in a source class and a destination class.
+
+           Arguemnts: Takes input for the source class and input for the destination class. 
+                      Next is an option for type of relationship to add, 1 for Aggregation, 2 for Composition, 
+                      3 for Generalization, 4 for Realization
+
+                        > create_relationship
+                        Type in a class name you'd like to use for the source -> class1
+                        Type in a class name you'd like to use for the destination -> class2
+                        Choose the type of relationship:
+                        [1] Aggregation
+                        [2] Composition
+                        [3] Generalization
+                        [4] Realization
+
+                        Choice: 1
+                        Relationship added between class1 and class2 of type aggregation
+
+
+        Requirements: Must enter existing class names.
+                      Cannot have two relationships between the same source and destination.
+
+-----------------------------------------------------------------------------------------------------------
+delete_class        : User will be prompted to type the name of the class they'd like to delete.
+
+           Arguemnts: Class name to delete.
+
+        Requirements: Must input existing class name.
+                      If the input name does not exist the command will fail.
+
+-----------------------------------------------------------------------------------------------------------
+
+delete_relationship : User will be prompted to type the source and destination. The relationship
+                      will be no more, but the classes will still exist.
+
+           Arguemnts: Source of the relationship is input first. Then the destination of the relationship.
+
+                        > delete_relationship
+                        Enter the source of the relationship to be deleted -> class1
+                        Enter the destination of the relationship to be deleted -> class2
+                        Relationship was successfully deleted.
+
+        Requirements: If there is no relationship for the entered classes then the command will fail.
+
+-----------------------------------------------------------------------------------------------------------
+
+rename_class        : User will be prompted to type the existing class name, and then the new
+                      name.
+
+           Arguemnts: Existing class name is input first. Then the new name is entered.
+
+                        > rename_class
+                        Enter the CURRENT name of the class you'd like to rename. -> class1
+                        Enter the new name you'd like to rename it to. -> class2
+                        The class "class1" has been renamed to "class2".
+
+        Requirements: Must input existing class name.
+                      Cannot input any invalid name or an existing class name for the new name.
+
+-----------------------------------------------------------------------------------------------------------
+
+change_relationship : User will be prompted to type in source, destination, and the NEW type
+                      of the relationship, and the type will be changed accordingly.
+
+           Arguemnts: Takes input for the source class and input for the destination class for an existing relationship. 
+                      Next is an option for the changing to the new relationship, 1 for Aggregation, 2 for Composition, 
+                      3 for Generalization, 4 for Realization
+
+                        > change_relationship
+                        Type in the source of the relationship whose type you'd like to change. -> class1
+                        Type in the destination. -> class2
+
+                        Choose the type of relationship:
+                        [1] Aggregation
+                        [2] Composition
+                        [3] Generalization
+                        [4] Realization
+
+                        Choice: 2
+                        The relationship's type was changed successfully!
+
+        Requirements: Must input source and destination class names that have an existing relationship.
+
+-----------------------------------------------------------------------------------------------------------
+
+edit_fields         : User will be sent to a sub-menu, where they can enter in field editor
+                      commands.
+
+           Arguemnts: Name of class to edit fields for is entered, then edit_fields opens a new editor with different commands.
+
+        Requirements: Must be an existing class.
+
+    FIELD EDITOR:
+        The field editor is a sub editor within the CLI, having access to it's own commands which can be diplayed by entering in "help".
+
+            > edit_fields
+            Enter the name of the class whose fields and/or parameters you'd like to edit.
+            -> className
+            Type "help" to view all available editor commands.
+            -> help
+            FIELD EDITOR COMMANDS:
+            view         : View the current class with its fields.
+            add          : Add a new field.
+            delete       : Delete an existing field.
+            rename       : Rename an existing field.
+            change       : Change the type of an existing field.
+            switch_class : Allows the user to switch to a different class.
+            exit         : Quit the field editor and return to the normal interface.
+
+        List of Field Editor Commands:
+        ------------------------------
+        view         : View the current class with its fields.
+
+            Arguments: None
+
+         Requirements: None
+        ------------------------------
+        add          : Add a new field.
+
+            Arguments: Name of field to add and its type.
+
+         Requirements: Must not be an existing field name and must follow valid name syntax.
+                        i.e. must start with letter, can only be letters, numbers, and underscore.
+        ------------------------------
+        delete       : Delete an existing field.
+
+            Arguments: Name of a field.
+
+         Requirements: Field to be deleted must exist.
+        ------------------------------
+        rename       : Rename an existing field.
+
+            Arguments: Name of field to rename and its new name.
+
+         Requirements: Old name must be an existing field and the new name must be valid.
+        ------------------------------
+        change       : Change the type of an existing field.
+
+            Arguments: Name of a field and the new type.
+
+         Requirements: Name of field must be an existing field.
+        ------------------------------
+        switch_class : Allows the user to switch to a different class.
+
+            Arguments: The name of a class to edit the fields for.
+
+         Requirements: The class must exist.
+        ------------------------------
+        exit         : Quit the field editor and return to the normal interface.
+
+            Arguments: None
+
+         Requirements: None
+
+-----------------------------------------------------------------------------------------------------------
+
+edit_methods        : User will be sent to a sub-menu, where they can enter in method editor
+                      commands (including a parameter editor sub-sub-menu).
+
+           Arguemnts: Name of class to edit methods for is entered, then edit_methods opens a new editor with different commands.
+
+        Requirements: Must be an existing class.
+
+    METHOD EDITOR:
+        The method editor is a sub editor within the CLI, having access to it's own commands which can be diplayed by entering in "help".
+
+            > edit_methods
+            Enter the name of the class whose methods and/or parameters you'd like to edit.
+            -> className
+            Type "help" to view all available editor commands.
+            -> help
+            METHOD EDITOR COMMANDS:
+            view            : View the current class with its methods.
+            add             : Add a new method.
+            delete          : Delete an existing method.
+            rename          : Rename an existing method.
+            change          : Change the type of an existing method.
+            switch_class    : Allows the user to switch to a different class.
+            edit_parameters : User will be sent to a sub menu to edit a method's parameters.
+            exit            : Quit the method editor and return to the normal interface.
+
+        List of Method Editor Commands:
+        ------------------------------
+        view         : View the current class with its methods.
+
+            Arguments: None
+
+         Requirements: None
+        ------------------------------
+        add          : Add a new method.
+
+            Arguments: Name of method to add, its type, and number of parameters to add.
+
+         Requirements: Must be a method with a valid name and unique type signature.
+                        i.e. name must start with a letter and contain only letters, numbers, and underscore. 
+                             Must have different parameters than another method with the same name. 
+        ------------------------------
+        delete       : Delete an existing method.
+
+            Arguments: Name of a method.
+
+         Requirements: Method to be deleted must exist.
+        ------------------------------
+        rename       : Rename an existing method.
+
+            Arguments: Name of method to rename and its new name.
+
+         Requirements: Old name must be an existing method and the new name must be valid.
+        ------------------------------
+        change       : Change the type of an existing method.
+
+            Arguments: Name of a method and the new type.
+
+         Requirements: Name of method must be an existing method.
+        ------------------------------
+        switch_class : Allows the user to switch to a different class.
+
+            Arguments: The name of a class to edit the method for.
+
+         Requirements: The class must exist.
+        ------------------------------
+        edit_parameters : User will be sent to a sub menu to edit a method's parameters.
+
+            Arguments: Method name to edit parameters for, edit_parameters opens a new editor with different commands.
+
+         Requirements: Method name must exist.
+
+        PARAMETER EDITOR:
+        The Parameter editor is a sub editor within the CLI, having access to it's own commands which can be diplayed by entering in "help".
+
+                Enter the name of the method whose parameters you'd like to edit.
+                -> methodName
+                Type "help" to view all available editor commands.
+                -> help
+                PARAMETER EDITOR COMMANDS:
+                view          : View the current method with its parameters.
+                add           : Add a new parameter.
+                delete        : Delete an existing parameter.
+                rename        : Rename an existing parameter
+                change        : Change the type of an existing parameter.
+                switch_method : Allows the user to switch to a different method.
+                exit          : Quit the parameter editor and return to the method editor.
+
+            List of Parameter Editor Commands:
+            ----------------------------------
+            view          : View the current method with its parameters.
+            
+                Arguments: None
+
+                Requirements: None
+            ----------------------------------
+            add           : Add a new parameter.
+            
+                Arguments: Name of parameter and its type.
+
+                Requirements: Name of parameter must be valid.
+            ----------------------------------
+            delete        : Delete an existing parameter.
+            
+                Arguments: Name of parameter to delete.
+
+                Requirements: Parameter must exist.
+            ----------------------------------
+            rename        : Rename an existing parameter
+            
+                Arguments: Old parameter name and then the new name.
+
+                Requirements: New parameter name must be valid.
+            ----------------------------------
+            change        : Change the type of an existing parameter.
+            
+                Arguments: Name of the parameter and the new type.
+
+                Requirements: None
+            ----------------------------------
+            switch_method : Allows the user to switch to a different method.
+            
+                Arguments: Name of another method within the same class to edit.
+
+                Requirements: New method must exist.
+            ----------------------------------
+            exit          : Quit the parameter editor and return to the method editor.
+            
+                Arguments: None
+
+                Requirements: None
+                
+        ------------------------------
+        exit         : Quit the method editor and return to the normal interface.
+
+            Arguments: None
+
+         Requirements: None
+
+-----------------------------------------------------------------------------------------------------------
+
+load                : User will be prompted to type the name of the json file, and then it loads
+                      the model from that file. WARNING! Existing progress will be overwritten!
+
+           Arguemnts: Name of file to load.
+
+        Requirements: If the specified file is not in the program directory then an error will be presented.
+
+-----------------------------------------------------------------------------------------------------------
+
+save                : User will be prompted to name the JSON file, which will contain their
+                      current progress.
+
+           Arguemnts: Name of file to save.
+
+        Requirements: Must use standard file names.
+
+-----------------------------------------------------------------------------------------------------------
+
+quit                : Exit your current session.
+
+           Arguemnts: None
+
+        Requirements: None
+
+-----------------------------------------------------------------------------------------------------------
