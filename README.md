@@ -44,7 +44,7 @@ For a user guide, access helpCLI.txt within the cloned repository to see expande
 ```
 ./project --cli
 ```
-7. For GUI, provide no argument. Open port 8080 and enter interface in your browser through localhost:60555.
+7. For GUI, provide no argument. Open port 60555 and enter interface in your browser through localhost:60555. When running, press "help" to enter a webpage that provides a user guide for using the GUI interface.
 ```
 ./project
 ```

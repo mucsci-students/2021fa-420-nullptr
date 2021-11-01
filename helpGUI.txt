@@ -1,19 +1,84 @@
 UML++ serves as an editor for an implementation of a UML class diagram.
 
-This is an alpha of the GUI interface that is currently being implemented. As
-such, all features are a work in progress. It uses the inja templating 
-interface  as well as cpp-httplib to display a basic editor into your browser. 
-This editor opens on one's localhost at port 8080 by default when compiled 
-(localhost:8080).
 
-Each feature of the UML class diagram is implemented by inserting text into text 
-boxes. You are able to add...
+Introduction
+------------
+The Graphical User Interface (GUI) is the default interface for creating a UML diagram.
+It is entered by running the program through a terminal and entering localhost:60555 into a web browser.
+This text document serves as a user guide to the various features that the UML++ class diagram editor has.
+These are 1. the GUI, 2. classes, 3. fields and methods, 4. relationships, 5. saving and loading, and 6. undo and redo.
 
-- Classes 
-    - Two types of attributes (fields, methods) with types to go alongside them
-        - Parameters to methods (with their own types)
-    - Relationships between classes 
+This text document can be reached by pressing the help button at the top of the Editor Pannel.
 
-You can also save using the "File" section. You can either chose a file, or 
-select from the drop down based JSON files stored in the folder.
-    
+
+1. The GUI
+-------
+Upon loading the web browser, you will see the window in which classes are displayed at the right of the screen. 
+On the left of the screen is the Editor Pannel through which classes can be created and modified. The Editor Pannel 
+can be toggled on and off using the Toggle Editor Pannel button at the top left.
+
+
+2. Classes
+-------
+To create a class, enter the name of the class into the text field in the Editor Pannel and click the Add Class button.
+The name of the class can be changed by clicking the Edit button next to the class name. Pressing the Delete button will 
+remove the class and all its components.
+
+The name of the class must be valid, that is it must be start with a letter and contain only letters, numbers, and underscore
+and cannot be the name of an existing class.
+
+After a class is created, it will appear on the right of the screen as a box and in the Editor Pannel. The box can be moved by 
+clicking and dragging it with the mouse. The class is modified using the buttons below it in the Editor Pannel.
+
+
+3. Fields and Methods
+------------------
+Fields and methods can be added to a class by entering them into the text fields under the class. 
+
+To enter a field, input the field type and name and click Add Field. The name and type of the field can be modified using the 
+Edit button next to the field and deleted using the Delete button.
+
+To enter a method, input the method type and name and click Add Method. The name and type of the method can be modified using 
+the Edit button next to the field and deleted using the Delete button.
+
+Methods can also contain parameters. Paramters are added by entering the name and type into the text fields under the method 
+and clicking Add Parameter. Paramters can also be edited and deleted using the buttons next to the parameter.
+
+The names of Fields, Methods, and Parameters must be valid, so they must start with a letter and contain only letters, numbers, 
+and underscore. Additionally, the name for fields and methods must not be the same as an existing field or method. However, 
+a method can have the same name as another method as long as the parameters are different. Parameters cannot have the same name
+as other parameters in the same method.
+
+All fields and methods are displayed in the display window in the box of the class they are a part of. Parameters are displayed
+next to the method they are attatched to.
+
+
+4. Relationships
+-------------
+Relations that are added exist between either two classes or a class and itself, and are added using the Relationships portion of the
+Editor Panel at the bottom.
+
+To add a relationship, enter the name of the class that is the source inot the Source text field, and the name of the class that is the
+destination into the Destination text field. Next, choose the type of relationship from the drop down menu and click add relationship.
+
+Invalid relationships are a class can only the the destination for one composition. And for generalization and realizations a class cannot
+be the same source and destination.
+
+When the relationship is added, it is displayed in the Editor Pannel with the source pointint to the destination. The relationship can be
+edited and deleted using the respective buttons. In the display window, the relationship is shown using a line from one class to the other.
+
+
+5. Save/Load
+------------
+To save the current UML Diagram, enter the name of the file at the bottom of the Editor Pannel in the text field next to the Save button 
+and press the button. Valid names are standard operating system file names. Entering the name of an existing file will overwrite the file.
+
+To load a UML Diagram from a file, enter the name of the file into the second text field and press the load button.
+
+Files are saved and loaded in the same directory as the program.
+
+
+6. Undo/Redo
+------------
+When making changes in the UML Diagram, pressing the Undo button at the top of the Editor Pannel will revert the last change made, 
+and the Redo button undoes whatever the Undo button did.
