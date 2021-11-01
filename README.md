@@ -22,9 +22,10 @@ UML++ is a C++ editor of UML class diagrams.
 ```
 git clone https://github.com/mucsci-students/2021fa-420-nullptr.git
 ```
-2. Go to repository root directory.
+2. Go to repository root directory. If submodules (cpp-httplib and inja) display as empty folders, run command underneath to acquire files.
 ```
 cd 2021fa-420-nullptr
+git submodule update
 ```
 3. Create and move to build folder.
 ```
