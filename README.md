@@ -22,29 +22,26 @@ UML++ is a C++ editor of UML class diagrams.
 ```
 git clone https://github.com/mucsci-students/2021fa-420-nullptr.git
 ```
-2. Go to repository root directory.
+2. Go to repository root directory. If submodules (cpp-httplib and inja) display as empty folders, run command underneath to acquire files.
 ```
 cd 2021fa-420-nullptr
+git submodule update
 ```
 3. Create and move to build folder.
 ```
-mkdir build
+cmake -B build ..
 cd build
 ```
-4. Create make file within build folder.
+4. Build the project.
 ```
-cmake ..
+cmake --build build --parallel
 ```
-5. Run make to build program.
-```
-make project
-```
-6. For CLI, use "--cli argument." The interface will open in your command line. 
+5. For CLI, use "--cli" argument. The interface will open in your command line. 
 For a user guide, access helpCLI.txt within the cloned repository to see expanded information on different commands.
 ```
 ./project --cli
 ```
-7. For GUI, provide no argument. Open port 60555 and enter interface in your browser through localhost:60555. When running, press "help" to enter a webpage that provides a user guide for using the GUI interface.
+6. For GUI, provide no argument. Open port 60555 and enter interface in your browser through localhost:60555. When running, press "help" to enter a webpage that provides a user guide for using the GUI interface.
 ```
 ./project
 ```
@@ -57,6 +54,10 @@ For a user guide, access helpCLI.txt within the cloned repository to see expande
 [cpp-httplib - Yuji Hirose](https://github.com/yhirose/cpp-httplib) ([MIT License](https://raw.githubusercontent.com/yhirose/cpp-httplib/master/LICENSE))
 
 [inja - pantor](https://github.com/pantor/inja) ([MIT License](https://raw.githubusercontent.com/pantor/inja/master/LICENSE))
+
+[svgdotjs - svg.js](https://github.com/svgdotjs/svg.js) ([MIT License](https://raw.githubusercontent.com/svgdotjs/svg.js/master/LICENSE.txt))
+
+[svgdotjs - svg.draggable.js](https://github.com/svgdotjs/svg.draggable.js) ([MIT License](https://raw.githubusercontent.com/svgdotjs/svg.draggable.js/master/LICENSE))
 
 ## Authors
 [DHDodo](https://github.com/DHDodo) - Briar Sauble
