@@ -10,6 +10,7 @@
 #include "include/UMLAttribute.hpp"
 #include "include/UMLClass.hpp"
 #include "include/UMLData.hpp"
+#include "include/UMLDataHistory.hpp"
 #include "include/UMLMethod.hpp"
 #include "include/UMLParameter.hpp"
 #include "server.hpp"

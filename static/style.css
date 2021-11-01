@@ -1,0 +1,36 @@
+body{
+  background-color: #333;
+}
+svg {
+  margin-top:50px;
+  width:100vw;
+  height:100vh;
+  background-color:#FFF;
+  max-width:100%;
+  z-index:-1;
+  position:absolute;
+  left:0;
+  top:0;
+}
+.sidebar
+{
+  margin-top:50px;
+  height:100vh;
+  background-color:#A9ADAF;
+  overflow-x:auto;
+}
+
+.class-table
+{
+  margin-top: 15px;
+}
+
+body h1, h2, h3, h4, h5 {
+  font-size:20px;
+}
+
+body form
+{
+  font-size:15px;
+}
+

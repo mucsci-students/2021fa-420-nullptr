@@ -219,6 +219,8 @@ class UMLData
     // the current class.
     bool doesParameterExist(method_ptr methodIter, string paramName);
 
+    // Gets class reference for the given name
+    UMLClass& getClass(string name);
     // Checks if identifier name is valid
     bool isValidName(string name);
 
@@ -247,9 +249,6 @@ class UMLData
 
     // Finds relationship using two UML classes and returns index within member classes vector
     int findRelationship(const UMLClass& sourceClassIn, const UMLClass& destClassIn);
-
-    // Gets class reference for the given name
-    UMLClass& getClass(string name);
 
     // Takes in relationship object and adds it to relationship vector
     void addRelationship(const UMLRelationship& relationshipIn);
