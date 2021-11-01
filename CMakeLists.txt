@@ -3,36 +3,40 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # set the project name
-project(project C CXX)
+project(project CXX)
 
-add_subdirectory(include/json)
-add_subdirectory(include/httplib)
-add_subdirectory(include/inja)
+# find_package (Threads REQUIRED)
 
-# add executables here
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
+set(INJA_USE_EMBEDDED_JSON On CACHE Bool "" FORCE)
+set(BUILD_BENCHMARK Off CACHE Bool "" FORCE)
+set(BUILD_TESTING Off CACHE Bool "" FORCE)
+add_subdirectory(inja)
+#add_subdirectory(json)
+add_subdirectory(cpp-httplib)
 
-add_executable(project main.cpp UMLClass.cpp UMLAttribute.cpp UMLRelationship.cpp UMLData.cpp UMLFile.cpp UMLParameter.cpp UMLMethod.cpp UMLField.cpp CLI.cpp UMLDataHistory.cpp)
+add_library(umllib
+  UMLAttribute.cpp
+  UMLClass.cpp
+  UMLData.cpp
+  UMLDataHistory.cpp
+  UMLField.cpp
+  UMLFile.cpp
+  UMLMethod.cpp
+  UMLParameter.cpp
+  UMLRelationship.cpp
+  CLI.cpp)
 
-# add threads for http library
-find_package (Threads REQUIRED)
+target_include_directories(umllib PUBLIC "${PROJECT_SOURCE_DIR}/include")
 
-target_link_libraries(project PUBLIC Threads::Threads)
+target_link_libraries(umllib PUBLIC 
+  nlohmann_json
+  inja
+  httplib)
 
-target_link_libraries(project PUBLIC json)
+add_executable(project main.cpp)
 
-target_link_libraries(project PUBLIC http)
-
-target_link_libraries(project PUBLIC inja)
-
-
-target_link_libraries(project PUBLIC http)
-
-target_include_directories(project PUBLIC
-                          "${PROJECT_BINARY_DIR}"
-                          "${PROJECT_SOURCE_DIR}/include/json"
-                          "${PROJECT_SOURCE_DIR}/include/http"
-                          "${PROJECT_SOURCE_DIR}/include/inja"
-                          )
+target_link_libraries(project PUBLIC umllib)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -45,8 +49,9 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(Tests Tests.cpp UMLClass.cpp UMLAttribute.cpp UMLRelationship.cpp UMLData.cpp UMLFile.cpp UMLParameter.cpp UMLMethod.cpp UMLField.cpp CLI.cpp UMLDataHistory.cpp)
+add_executable(Tests Tests.cpp)
 
-target_link_libraries(Tests gtest_main)
+target_link_libraries(Tests PUBLIC gtest_main umllib)
+
 include(GoogleTest)
 gtest_discover_tests(Tests)

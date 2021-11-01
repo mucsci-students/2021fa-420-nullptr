@@ -10,7 +10,10 @@
 #include <vector>
 #include <string>
 #include <fstream>
-#include "json/json.hpp"
+
+#include <nlohmann/json.hpp>
+#include <inja/inja.hpp>
+
 #include "UMLClass.hpp"
 #include "UMLData.hpp"
 #include "UMLAttribute.hpp"

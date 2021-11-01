@@ -49,7 +49,7 @@ class UMLRelationship
 		void setType(int newType);
 
 		// Equals operator
-		bool operator==(const UMLRelationship& other) {
+		bool operator==(const UMLRelationship& other) const {
 			return (this->getSource().getName() == other.getSource().getName() 
 			&& this->getDestination().getName() == other.getDestination().getName()
 			&& this->getType() == other.getType());}
