@@ -12,6 +12,7 @@
 #include "UMLAttribute.hpp"
 #include "UMLRelationship.hpp"
 #include "UMLData.hpp"
+#include "UMLDataHistory.hpp"
 #include "UMLFile.hpp"
 #include "UMLMethod.hpp"
 #include "UMLField.hpp"
@@ -53,6 +54,9 @@ class CLI
 
     // Main UML data object storing UML stuff
     UMLData Model;
+
+    // Allows for undo/redo
+    UMLDataHistory History {Model};
 
     /********************/
     //Print-help functions
@@ -104,6 +108,13 @@ class CLI
 
     size_t user_int_input();
     string tab_completion();
+
+
+    /********************/
+    //Undo/Redo
+
+    void undo();
+    void redo();
 
     /********************/
     //Misc.
