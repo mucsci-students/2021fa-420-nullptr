@@ -28,6 +28,8 @@ class UMLClass
 		// Name of class and a vector of all of its attributes as objects
 		string className;
 		vector<std::shared_ptr<UMLAttribute>> classAttributes;
+		int x = 0;
+		int y = 0;
 
 	public:
 		// Constructor for class object without attributes
@@ -72,6 +74,18 @@ class UMLClass
 
 		// Returns vector pointer of attributes 
 		vector<std::shared_ptr<UMLAttribute>> getAttributes() const;
+
+		//sets the x value
+		void setX(int val);
+
+		//sets the y value
+		void setY(int val);
+
+		//gets the x value
+		int getX();
+
+		//gets the y value
+		int getY();
 
 		bool operator==(const UMLClass& other) {return (this->getName() == other.getName());}
 };

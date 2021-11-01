@@ -37,6 +37,7 @@ namespace umlserver
     void start (int port)
     {
         httplib::Server svr;
+        svr.set_mount_point("/", "../static");
         UMLData data;
         UMLDataHistory history(data);
         json errors = json::array();
@@ -44,7 +45,7 @@ namespace umlserver
 
         svr.Get("/", [&](const httplib::Request& req, httplib::Response& res) {
             inja::Environment env;
-            inja::Template temp = env.parse_template("../templates/test.html");
+            inja::Template temp = env.parse_template("../templates/index.html");
             json j = data.getJson();
             //for each for all the attributes in each class add the index number to the json object
             addAttributeIndexes(j, data);
@@ -85,7 +86,7 @@ namespace umlserver
             std::string paramType = req.params.find("ptype")->second;
 
             auto attr = data.getClassCopy(className).getAttributes()[methodIndex];
-            std::static_pointer_cast<UMLMethod>(attr)->addParam(UMLParameter(paramName, paramType));
+            ERR_ADD(data.addParameter(std::static_pointer_cast<UMLMethod>(attr), paramName, paramType));
             res.set_redirect("/");
          }); 
         //delete/parameter/classname/methodindex/paramname
@@ -213,6 +214,17 @@ namespace umlserver
 
         svr.Get("/redo", [&](const httplib::Request& req, httplib::Response& res) {
             data = history.redo();
+            res.set_redirect("/");
+        });
+
+        ///position/className/x/y
+        svr.Get(R"(/position/(\w+)/(\d+)/(\d+))", [&](const httplib::Request& req, httplib::Response& res) {
+            std::string className = req.matches[1].str();
+            int x = std::stoi(req.matches[2].str()); 
+            int y = std::stoi(req.matches[3].str()); 
+            data.getClass(className).setX(x);
+            data.getClass(className).setY(y);
+            history.save(data);
             res.set_redirect("/");
         });
 

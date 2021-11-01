@@ -1,212 +1,186 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head> 
-    <meta charset="utf-8">
-    <title>UML++</title>
-     <!--  CSS  Bootstrap Include   -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
- 
+<html>
+<head>
+  <title>UML++</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="svg.js"></script>
+  <script src="svg.draggable.js"></script>
+  <script src="diagram.js" type="text/javascript"></script>
+  <script src="sidebar.js" type="text/javascript"></script>
+  <script type="text/javascript">
+      setJsonText({{ classes }}, {{ relationships }});
+  </script>
+</head>
+<body>
+    <button type="button" onclick="toggleSidebar()" name="button">toggle</button>
+    <div id="umlsidebar" class="container col-xs-4 sidebar">
+        {% for error in errors %}
+            <p style="color:red; font-size: 30px;">{{ error }}</p>
+        {% endfor %}
+        {% for succ in success %}
+            <p style="color:green;font-size: 30px;">{{ succ }}</p>
+        {% endfor %}
+        <a style="font-size: 17px" href="/help">help</a>
 
-    <!--  CSS  resize Include   -->
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
- 
-  </head> 
-  
-  <body class="bg-primary">
-   <!--  Javascript Bootstrap Include   -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" 
-      integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous">
-    </script>
-   
-   <!--  Welcome banner  -->
-   <div class=" fixed-bottom badge bg-primary text-wrap" style="width: auto; border:white; border-style: dotted; font-size: medium;">
-    Welcome to UML++
-  </div>
+        <h3><a href="/undo">undo</a>/<a href="/redo">redo</a></h3>
+        <hr>
+        {% for class in classes %}
 
-
-  <!--  Class Menu Options -->
-<div class="btn-group" style="position: absolute; width: 50px; right: 50%; bottom: 5%">
-  <button type="button" class="btn btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" >
-    Class
-  </button>
-
-  
-  <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="#" id="addClass" onclick="addTextBox()">Add Class</a></li>
-    <li><a class="dropdown-item" href="#" id="removeClass" onclick="removeElement()">Remove Class</a></li>
-    
-  </ul>
-</div>
-
-
-     <!--  Load File Options -->
-    <div class="mb-3" style="width: 8%; margin: auto; position: absolute; right: 0px; bottom: 15px;" >
-      <label for="formFile" class="form-label" style="border:white; border-style: dotted; font-size: small;">Load UML File</label>
-      <input class="form-control" type="file" id="formFile">
-    </div>
-
-  
-
-
-   <!--  Drag textbox  Options -->
-   <input type="button" class="draggable"  style=" color: red;"/>
-   <script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
-   <script>
-     (function($) {
-         $.fn.drags = function(opt) {
-     
-             opt = $.extend({handle:"",cursor:"move"}, opt);
-     
-             if(opt.handle === "") {
-                 var $el = this;
-             } else {
-                 var $el = this.find(opt.handle);
-             }
-     
-             return $el.css('cursor', opt.cursor).on("mousedown", function(e) {
-                 if(opt.handle === "") {
-                     var $drag = $(this).addClass('draggable');
-                 } else {
-                     var $drag = $(this).addClass('active-handle').parent().addClass('draggable');
-                 }
-                 var z_idx = $drag.css('z-index'),
-                     drg_h = $drag.outerHeight(),
-                     drg_w = $drag.outerWidth(),
-                     pos_y = $drag.offset().top + drg_h - e.pageY,
-                     pos_x = $drag.offset().left + drg_w - e.pageX;
-                 $drag.css('z-index', 1000).parents().on("mousemove", function(e) {
-                     $('.draggable').offset({
-                         top:e.pageY + pos_y - drg_h,
-                         left:e.pageX + pos_x - drg_w
-                     }).on("mouseup", function() {
-                         $(this).removeClass('draggable').css('z-index', z_idx);
-                     });
-                 });
-                 e.preventDefault(); // disable selection
-             }).on("mouseup", function() {
-                 if(opt.handle === "") {
-                     $(this).removeClass('draggable');
-                 } else {
-                     $(this).removeClass('active-handle').parent().removeClass('draggable');
-                 }
-             });
-     
-         }
-     })(jQuery);
-     
-     $(".draggable").drags();
-   </script>
-
-
-   <!--  SCRIPTS   -->
- 
-  
-    <script>
-   
-   //ADD textbox when create class is clicked
-
-  function addTextBox() {
-      
-
-
-    var t = document.createTextNode("Remove Class");    
-    var but = document.createElement("button"); 
-        but.setAttribute("type", "button");
-        but.setAttribute("id", "removeClassButton");
-        but.setAttribute("name", "removeClassButtonN");
-        but.setAttribute('style', 'height: 30px; width: 120px;');
-        but.setAttribute("class", "draggable");
-    
-    var submitButtonText = document.createTextNode("Submit");  
-    var butto = document.createElement("button"); 
-        butto.setAttribute("type", "button");
-        butto.setAttribute("id", "submitClassButton");
-        butto.setAttribute("name", "submitClassButtonN");
-        butto.setAttribute('style', 'height: 30px; width: 60px;');
-        butto.setAttribute("class", "draggable");
-   
-    var classElement = document.createElement("textarea");
-        classElement.setAttribute('style', 'height: 35px;  position: relative; left: -120px; top:43px; ');
-        classElement.setAttribute('placeholder', 'Enter Class Name:');
-        classElement.setAttribute("class", "draggable");
-        classElement.setAttribute("type", "text");
-        classElement.setAttribute("id", "classTextBox");
-        classElement.setAttribute("name", "classTextBoxN");
-      
-    var AttributeElement = document.createElement("textarea");
-        AttributeElement.setAttribute('style', 'height: 35px;  position: relative; left: -290px; top: 80px; ');
-        AttributeElement.setAttribute('placeholder', 'Enter Attribute Name:');
-        AttributeElement.setAttribute("class", "draggable");
-        AttributeElement.setAttribute("type", "text");
-        AttributeElement.setAttribute("name", "attributeN");
-        AttributeElement.setAttribute("id", "attribute");
-    
-    var relationshipElement = document.createElement("textarea");
-        relationshipElement.setAttribute('style', 'height: 35px; position: relative; left: -460px; top: 117px;');
-        relationshipElement.setAttribute('placeholder', 'Enter Relationships:');
-        relationshipElement.setAttribute("class", "draggable");
-        relationshipElement.setAttribute("type", "text");
-        relationshipElement.setAttribute("name", "relationshipN");
-        relationshipElement.setAttribute("id", "relationship");
-
-    var paramElement = document.createElement("textarea");
-        paramElement.setAttribute('style', 'height: 35px;  position: relative;  left: -630px; top: 154px;');
-        paramElement.setAttribute('placeholder', 'Enter Parameters:');
-        paramElement.setAttribute("class", "draggable");
-        paramElement.setAttribute("type", "text");
-        paramElement.setAttribute("name", "parameterN");
-        paramElement.setAttribute("id", "parameter");
-      
-
-
-
-        butto.appendChild(submitButtonText);
-        document.body.appendChild(butto);
-        but.appendChild(t);
-        document.body.appendChild(but);
-        document.body.appendChild(classElement);
-        document.body.appendChild(AttributeElement);
-        document.body.appendChild(relationshipElement);
-        document.body.appendChild(paramElement);
-
-        //Event listener to remove elements when clicked
-       // but.addEventListener("click", removeElement);
-     
-
-   
+            <h4 style="font-weight: bold;" id="{{ class.name }}class"><span>Class: {{ class.name }}</span> <button id="{{ class.name }}classedit">edit</button> <a href="/delete/class/{{ class.name }}">delete</a></h4>
+        <div class="attr">
+            <h5>Fields:</h5>
             
-      }
+            {% for field in class.fields %}
+                <h5 id="{{class.name}}{{ field.name }}field">{{ field.type }} {{ field.name }} <button id="{{class.name}}{{ field.name }}fieldedit">edit</button> <a href="/delete/attribute/{{ class.name }}/{{ field.name }}">delete</a></h5>
+            {% endfor %}
+            <div class="form-group">
+              <form style="margin-top: 50px;" action="/add/field/{{ class.name }}" method="GET">
+                <label for="ftype">Field type:</label>
+                <input class="form-control" type="text" id="ftype" name="ftype">
+                <label for="fname">Field name:</label>
+                <input class="form-control" type="text" id="fname" name="fname">
+                <input type="submit" value="add field">
+              </form>
+            </div>
+            <h5>Methods:</h5>
+           
+            {% for method in class.methods %}
+    
+                <h4 id="{{class.name}}{{ method.index }}">{{ method.return_type }} {{ method.name }}() <button id="{{class.name}}{{ method.index }}edit">edit</button> <a href="/delete/attribute/{{ class.name }}/{{ method.name }}">delete</a></h4>
+                <!--parameters-->
+                <h5>Params</h5>
+                {% for param in method.params %}
+                    <p id="{{class.name}}{{method.index}}{{ param.name }}param">{{param.type}} {{param.name}} <button id="{{class.name}}{{method.index}}{{ param.name }}paramedit">edit</button><a href="/delete/parameter/{{ class.name }}/{{ method.index }}/{{ param.name }}">delete</a></p>
+                {% endfor %}
+                <div class="form-group">
+                <form action="/add/parameter/{{ class.name }}/{{ method.index }}" method="GET">
+                    <label for="ptype">Parameter type:</label>
+                    <input class="form-control" type="text" id="ptype" name="ptype">
+                    <label for="pname">Parameter name:</label>
+                    <input class="form-control" type="text" id="panme" name="pname">
+                    <input type="submit" value="add parameter">
+                </form>
+              </div>
+            {% endfor %}
+            <div class="form-group">
+            <form style="margin-top: 20px;" action="/add/method/{{ class.name }}" method="GET">
+                <label for="mtype">Method type:</label>
+                <input class="form-control" type="text" id="mtype" name="mtype">
+                <label for="mname">Method name:</label>
+                <input class="form-control" type="text" id="mname" name="mname">
+                <input type="submit" value="add method">
+            </form>
+          </div>
+        </div>
+        <hr>
+        {% endfor %}
+        <form style="font-size: 20px;margin-top: 20px;" action="/add/class" method="GET">
+            <label for="cname">Class name:</label>
+            <input type="text" id="cname" name="cname">
+            <input type="submit" value="add class">
+        </form>
+        <h1>Relationships:</h1>
+        {% for relationship in relationships %}
+            <h3 id="{{ relationship.destination}}{{ relationship.source }}">{{relationship.source}} -> {{relationship.destination}} type: {{relationship.type}}
+                <button id="{{ relationship.destination}}{{ relationship.source }}edit">edit</button>
+                <a href="/delete/relationship/{{relationship.source}}/{{relationship.destination}}">delete</a></h3>
+        {% endfor %}
+        <form action="/add/relationship" method="GET">
+          <div class="form-group">
+            <label for="cname">Source:</label>
+            <input class="form-control" type="text" id="source" name="source">
+            <label for="cname">Destination:</label>
+            <input class="form-control" type="text" id="dest" name="dest">
+            <label for="reltype">Type:</label>
+            <select class="form-control" name="reltype" id="reltype">
+                <option value="0">aggregation</option>
+                <option value="1">composition</option>
+                <option value="2">generalization</option>
+                <option value="3">realization</option>
+            </select>
+            <input type="submit" value="add relationship">
+          </div>
+        </form>
+        <h1>File:</h1>
+        <form action="/save">
+            <label for="save">File Name:</label>
+            <input type="text" name="save" id="save">
+            <input type="submit" value="save">
+        </form>
+        <h3>OR</h3>
+        <form action="/load" method="GET">
+            <label for="load">File Name:</label>
+            <select name="load" id="load">
+                {% for file in files %}
+                <option value="{{file}}">{{file }}</option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="load">
+        </form>
 
-      //function to remove elements
-      function removeElement(){
-        
-        var removeButton = document.getElementById('removeClassButton');
-        removeButton.remove();
-
-        var removeClass = document.getElementById('classTextBox');
-        removeClass.remove();
-
-        var removeAttribute = document.getElementById('attribute');
-        removeAttribute.remove();
-
-        var removeRelationship = document.getElementById('relationship');
-        removeRelationship.remove();
-
-        var removeParameter = document.getElementById('parameter');
-        removeParameter.remove();
-
-        var removeSubmitButton = document.getElementById('submitClassButton');
-        removeSubmitButton.remove();
-         
-
-      }
-
-
-</script>
- 
-<!-- Include for textbox resize-->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
-
-  </body>
+    </body>
+    </div>
+    <svg></svg>
+    <script>
+      {% for class in classes %}
+          element = document.getElementById('{{ class.name }}classedit');
+          element.addEventListener("click", () => {
+              document.getElementById("{{ class.name }}class").innerHTML =
+                  "<form action='/edit/class/{{ class.name }}' method='GET'>" +
+                      "<input type='text' id='cname' name='cname' value='{{ class.name }}'>" +
+                      "<input type='submit' value='edit class'>"
+                  "</form>";
+          });
+          {% for method in class.methods %}
+          element = document.getElementById('{{class.name}}{{ method.index }}edit');
+          element.addEventListener("click", () => {
+              document.getElementById("{{class.name}}{{ method.index }}").innerHTML =
+                  "<form action='/edit/attribute/{{ class.name }}/{{ method.index }}' method='GET'>" +
+                      "<input type='text' id='type' name='type' placeholder='return type' value='{{ method.return_type }}'>" +
+                      "<input type='text' id='name' name='name' placeholder='name' value='{{ method.name }}'>" +
+                      "<input type='submit' value='edit method'>" +
+                  "</form>";
+          });
+              {% for param in method.params %}
+                  element = document.getElementById('{{class.name}}{{method.index}}{{ param.name }}paramedit');
+                  element.addEventListener("click", () => {
+                  document.getElementById("{{class.name}}{{method.index}}{{ param.name }}param").innerHTML =
+                      "<form action='/edit/parameter/{{ class.name }}/{{ method.index }}/{{ param.name }}' method='GET'>" +
+                          "<input type='text' id='ptype' name='ptype' placeholder='type' value='{{ param.type }}'>" +
+                          "<input type='text' id='pname' name='pname' placeholder='name' value='{{ param.name }}'>" +
+                          "<input type='submit' value='edit parameter'>" +
+                      "</form>";
+              });
+              {% endfor %}
+          {% endfor %}
+          {% for field in class.fields %}
+          element = document.getElementById('{{class.name}}{{ field.name }}fieldedit');
+          element.addEventListener("click", () => {
+              document.getElementById("{{class.name}}{{ field.name }}field").innerHTML =
+                  "<form action='/edit/attribute/{{ class.name }}/{{ field.index }}' method='GET'>" +
+                      "<input type='text' id='type' name='type' placeholder='type' value='{{ field.type }}'>" +
+                      "<input type='text' id='name' name='name' placeholder='name' value='{{ field.name }}'>" +
+                      "<input type='submit' value='edit field'>" +
+                  "</form>";
+          });
+          {% endfor %}
+      {% endfor %}
+      {% for relationship in relationships %}
+      element = document.getElementById('{{ relationship.destination}}{{ relationship.source }}edit');
+          element.addEventListener("click", () => {
+              document.getElementById("{{ relationship.destination}}{{ relationship.source }}").innerHTML =
+                  "<form action='/edit/relationship/{{ relationship.source }}/{{ relationship.destination }}' method='GET'>" +
+                   "<select name='reltype' id='reltype'>" +
+                      " <option value='0'>aggregation</option>" +
+                      "<option value='1'>composition</option>" +
+                      "<option value='2'>generalization</option>" +
+                      "<option value='3'>realization</option></select>" +
+                      "<input type='submit' value='edit relationship'>" +
+                  "</form>";
+          });
+      {% endfor %}
+  </script>
+</body>
 </html>

@@ -224,7 +224,7 @@ json UMLData::getJson()
         jsonattr["methods"] += {{"name", uattr->getAttributeName()}, {"return_type", uattr->getType()}, {"params", jsonparams}};
       }
     } 
-    jsonObj["classes"] += { {"name", uclass.getName()}, {"fields", jsonattr["fields"]}, {"methods", jsonattr["methods"]} };
+    jsonObj["classes"] += { {"name", uclass.getName()}, {"position_x", uclass.getX()}, {"position_y", uclass.getY()}, {"fields", jsonattr["fields"]}, {"methods", jsonattr["methods"]} };
   }
 
   jsonObj["relationships"] = json::array();
