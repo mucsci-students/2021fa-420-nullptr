@@ -9,7 +9,17 @@ SVG.on(document, 'DOMContentLoaded', function() {
   for (let key in classesJson)
   {
     let uclass = classesJson[key];
-    createClassBox(draw, uclass, uclass["position_x"], uclass["position_y"]);
+    //if position is (0,0) (likely new class) move out so user can see while toggle is out
+    var pos_x, pos_y;
+    if (uclass["position_x"] == 0 && uclass["position_y"] == 0)
+    {
+      pos_x = 1000;
+      pos_y = 350;
+    } else {
+      pos_x = uclass["position_x"];
+      pos_y = uclass["position_y"];
+    }
+    createClassBox(draw, uclass, pos_x, pos_y);
   }
   //relationships
   for (let relKey in relationshipsJson)

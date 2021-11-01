@@ -625,7 +625,7 @@ TEST (UMLFileTest, AddComponentsTest)
 {
   // Start with JSON string, add classes and relationships based on the JSON
   json j =
-    "{\"classes\":[{\"fields\":[{\"name\":\"test\",\"type\":\"int\"}],\"methods\":[{\"name\":\"ff\",\"params\":[{\"name\":\"something\",\"type\":\"something\"}],\"return_type\":\"string\"}],\"name\":\"fish2\"},{\"fields\":[],\"methods\":[],\"name\":\"test\"}],\"relationships\":[{\"destination\":\"test\",\"source\":\"fish2\",\"type\":\"aggregation\"}]}"_json;
+        "{\"classes\":[{\"fields\":[{\"name\":\"test\",\"type\":\"int\"}],\"methods\":[{\"name\":\"ff\",\"params\":[{\"name\":\"something\",\"type\":\"something\"}],\"return_type\":\"string\"}],\"name\":\"fish2\",\"position_x\":0,\"position_y\":0},{\"fields\":[],\"methods\":[],\"name\":\"test\",\"position_x\":0,\"position_y\":0}],\"relationships\":[{\"destination\":\"test\",\"source\":\"fish2\",\"type\":\"aggregation\"}]}"_json;
   UMLData data;
   UMLFile file ("test.json");
   file.addClasses (data, j);
@@ -1050,7 +1050,7 @@ TEST (UMLDataRelationshipTest, ChangeRelationshipTypeErrors)
 TEST (UMLDataJsonTest, ReturnedJSONIsCorrect)
 {
   json j =
-    "{\"classes\":[{\"fields\":[{\"name\":\"test\",\"type\":\"int\"}],\"methods\":[{\"name\":\"ff\",\"params\":[{\"name\":\"something\",\"type\":\"something\"}],\"return_type\":\"string\"}],\"name\":\"fish2\"},{\"fields\":[],\"methods\":[],\"name\":\"test\"}],\"relationships\":[{\"destination\":\"test\",\"source\":\"fish2\",\"type\":\"aggregation\"}]}"_json;
+    "{\"classes\":[{\"fields\":[{\"name\":\"test\",\"type\":\"int\"}],\"methods\":[{\"name\":\"ff\",\"params\":[{\"name\":\"something\",\"type\":\"something\"}],\"return_type\":\"string\"}],\"name\":\"fish2\",\"position_x\":0,\"position_y\":0},{\"fields\":[],\"methods\":[],\"name\":\"test\",\"position_x\":0,\"position_y\":0}],\"relationships\":[{\"destination\":\"test\",\"source\":\"fish2\",\"type\":\"aggregation\"}]}"_json;
   UMLData data;
   data.addClass ("fish2");
   data.addClass ("test");
