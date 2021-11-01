@@ -1,0 +1,43 @@
+nullptr UML++ Design Pattern Instances
+
+- 1. Iterator (UMLData): Used in multiple methods, including doesClassExist,
+doesFieldExist, findClass, and getClass. Note--despite being labeled as such,
+variables marked as methodIter do not currently use this design pattern. These
+all use standard C++ iterators.
+
+- 2. Iterator (UMLClass): Used for the checkParameter algorithm to see if a 
+supplied attribute would break rules for duplicates and overloads. When a 
+method is given, an iterator is used to loop through each parameter that exists
+in the method being checked. 
+
+- 3. Iterator (CLI): Primarily in displaying classes, methods etc., iterators
+are used to loop through the data model in order to grab each element from the 
+vectors in order to display them to the user. Like in UMLData, iter is used 
+for some variables but is not a part of the design pattern unless explicitly
+using C++'s iterators (hold-over from JSMACH).
+
+- 4. Iterator (inja): Uses reverse_iterators alongside iterators throughout 
+its code.
+
+- 5. Iterator (json): nlohmann_json uses iterators for operations involving 
+std::inserter and std::front_inserter.
+
+- 6. Command (inja): Stores various commands in FunctionStorage and does
+various operations based on the commands given within a mass case statement.
+
+- 7. Bridge (Throughout): Proper practice for C++ already demands this by 
+having  us create several libraries (our include hpp files) that are 
+implemented by various cpp files within the root of the repository.
+
+- 8. Observer (server.hpp): server.hpp acts as an observer that notifies 
+UMLData  when its publisher (the GUI) has a specific event occur.
+
+- 9. Template (UMLAttribute): UMLAttribute defines UMLMethod and UMLField,
+allowing for standardized UMLAttribute operations but also allowing for 
+identifier overloads and for a parameter list to exist in UMLMethod.
+
+- 10. Strategy (UMLAttribute, UMLMethod, UMLField, UMLData): Various 
+operations in UMLData involve UMLAttributes, but can be interchangably 
+done upon UMLMethods and UMLFields. For example, adding an attribute is 
+simply addClassAttribute, but whatever's being held in the attr_ptr sent in 
+can be a field, method, or standard attribute. 
