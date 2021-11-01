@@ -1,5 +1,5 @@
 body{
-  background-color: #333;
+  background-color: black;
 }
 svg {
   margin-top:50px;
@@ -16,8 +16,9 @@ svg {
 {
   margin-top:50px;
   height:100vh;
-  background-color:#A9ADAF;
+  background-color:black;
   overflow-x:auto;
+  color:white;
 }
 
 .class-table
@@ -27,6 +28,7 @@ svg {
 
 body h1, h2, h3, h4, h5 {
   font-size:20px;
+  
 }
 
 body form

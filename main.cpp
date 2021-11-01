@@ -26,7 +26,7 @@ int main(int argc, char** argv)
           newInterface.cli_menu();
       }
     } else {
-      umlserver::start(8080);
+      umlserver::start(60555);
     }   
 
     return 0;
