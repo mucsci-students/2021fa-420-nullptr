@@ -29,7 +29,7 @@ git submodule update
 ```
 3. Create and move to build folder.
 ```
-cmake -B build ..
+cmake -B build 
 cd build
 ```
 4. Build the project.
