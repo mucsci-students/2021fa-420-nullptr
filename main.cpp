@@ -13,7 +13,7 @@
 #include "include/UMLDataHistory.hpp"
 #include "include/UMLMethod.hpp"
 #include "include/UMLParameter.hpp"
-#include "server.hpp"
+#include "include/UMLServer.hpp"
 #include <memory>
 //--------------------------------------------------------------------
 
@@ -26,7 +26,8 @@ int main(int argc, char** argv)
           newInterface.cli_menu();
       }
     } else {
-      umlserver::start(60555);
+      UMLServer newServer;
+      newServer.start(60555);
     }   
 
     return 0;
