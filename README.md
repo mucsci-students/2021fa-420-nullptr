@@ -31,7 +31,7 @@ cd 2021fa-420-nullptr
 cmake -B build 
 cmake --build build --parallel
 ```
-4. Navigate to the build folder that you have created.
+4. Navigate to the build folder that you have created. You must be in the build folder to run the program.
 ```
 cd build
 ```

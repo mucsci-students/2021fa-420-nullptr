@@ -12,7 +12,6 @@ set(INJA_USE_EMBEDDED_JSON On CACHE Bool "" FORCE)
 set(BUILD_BENCHMARK Off CACHE Bool "" FORCE)
 set(BUILD_TESTING Off CACHE Bool "" FORCE)
 add_subdirectory(inja)
-#add_subdirectory(json)
 add_subdirectory(cpp-httplib)
 
 add_library(umllib
@@ -31,7 +30,6 @@ add_library(umllib
 target_include_directories(umllib PUBLIC "${PROJECT_SOURCE_DIR}/include")
 
 target_link_libraries(umllib PUBLIC 
-  nlohmann_json
   inja
   httplib)
 
