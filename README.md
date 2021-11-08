@@ -20,21 +20,20 @@ UML++ is a C++ editor of UML class diagrams.
 
 1. Clone this repository locally.
 ```
-git clone https://github.com/mucsci-students/2021fa-420-nullptr.git
+git clone --recurse-submodules -j8 https://github.com/mucsci-students/2021fa-420-nullptr.git
 ```
-2. Go to repository root directory. If submodules (cpp-httplib and inja) display as empty folders, run command underneath to acquire files.
+2. Go to repository root directory.
 ```
 cd 2021fa-420-nullptr
-git submodule update
 ```
-3. Create and move to build folder.
+3. Create and then build the project using the following commands.
 ```
 cmake -B build 
-cd build
-```
-4. Build the project.
-```
 cmake --build build --parallel
+```
+4. Navigate to the build folder that you have created. You must be in the build folder to run the program.
+```
+cd build
 ```
 5. For CLI, use "--cli" argument. The interface will open in your command line. 
 For a user guide, access helpCLI.txt within the cloned repository to see expanded information on different commands.

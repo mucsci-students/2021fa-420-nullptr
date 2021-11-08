@@ -75,17 +75,18 @@ class UMLClass
 		// Returns vector pointer of attributes 
 		vector<std::shared_ptr<UMLAttribute>> getAttributes() const;
 
-		//sets the x value
+		// Sets the x value
 		void setX(int val);
 
-		//sets the y value
+		// Sets the y value
 		void setY(int val);
 
-		//gets the x value
+		// Gets the x value
 		int getX();
 
-		//gets the y value
+		// Gets the y value
 		int getY();
 
-		bool operator==(const UMLClass& other) {return (this->getName() == other.getName());}
+		// Operator that allows for two UMLClasses to be tested as equal
+		bool operator==(const UMLClass& other) const {return (this->getName() == other.getName());}
 };
