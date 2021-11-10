@@ -36,3 +36,22 @@ body form
   font-size:15px;
 }
 
+.helpformat-container{
+  color: white;
+  padding-right: 50%;
+}
+
+.spacing{
+  line-break: strict;
+ 
+}
+.headers{
+  color: red;
+  font-size: large;
+  font-style: italic;
+}
+.titleforHelp{
+  color: gray;
+  font-size: x-large;
+  font-style: italic;
+}

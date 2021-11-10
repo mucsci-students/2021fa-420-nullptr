@@ -204,7 +204,7 @@ void UMLServer::start (int port)
   });
   svr.Get ("/help", [&] (const httplib::Request& req, httplib::Response& res) {
     inja::Environment env;
-    inja::Template temp = env.parse_template ("../helpGUI.txt");
+    inja::Template temp = env.parse_template ("../helpGUI.html");
     json j = data.getJson();
     j["errors"] = errors;
     errors.clear();

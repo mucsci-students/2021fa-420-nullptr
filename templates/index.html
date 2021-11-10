@@ -13,8 +13,11 @@
       setJsonText({{ classes }}, {{ relationships }});
   </script>
   
-  
-
+  <!--
+    attempt at resize, figure this out
+-->
+<!-- Include for textbox resize-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
 </head>
 <body>
@@ -96,7 +99,7 @@
         </div>
         <hr>
         {% endfor %}
-        <form style="font-size: 20px;margin-top: 20px;" action="/add/class" method="GET">
+        <form style="font-size: 20px;margin-top: 20px;" action="/add/class" method="GET" >
             <label for="cname">Class name:</label>
             <input type="text" id="cname" name="cname">
             <input type="submit" style=" background-color: red;   color: white;  border-radius: 10px; border-width: 9px; " value="Add Class">
@@ -144,6 +147,7 @@
     </div>
     <svg></svg>
     <script>
+        //make the textbox extendable here
       {% for class in classes %}
           element = document.getElementById('{{ class.name }}classedit');
           element.addEventListener("click", () => {
