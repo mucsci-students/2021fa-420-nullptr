@@ -13,6 +13,7 @@ set(BUILD_BENCHMARK Off CACHE Bool "" FORCE)
 set(BUILD_TESTING Off CACHE Bool "" FORCE)
 add_subdirectory(inja)
 add_subdirectory(cpp-httplib)
+add_subdirectory(cli)
 
 add_library(umllib
   UMLAttribute.cpp
@@ -27,11 +28,16 @@ add_library(umllib
   UMLServer.cpp
   CLI.cpp)
 
+# Included to increase functionality of CLI library
+target_link_libraries(cli INTERFACE Boost::system)
+target_compile_definitions(cli INTERFACE BOOST_ASIO_NO_DEPRECATED=1)
+
 target_include_directories(umllib PUBLIC "${PROJECT_SOURCE_DIR}/include")
 
 target_link_libraries(umllib PUBLIC 
   inja
-  httplib)
+  httplib
+  cli)
 
 add_executable(project main.cpp)
 
