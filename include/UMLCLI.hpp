@@ -1,6 +1,6 @@
 #pragma once
 /*
-  Filename   : CLI.hpp
+  Filename   : UMLCLI.hpp
   Description: File which generates the command line interface
   for the user to create UML diagrams
 */
@@ -42,7 +42,7 @@ typedef shared_ptr<UMLAttribute> attr_ptr;
 typedef shared_ptr<UMLMethod> method_ptr;
 typedef long unsigned int size_t;
 
-class CLI
+class UMLCLI
 {
   private:
     

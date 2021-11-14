@@ -1,24 +1,7 @@
 /*
   Filename   : CLI.cpp
-  Author(s)  : Matt Giacoponello
   Description: Implementation of the command line interface.
 */
-
-
-/*
-////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-|**************************************************************|
-|                       NOTES & STARTUP                        |
-|**************************************************************|
-\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////
-
-
-BUGS & ISSUES:
-
-  - 
-
-*/
-
 
 /************************************************************/
 // Catch for functions to protect from invalid inputs
@@ -35,9 +18,17 @@ BUGS & ISSUES:
 
 //--------------------------------------------------------------------
 // System includes
-#include <memory>
-#include <list>
-#include "include/CLI.hpp"
+#include <cli/cli.h>
+#include <cli/loopscheduler.h>
+#include <cli/clilocalsession.h>
+#include <cli/clifilesession.h>
+#include <vector>
+#include <algorithm> // std::copy
+#include "include/UMLCLI.hpp"
+//--------------------------------------------------------------------
+// Using declarations
+using namespace cli;
+using namespace std;
 //--------------------------------------------------------------------
 // strcasecmp Windows support
 #if defined(_WIN64)
@@ -58,80 +49,429 @@ BUGS & ISSUES:
  * what command the user types.
  * 
  */
-void CLI::cli_menu()
+void UMLCLI::cli_menu()
 {
-  ErrorStatus = false;
+  //--------------------------------------------------------------------
 
-  cout << "Welcome to UML++!\n\n";
-  cout << "Type \"help\" to view all available commands.\nType \"quit\" to quit your current session.\n";
+  // Setup CLI's initial root menu
+  auto rootMenu = make_unique<Menu>("cli");
 
-  string userInput; 
+  // List Classes
+  rootMenu -> Insert(
+      "list_classes",
+      [&](){ list_classes(); },
+      "Lists all classes the user has created, as well as their attributes.");
+
+  // List Relationships
+  rootMenu -> Insert(
+      "list_relationships",
+      [&](){ list_relationships(); },
+      "Lists all relationships created by the user. (e.g. [source -> destination])");
+
+  // Create Class
+  rootMenu -> Insert(
+      "create_class",
+      [&](){ create_class(); },
+      "User will be prompted to name the class, and then it\'ll be created.");
+
+  // Create Relationship
+  rootMenu -> Insert(
+      "create_relationship",
+      [&](){ create_relationship(); },
+      "Type in a source class and a destination class to create a relationship between them.");
+
+  // Delete Class
+  rootMenu -> Insert(
+      "delete_class",
+      [&](){ delete_class(); },
+      "User will be prompted to type the name of the class they\'d like to delete.");
+
+  // Delete Relationship
+  rootMenu -> Insert(
+      "delete_relationship",
+      [&](){ delete_relationship(); },
+      "User will be prompted to type the source and destination. The relationship will be no more, but the classes will still exist.");
+
+  // Rename Class
+  rootMenu -> Insert(
+      "rename_class",
+      [&](){ rename_class(); },
+      "User will be prompted to type an existing class name, and then the new name they'd like to replace it with.");
+
+  // Change Relationship
+  rootMenu -> Insert(
+      "change_relationship",
+      [&](){ change_relationship(); },
+      "Supply a source, destination, and new type to replace a preexisting relationship with a new one.");
+
+  // Undo
+  rootMenu -> Insert(
+      "undo",
+      [&](){ undo(); },
+      "Undo the most recent thing you\'ve done.");
+
+  // Redo 
+  rootMenu -> Insert(
+      "redo",
+      [&](){ redo(); },
+      "Redo your most recently undone action.");
   
-  do
-  {
-    cout << "> ";
-    cin >> userInput;
+  // Load 
+  rootMenu -> Insert(
+      "load",
+      [&](){ load_uml(); },
+      "Enter the name of a json file within your build directory to override the current UML diagram with a new model.");
 
-    if (userInput == "help")
-      print_main_commands();
+  // Save
+  rootMenu -> Insert(
+      "save",
+      [&](){ save_uml(); },
+      "Enter the name of your UML diagram to save a json representation of it within your build directory.");
 
-    else if(userInput == "list_classes")
-      list_classes();
-    
-    else if(userInput == "list_relationships")
-      list_relationships();
-    
-    else if(userInput == "create_class")
-      create_class();
-    
-    else if(userInput == "create_relationship")
-      create_relationship();
-    
-    else if(userInput == "delete_class")
-      delete_class();
-    
-    else if(userInput == "delete_relationship")
-      delete_relationship();
-    
-    else if(userInput == "rename_class")
-      rename_class();
-    
-    else if(userInput == "change_relationship")
-      change_relationship();
+  // Turn On Color
+  rootMenu -> Insert(
+      "color",
+      [](std::ostream& out){ out << "Colors ON\n"; SetColor(); },
+      "Enable colors in the CLI.");
 
-    else if(userInput == "edit_fields")
-      edit_fields();
-    
-    else if(userInput == "edit_methods")
-      edit_methods();
+  // Turn Off Color
+  rootMenu -> Insert(
+      "nocolor",
+      [](std::ostream& out){ out << "Colors OFF\n"; SetNoColor(); },
+      "Disable colors in the CLI.");
 
-    else if(userInput == "undo")
-      undo();
+  //--------------------------------------------------------------------
+  
+  // Create submenu for editing fields
+  auto fieldMenu = make_unique<Menu>("edit_fields");
 
-    else if(userInput == "redo")
-      redo();
+  // View Class
+  fieldMenu -> Insert(
+      "view", {"class_name"},
+      [&](std::ostream& out, string className)
+      {
+          if (Model.doesClassExist(className)) {
+            UMLClass currentClass = Model.getClassCopy(className);
+            display_class(currentClass);
+          }
+          else{
+            out << "Class does not exist. Cannot view class.\n"
+          };
+      },
+      "View a given class with its fields and methods.");
+  
+  // Add Field
+  fieldMenu -> Insert(
+      "add", {"class_name"},
+      [&](std::ostream& out, string className)
+      {
+          if (Model.doesClassExist(className)) {
+            add_field(className);
+          }
+          else{
+            out << "Class does not exist. Cannot add fields.\n"
+          };
+      },
+      "Add a new field.");
+  
+  // Delete Field
+  fieldMenu -> Insert(
+      "delete", {"class_name"},
+      [&](std::ostream& out, string className)
+      {
+          if (Model.doesClassExist(className)) {
+            delete_field(className);
+          }
+          else{
+            out << "Class does not exist. Cannot delete fields.\n"
+          };
+      },
+      "Deletes an existing field.");
+  
+  // Rename Field
+  fieldMenu -> Insert(
+      "rename", {"class_name"},
+      [&](std::ostream& out, string className)
+      {
+          if (Model.doesClassExist(className)) {
+            rename_field(className);
+          }
+          else{
+            out << "Class does not exist. Cannot rename fields.\n"
+          };
+      },
+      "Renames an existing field.");
+  
+  // Change Field
+  fieldMenu -> Insert(
+      "change", {"class_name"},
+      [&](std::ostream& out, string className)
+      {
+          if (Model.doesClassExist(className)) {
+            change_field(className);
+          }
+          else{
+            out << "Class does not exist. Cannot change field types.\n"
+          };
+      },
+      "Changes the type of an existing field.");
+    
+  // Undo
+  fieldMenu -> Insert(
+      "undo",
+      [&](){ undo(); },
+      "Undo the most recent thing you\'ve done.");
 
-    else if(userInput == "load")
-      load_uml();
+  // Redo 
+  fieldMenu -> Insert(
+      "redo",
+      [&](){ redo(); },
+      "Redo your most recently undone action.");
+
+  //--------------------------------------------------------------------
+
+  // Create submenu for editing methods
+  auto methodMenu = make_unique<Menu>("edit_methods");
+
+  // View Class
+  methodMenu -> Insert(
+      "view", {"class_name"},
+      [&](std::ostream& out, string className)
+      {
+          if (Model.doesClassExist(className)) {
+            UMLClass currentClass = Model.getClassCopy(className);
+            display_class(currentClass);
+          }
+          else{
+            out << "Class does not exist. Cannot view class.\n"
+          };
+      },
+      "View a given class with its fields and methods.");
+  
+  // Add Method
+  methodMenu -> Insert(
+      "add", {"class_name"},
+      [&](std::ostream& out, string className)
+      {
+          if (Model.doesClassExist(className)) {
+            add_method(className);
+          }
+          else{
+            out << "Class does not exist. Cannot add fields.\n"
+          };
+      },
+      "Add a new method.");
+  
+  // Delete Method
+  methodMenu -> Insert(
+      "delete", {"class_name"},
+      [&](std::ostream& out, string className)
+      {
+          if (Model.doesClassExist(className)) {
+            delete_method(className);
+          }
+          else{
+            out << "Class does not exist. Cannot delete fields.\n"
+          };
+      },
+      "Deletes an existing method.");
+  
+  // Rename Method
+  methodMenu -> Insert(
+      "rename", {"class_name"},
+      [&](std::ostream& out, string className)
+      {
+          if (Model.doesClassExist(className)) {
+            rename_method(className);
+          }
+          else{
+            out << "Class does not exist. Cannot rename fields.\n"
+          };
+      },
+      "Renames an existing method.");
+  
+  // Change Method
+  methodMenu -> Insert(
+      "change", {"class_name"},
+      [&](std::ostream& out, string className)
+      {
+          if (Model.doesClassExist(className)) {
+            change_method(className);
+          }
+          else{
+            out << "Class does not exist. Cannot change field types.\n"
+          };
+      },
+      "Changes the type of an existing method.");
     
-    else if(userInput == "save")
-      save_uml();
-    
-    else if (userInput == "quit")
-      cout << "\n";
-    
-    else
+  // Undo
+  methodMenu -> Insert(
+      "undo",
+      [&](){ undo(); },
+      "Undo the most recent thing you\'ve done.");
+
+  // Redo 
+  methodMenu -> Insert(
+      "redo",
+      [&](){ redo(); },
+      "Redo your most recently undone action.");
+
+  //--------------------------------------------------------------------
+
+  // Create sub-submenu for editing parameters
+  auto parameterMenu = make_unique<Menu>("edit_parameters");
+
+  // View Class
+  parameterMenu -> Insert(
+      "view_class", {"class_name"},
+      [&](std::ostream& out, string className)
+      {
+          if (Model.doesClassExist(className)) {
+            UMLClass currentClass = Model.getClassCopy(className);
+            display_class(currentClass);
+          }
+          else{
+            out << "Class does not exist. Cannot view class.\n"
+          };
+      },
+      "View a given class with its fields and methods.");
+
+  // View Method
+  parameterMenu -> Insert(
+      "view_method", {"class_name", "method_name"},
+      [&](std::ostream& out, string className, string methodName)
+      {
+          // Only perform method find if class was found
+          if (Model.doesClassExist(className)) {
+            // Check if method exists and store into pointer.
+            method_ptr methodIter;
+            ERR_CATCH(methodIter = select_method(className, methodName));
+            // Only perform action if method was found
+            if(!ErrorStatus) {
+              display_method(methodIter);
+            }
+            else {
+              out << "Method does not exist. Cannot view method.\n"
+              ErrorStatus = false;
+            }
+          }
+          else{
+            out << "Class does not exist. Cannot view methods.\n"
+          };
+      },
+      "View a given method with its parameters.");
+  
+  // Add Parameter
+  parameterMenu -> Insert(
+      "add", {"class_name", "method_name"},
+      [&](std::ostream& out, string className, string methodName)
+      {
+          // Only perform method find if class was found
+          if (Model.doesClassExist(className)) {
+            // Check if method exists and store into pointer.
+            method_ptr methodIter;
+            ERR_CATCH(methodIter = select_method(className, methodName));
+            // Only perform action if method was found
+            if(!ErrorStatus) {
+              add_parameter(className, methodIter);
+            }
+            else {
+              out << "Method does not exist. Cannot add parameters.\n"
+              ErrorStatus = false;
+            }
+          }
+          else{
+            out << "Class does not exist. Cannot add parameters.\n"
+          };
+      },
+      "Add a new parameter to a given method.");
+  
+  // Delete Parameter
+  parameterMenu -> Insert(
+      "delete", {"class_name", "method_name"},
+      [&](std::ostream& out, string className, string methodName)
+      {
+          // Only perform method find if class was found
+          if (Model.doesClassExist(className)) {
+            // Check if method exists and store into pointer.
+            method_ptr methodIter;
+            ERR_CATCH(methodIter = select_method(className, methodName));
+            // Only perform action if method was found
+            if(!ErrorStatus) {
+              delete_parameter(className, methodIter);
+            }
+            else {
+              out << "Method does not exist. Cannot delete parameters.\n"
+              ErrorStatus = false;
+            }
+          }
+          else{
+            out << "Class does not exist. Cannot delete parameters.\n"
+          };
+      },
+      "Delete an existing parameter of a given method.");
+  
+  // Change Parameter
+  parameterMenu -> Insert(
+      "change", {"class_name", "method_name"},
+      [&](std::ostream& out, string className, string methodName)
+      {
+          // Only perform method find if class was found
+          if (Model.doesClassExist(className)) {
+            // Check if method exists and store into pointer.
+            method_ptr methodIter;
+            ERR_CATCH(methodIter = select_method(className, methodName));
+            // Only perform action if method was found
+            if(!ErrorStatus) {
+              change_parameter(className, methodIter);
+            }
+            else {
+              out << "Method does not exist. Cannot change parameter types.\n"
+              ErrorStatus = false;
+            }
+          }
+          else{
+            out << "Class does not exist. Cannot change parameter types..\n"
+          };
+      },
+      "Changes an existing parameter's type within a given method.");
+  
+  // Undo
+  parameterMenu -> Insert(
+      "undo",
+      [&](){ undo(); },
+      "Undo the most recent thing you\'ve done.");
+
+  // Redo 
+  parameterMenu -> Insert(
+      "redo",
+      [&](){ redo(); },
+      "Redo your most recently undone action.");
+  
+  //--------------------------------------------------------------------
+
+  // Initialize menus in order of submenuing.
+  methodMenu -> Insert(std::move(parameterMenu));
+  rootMenu -> Insert(std::move(fieldMenu));
+  rootMenu -> Insert(std::move(methodMenu));
+  Cli cli(std::move(rootMenu));
+
+  // Global exit action
+  cli.ExitAction( [](auto& out){ out << "See ya!\n"; } );
+
+  // Initialize and run the local CLI session.
+  // Until the exit action is called, the scheduler operates on a loop.
+  LoopScheduler scheduler;
+  CliLocalTerminalSession localSession(cli, scheduler, std::cout, 200);
+  localSession.ExitAction(
+    [&scheduler](auto& out) // session exit action
     {
-      cout << "Invalid command! Type \"help\" to view all available coommands.\n";
+      out << "Exiting CLI...\n";
+      scheduler.Stop();
     }
-  }
-  while(userInput != "quit");
-  
-  cout << "See ya!\n";
-
-
+  );
+  scheduler.Run();
 }
-
 
 /************************************/
 
@@ -139,7 +479,7 @@ void CLI::cli_menu()
  * @brief Lists all classes the user has created.
  * 
  */
-void CLI::list_classes()
+void UMLCLI::list_classes()
 {
   list<UMLClass> classList = Model.getClasses();
 
@@ -155,14 +495,13 @@ void CLI::list_classes()
   
 }
 
-
 /************************************/
 
 /**
  * @brief Lists all relationships the user has created.
  * 
  */
-void CLI::list_relationships()
+void UMLCLI::list_relationships()
 {
   std::vector <UMLRelationship> allRelationships = Model.getRelationships();
   if (allRelationships.size() == 0)
@@ -184,16 +523,14 @@ void CLI::list_relationships()
   }
 }
 
-
 /************************************/
-
 
 /**
  * @brief User creates and names a class and may give it any number
  * of attributes.
  * 
  */
-void CLI::create_class()
+void UMLCLI::create_class()
 {
 
   string className;
@@ -242,9 +579,7 @@ void CLI::create_class()
   display_class(newClass);
 }
 
-
 /************************************/
-
 
 /**
  * @brief Creates a new relationship between classes.
@@ -254,7 +589,7 @@ void CLI::create_class()
  * making a few changes.
  * 
  */
-void CLI::create_relationship()
+void UMLCLI::create_relationship()
 {
 
   string sourceClassName;
@@ -287,8 +622,6 @@ void CLI::create_relationship()
       break;
   }
 
-
-  
   if(Model.doesRelationshipExist(sourceClassName, destinationClassName))
   {
     cout << "A relationship already exists between " << sourceClassName << " and " << destinationClassName << ". Aborting.\n";
@@ -322,8 +655,7 @@ void CLI::create_relationship()
     else
       cout << "Invalid type!\n";
      
-  }while(typeIndex < 0 || typeIndex > 3);
-
+  } while(typeIndex < 0 || typeIndex > 3);
 
   ERR_CATCH(Model.addRelationship(sourceClassName, destinationClassName, typeIndex));
   if(ErrorStatus)
@@ -338,16 +670,14 @@ void CLI::create_relationship()
   
 }
 
-
 /************************************/
-
 
 /**
  * @brief User will be prompted to type in the class name,
  * and if it exists, it will be deleted.
  * 
  */
-void CLI::delete_class()
+void UMLCLI::delete_class()
 {
   string className;
   cout << "Enter class name to be deleted -> ";
@@ -363,16 +693,14 @@ void CLI::delete_class()
   cout << className << " was successfully removed.\n";
 }
 
-
 /************************************/
-
 
 /**
  * @brief User will be prompted to type in the source and destination,
  * and if the relationship exists, it will be deleted.
  * 
  */
-void CLI::delete_relationship()
+void UMLCLI::delete_relationship()
 {
   string sourceClassName;
   string destinationClassName;
@@ -395,16 +723,14 @@ void CLI::delete_relationship()
   cout << "Relationship was successfully deleted.\n";
 }
 
-
 /************************************/
-
 
 /**
  * @brief User types in the current class name, and then the name
  * they'd like to change it to. Then it gets renamed.
  * 
  */
-void CLI::rename_class()
+void UMLCLI::rename_class()
 {
   string oldClassName;
   string newClassName;
@@ -418,7 +744,6 @@ void CLI::rename_class()
     cout << "Error! The class you typed does not exist.\n";
     return;
   }
-
   
   cout << "Enter the new name you\'d like to rename it to. -> ";
   cin >> newClassName;
@@ -435,16 +760,14 @@ void CLI::rename_class()
   cout << "The class \"" << oldClassName << "\" has been renamed to \"" << newClassName << "\".\n";
 }
 
-
 /************************************/
-
 
 /**
  * @brief User will be prompted to type in the source, destination,
  * and NEW type. Then the relationship type will be changed.
  * 
  */
-void CLI::change_relationship()
+void UMLCLI::change_relationship()
 {
   string source;
   string destination;
@@ -468,7 +791,6 @@ void CLI::change_relationship()
     return;
   }
 
-  
   do
   {
     cout << "Choose the type of relationship:\n"
@@ -495,8 +817,7 @@ void CLI::change_relationship()
     else
       cout << "Invalid type!\n";
      
-  }while(typeIndex < 0 || typeIndex > 3);
-
+  } while(typeIndex < 0 || typeIndex > 3);
 
   ERR_CATCH(Model.changeRelationshipType(source, destination, typeIndex));
   if(ErrorStatus)
@@ -509,243 +830,13 @@ void CLI::change_relationship()
   cout << "The relationship\'s type was changed successfully!\n";
 }
 
-
-/************************************/
-
-
-/**
- * @brief Does various things with fields based on user input.
- * 
- * This one might be difficult.
- */
-void CLI::edit_fields()
-{
-  string className;
-  string input;
-  
-  cout << "Enter the name of the class whose fields and/or parameters you\'d like to edit.\n-> ";
-  cin >> className;
-
-  if (!Model.doesClassExist(className))
-  {
-    cout << "Error! The class you typed does not exist.\n";
-    cout << "Returning to main menu.\n";
-    return;
-  }
-  
-  cout << "Type \"help\" to view all available editor commands.\n";
-  do
-  {
-    cout << "-> ";
-
-    cin >> input;
-    
-    if(input == "help")
-      print_field_commands();
-    
-    else if(input == "view")
-    {
-      UMLClass currentClass = Model.getClassCopy(className);
-      display_class(currentClass);
-    }
-    else if(input == "add")
-      add_field(className);
-
-    else if(input == "delete")
-      delete_field(className);
-    
-    else if(input == "rename")
-      rename_field(className);
-
-    else if(input == "change")
-      change_field(className);
-
-    else if (input == "undo")
-      undo();
-    
-    else if (input == "redo")
-      redo();
-
-    else if (input == "switch_class")
-    {
-      //recursive call
-      edit_fields();
-      return;
-    }
-    else if(input == "exit")
-    {
-      cout << "You have exited the field editor.\n";
-      cout << "Returning to main menu.\n";
-      return;
-    }
-    else
-      cout << "Invadid command! Type \"help\" to view all available field editor commands.\n";
-  
-  }
-  while(1);
-}
-
-
-/************************************/
-
-/**
- * @brief Does various things with methods based on user input.
- * 
- */
-void CLI::edit_methods()
-{
-  string className;
-  string input;
-  
-  
-  cout << "Enter the name of the class whose methods and/or parameters you\'d like to edit.\n-> ";
-  cin >> className;
-
-  if (!Model.doesClassExist(className))
-  {
-    cout << "Error! The class you typed does not exist.\n";
-    cout << "Returning to main menu.\n";
-    return;
-  }
-
-  cout << "Type \"help\" to view all available editor commands.\n";
-  do
-  {
-    cout << "-> ";
-
-    cin >> input;
-    
-    if(input == "help")
-      print_method_commands();
-    
-    else if(input == "view")
-    {
-      UMLClass currentClass = Model.getClassCopy(className);
-      display_class(currentClass);
-    }
-    else if(input == "add")
-      add_method(className);
-
-    else if(input == "delete")
-      delete_method(className);
-
-    else if(input == "rename")
-      rename_method(className);
-
-    else if(input == "change")
-      change_method(className);
-    
-    else if (input == "undo")
-      undo();
-    
-    else if (input == "redo")
-      redo();
-    
-    else if (input == "edit_parameters")
-      edit_parameters(className);
-
-    else if (input == "switch_class")
-    {
-      //recursive call
-      edit_methods();
-      return;
-    }
-    else if(input == "exit")
-    {
-      cout << "You have exited the method editor.\n";
-      cout << "Returning to main menu.\n";
-      return;
-    }
-    else
-      cout << "Invadid command! Type \"help\" to view all available method editor commands.\n";
-
-  }
-  while(1);
-}
-
-/************************************/
-
-/**
- * @brief Does various things with parameters based on user input.
- * 
- * @param className 
- */
-void CLI::edit_parameters(string className)
-{
-  string methodName;
-  string input;
-  method_ptr methodIter;
-
-  cout << "Enter the name of the method whose parameters you\'d like to edit.\n-> ";
-  cin >> methodName;
-  
-  ERR_CATCH(methodIter = select_method(className, methodName));
-  if(ErrorStatus)
-  {
-    cout << "Error! The method you typed does not exist.\n";
-    cout << "Returning to method editor.\n";
-    ErrorStatus = false;
-    return;
-  }
-  
-  cout << "Type \"help\" to view all available editor commands.\n";
-  while(1)
-  {
-    cout << "-> ";
-
-    cin >> input;
-    
-    if(input == "help")
-      print_parameter_commands();
-    
-    else if(input == "view")
-    {
-      cout << "Current Method:\n";
-      display_method(methodIter);
-    }
-    else if(input == "add")
-      add_parameter(className, methodIter); 
-    
-    else if(input == "delete")
-      delete_parameter(className, methodIter);
-    
-    else if(input == "rename")
-      rename_parameter(methodIter);
-
-    else if(input == "change")
-      change_parameter(className, methodIter);
-
-    else if (input == "undo")
-      undo();
-    
-    else if (input == "redo")
-      redo();
-
-    else if(input == "switch_method")
-    {
-      //recursive call
-      edit_parameters(className);
-      return;
-    }
-    else if(input == "exit")
-    {
-      cout << "You have exited the parameter editor.\n";
-      cout << "Returning to method editor.\n";
-      return;
-    }
-    else
-      cout << "Invadid command! Type \"help\" to view all available parameter editor commands.\n";
-  }
-}
-
-
 /************************************/
 
 /**
  * @brief Saves the user's progress into a json file.
  * 
  */
-void CLI::save_uml()
+void UMLCLI::save_uml()
 {
   // Saves UML diagram to a JSON file in the same directory as the executable
   cout << "Name of file: ";
@@ -759,12 +850,11 @@ void CLI::save_uml()
 
 /************************************/
 
-
 /**
  * @brief Loads a json save file, overwriting the current session.
  * 
  */
-void CLI::load_uml()
+void UMLCLI::load_uml()
 {
   // Ask for name of file, and then load UML data given the proper format
   cout << "Name of file: ";
@@ -786,7 +876,6 @@ void CLI::load_uml()
     ErrorStatus = false;
 }
 
-
 /*
 ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 |**************************************************************|
@@ -794,106 +883,6 @@ void CLI::load_uml()
 |**************************************************************|
 \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////
 */
-
-/**************************************************************/
-//PRINT-HELP FUNCTIONS
-
-
-/**
- * @brief Prints commands for the user to type, and explains
- * what each command does.
- * 
- */
-void CLI::print_main_commands()
-{
-  cout << "COMMANDS:\n\n" 
-  << "list_classes        : Lists all classes the user has created, as well as their attributes.\n\n"
-  << "list_relationships  : Lists all relationships created by the user. (e.g. [source -> destination])\n\n"
-  << "create_class        : User will be prompted to name the class, and then it\'ll be created.\n\n"
-  << "create_relationship : User will be prompted to type in a source class and a destination class.\n\n"
-  << "delete_class        : User will be prompted to type the name of the class they\'d like to delete.\n\n"
-  << "delete_relationship : User will be prompted to type the source and destination. The relationship\n"
-  << "                      will be no more, but the classes will still exist.\n\n"
-  << "rename_class        : User will be prompted to type the existing class name, and then the new\n"
-  << "                      name.\n\n"
-  << "change_relationship : User will be prompted to type in source, destination, and the NEW type\n"
-  << "                      of the relationship, and the type will be changed accordingly.\n\n"
-  << "edit_fields         : User will be sent to a sub-menu, where they can enter in field editor\n"
-  << "                      commands.\n\n"
-  << "edit_methods        : User will be sent to a sub-menu, where they can enter in method editor\n"
-  << "                      commands (including a parameter editor sub-sub-menu).\n\n" 
-  << "undo                : Undo the most recent thing you\'ve done.\n\n"
-  << "redo                : Undoes your most recent undo.\n\n"
-  << "load                : User will be prompted to type the name of the json file, and then it loads\n"
-  << "                      the model from that file. WARNING! Existing progress will be overwritten!\n\n" 
-  << "save                : User will be prompted to name the JSON file, which will contain their\n"
-  << "                      current progress.\n\n" 
-  << "quit                : Exit your current session.\n\n";
-}
-
-/************************************/
-
-/**
- * @brief Prints commands for the user to type, and explains
- * what each command does.
- * 
- */
-void CLI::print_field_commands()
-{
-  cout << "FIELD EDITOR COMMANDS:\n"
-    << "view         : View the current class with its fields.\n"
-    << "add          : Add a new field.\n"
-    << "delete       : Delete an existing field.\n"
-    << "rename       : Rename an existing field.\n"
-    << "change       : Change the type of an existing field.\n"
-    << "undo         : Undo the most recent thing you\'ve done.\n"
-    << "redo         : Undoes your most recent undo.\n"
-    << "switch_class : Allows the user to switch to a different class.\n"
-    << "exit         : Quit the field editor and return to the normal interface.\n\n";
-}
-
-/************************************/
-
-/**
- * @brief Prints commands for the user to type, and explains
- * what each command does.
- * 
- */
-void CLI::print_method_commands()
-{
-  cout << "METHOD EDITOR COMMANDS:\n"
-    << "view            : View the current class with its methods.\n"
-    << "add             : Add a new method.\n"
-    << "delete          : Delete an existing method.\n"
-    << "rename          : Rename an existing method.\n"
-    << "change          : Change the type of an existing method.\n"
-    << "undo            : Undo the most recent thing you\'ve done.\n"
-    << "redo            : Undoes your most recent undo.\n"
-    << "switch_class    : Allows the user to switch to a different class.\n"
-    << "edit_parameters : User will be sent to a sub menu to edit a method's parameters.\n"
-    << "exit            : Quit the method editor and return to the normal interface.\n\n";
-}
-
-/************************************/
-
-/**
- * @brief Prints commands for the user to type, and explains
- * what each command does.
- * 
- */
-void CLI::print_parameter_commands()
-{
-  cout << "PARAMETER EDITOR COMMANDS:\n"
-    << "view          : View the current method with its parameters.\n"
-    << "add           : Add a new parameter.\n"
-    << "delete        : Delete an existing parameter.\n"
-    << "rename        : Rename an existing parameter\n"
-    << "change        : Change the type of an existing parameter.\n"
-    << "undo          : Undo the most recent thing you\'ve done.\n"
-    << "redo          : Undoes your most recent undo.\n"
-    << "switch_method : Allows the user to switch to a different method.\n"
-    << "exit          : Quit the parameter editor and return to the method editor.\n\n";
-}
 
 /**************************************************************/
 //ADDING
@@ -904,7 +893,7 @@ void CLI::print_parameter_commands()
  * 
  * @param className 
  */
-bool CLI::add_field(string className)
+bool UMLCLI::add_field(string className)
 {
   string fieldName;
   string fieldType;
@@ -945,7 +934,7 @@ bool CLI::add_field(string className)
  * 
  * @param className 
  */
-bool CLI::add_method(string className)
+bool UMLCLI::add_method(string className)
 {
   string methodName;
   string methodType;
@@ -992,7 +981,7 @@ bool CLI::add_method(string className)
  * @return true 
  * @return false 
  */
-bool CLI::add_parameter(string className, method_ptr methodIter)
+bool UMLCLI::add_parameter(string className, method_ptr methodIter)
 {
   string paramName;
   string paramType;
@@ -1031,7 +1020,7 @@ bool CLI::add_parameter(string className, method_ptr methodIter)
  * 
  * @param className 
  */
-void CLI::delete_field(string className)
+void UMLCLI::delete_field(string className)
 {
   
   attr_ptr fieldIter;
@@ -1061,7 +1050,7 @@ void CLI::delete_field(string className)
  * 
  * @param className 
  */
-void CLI::delete_method(string className)
+void UMLCLI::delete_method(string className)
 {
   method_ptr methodIter;
   string methodName;
@@ -1099,7 +1088,7 @@ void CLI::delete_method(string className)
  * 
  * @param methodIter
  */
-void CLI::delete_parameter(string className, method_ptr methodIter)
+void UMLCLI::delete_parameter(string className, method_ptr methodIter)
 {
   string paramName;
   cout << "Type the name of the parameter you\'d like to delete. -> ";
@@ -1126,7 +1115,7 @@ void CLI::delete_parameter(string className, method_ptr methodIter)
  * 
  * @param className 
  */
-void CLI::rename_field(string className)
+void UMLCLI::rename_field(string className)
 {
   attr_ptr fieldIter;
   string fieldNameFrom;
@@ -1165,7 +1154,6 @@ void CLI::rename_field(string className)
 
 /*************************/
 
-
 /**
  * @brief User types in the old name of the method. If the
  * method is overloaded, they can specify which one (in
@@ -1174,7 +1162,7 @@ void CLI::rename_field(string className)
  * 
  * @param className 
  */
-void CLI::rename_method(string className)
+void UMLCLI::rename_method(string className)
 {
   method_ptr methodIter;
   string methodNameFrom;
@@ -1215,7 +1203,7 @@ void CLI::rename_method(string className)
  * 
  * @param methodIter
  */
-void CLI::rename_parameter(method_ptr methodIter)
+void UMLCLI::rename_parameter(method_ptr methodIter)
 {
   string paramNameFrom;
   string paramNameTo;
@@ -1237,8 +1225,6 @@ void CLI::rename_parameter(method_ptr methodIter)
   cout << "Parameter sucessfully renamed!\n";
 }
 
-
-
 /**************************************************************/
 //TYPE-CHANGING
 
@@ -1248,7 +1234,7 @@ void CLI::rename_parameter(method_ptr methodIter)
  * 
  * @param className 
  */
-void CLI::change_field(string className)
+void UMLCLI::change_field(string className)
 {
   attr_ptr fieldIter;
   string fieldName;
@@ -1282,7 +1268,7 @@ void CLI::change_field(string className)
  * 
  * @param className 
  */
-void CLI::change_method(string className)
+void UMLCLI::change_method(string className)
 {
   method_ptr methodIter;
   string methodName;
@@ -1323,7 +1309,7 @@ void CLI::change_method(string className)
  * 
  * @param methodIter 
  */
-void CLI::change_parameter(string className, method_ptr methodIter)
+void UMLCLI::change_parameter(string className, method_ptr methodIter)
 {
   string paramName;
   string newParamType;
@@ -1345,7 +1331,6 @@ void CLI::change_parameter(string className, method_ptr methodIter)
   cout << "The type of your parameter was changed successfully!\n";
 }
 
-
 /**************************************************************/
 //DISPLAY FUNCTIONS
 
@@ -1366,7 +1351,7 @@ void CLI::change_parameter(string className, method_ptr methodIter)
  * 
  * @param currentClass 
  */
-void CLI::display_class(UMLClass currentClass)
+void UMLCLI::display_class(UMLClass currentClass)
 { 
   string className = currentClass.getName();
 
@@ -1403,7 +1388,7 @@ void CLI::display_class(UMLClass currentClass)
  * 
  * @param methodIter 
  */
-void CLI::display_method(attr_ptr methodIter)
+void UMLCLI::display_method(attr_ptr methodIter)
 {
   if(methodIter->identifier() == "method")
   {
@@ -1424,7 +1409,6 @@ void CLI::display_method(attr_ptr methodIter)
   }
 }
 
-
 /*************************/
 
 /**
@@ -1438,17 +1422,15 @@ void CLI::display_method(attr_ptr methodIter)
  * @param destination 
  * @param rType 
  */
-void CLI::display_relationship(string source, string destination, string rType)
+void UMLCLI::display_relationship(string source, string destination, string rType)
 {
   cout << "TYPE        : " << rType << "\n";
   cout << "SOURCE      : " << source << "\n";
   cout << "DESTINATION : " << destination << "\n";
 }
 
-
 /**************************************************************/
 //INPUT PARSING
-
 
 /**
  * @brief Takes in user input and makes sure it's
@@ -1456,7 +1438,7 @@ void CLI::display_relationship(string source, string destination, string rType)
  * 
  * @return size_t 
  */
-size_t CLI::user_int_input()
+size_t UMLCLI::user_int_input()
 {
   size_t num;
 
@@ -1469,38 +1451,13 @@ size_t CLI::user_int_input()
   return num;
 }
 
-
-/*************************/
-
-
-/**
- * @brief (Sprint 4) Whatever goes on in here, I figured this method could replace
- * all instances of cin (except for the ones in here, or in user_int_input).
- * 
- * If that's not how it works, feel free to delete this function. Because
- * I currently have no idea
- * 
- * @return string 
- */
-string CLI::tab_completion()
-{
-  string input;
-
-  cin >> input; // Don't assume that this HAS to be above the implementation, or even has to exist at all. 
-  
-  //TODO
-  
-  return input;
-}
-
-
-
 /**************************************************************/
 //UNDO/REDO
 
-
-
-void CLI::undo()
+/**
+ * @brief Undo the most recent thing you've done.
+ */
+void UMLCLI::undo()
 {
   Model = History.undo();
   cout << "You\'ve undone your last action.\n";
@@ -1508,17 +1465,17 @@ void CLI::undo()
 
 /*************************/
 
-void CLI::redo()
+/**
+ * @brief Redo your most recently undone action.
+ */
+void UMLCLI::redo()
 {
   Model = History.redo();
   cout << "You\'ve redone your last undo.\n";
 }
 
-
-
 /**************************************************************/
 //MISC.
-
 
 /**
  * IMPORTANT: In Sprint 4, this function will be split in 2. The part that
@@ -1537,7 +1494,7 @@ void CLI::redo()
  * @param methodName 
  * @return method_ptr
  */
-method_ptr CLI::select_method(string className, string methodName)
+method_ptr UMLCLI::select_method(string className, string methodName)
 {
   vector<method_ptr> methodMatches;
 
@@ -1594,7 +1551,7 @@ method_ptr CLI::select_method(string className, string methodName)
  * @param fieldName 
  * @return attr_ptr 
  */
-attr_ptr CLI::select_field(string className, string fieldName)
+attr_ptr UMLCLI::select_field(string className, string fieldName)
 {
   vector<attr_ptr> allAttributes = Model.getClassAttributes(className);
 
