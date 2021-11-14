@@ -21,6 +21,7 @@
 #include <gtest/gtest.h>
 
 #include "include/CLI.hpp"
+#include "include/CLIView.hpp"
 #include "include/UMLClass.hpp"
 #include "include/UMLData.hpp"
 #include "include/UMLDataHistory.hpp"
@@ -59,6 +60,7 @@ UMLData - Classes
 UMLData - Methods/Fields
 UMLData - Relationships
 UMLDataHistory
+CLIView (## WIP ##)
 CLI (## WIP ##)
 Server (## WIP ##)
 */
@@ -1176,7 +1178,108 @@ TEST (UndoRedoTest, RedoAfterClassDeletedUndo)
 
 // ****************************************************
 
+// Tests for CLIView (CLIView.cpp)
+// **************************
+
+/*
+// Testing the bool that determines whether the output is printed to the console or pushed to the output queue.
+TEST() // <---- I'm not sure what parameters are supposed to go in there.
+{
+  CLIViewProxy Interface;
+  bool preStackPush = Interface.get_print_bool();
+  
+  Interface.push_input("Boop!");
+  bool postStackPush = Interface.get_print_bool();
+
+  ASSERT_EQ(preStackPush, postStackPush);
+}
+
+// get_user_input()
+
+TEST()
+{
+  CLIViewProxy Interface;
+  string ds = "DARK SOULS!!!!!";
+  
+  Interface.push_input(ds);
+  Interface.display_message("What\'s your favorite game?\n");
+  string dsCopy = Interface.get_user_input();
+  
+  ASSERT_EQ(ds, dsCopy);
+}
+
+TEST()
+{
+  CLIViewProxy Interface;
+  long unsigned int num = 69;
+  
+  Interface.push_input(num);
+  Interface.display_message("Type a number: \n");
+  string numCopy = Interface.get_user_input();
+
+  ASSERT_EQ(numCopy, "69");
+}
+
+
+// user_int_input()
+
+TEST()
+{
+  CLIViewProxy Interface;
+  long unsigned int num = 69;
+  
+  Interface.push_input(num);
+  Interface.display_message("Type a number: \n");
+  int numCopy = Interface.get_user_input();
+
+  ASSERT_EQ(numCopy, num);
+}
+
+TEST()
+{
+  CLIViewProxy Interface;
+  string fakeNum = "Lol rekt!";
+  
+  Interface.push_input(fakeNum);
+  Interface.display_message("Type a number: \n");
+  int num = Interface.get_user_input();
+  
+  ASSERT_EQ(num, -1);
+}
+
+
+
+*/
+
+
+// ****************************************************
+
+
 // Tests for CLI (CLI.CPP)
 // **************************
 
-// Need a way to grab the stream of characters.
+// Need a way to grab the stream of characters. (DONE!)
+
+//Tab completion tests
+/*
+TEST()
+{
+  CLI Controller;
+  CLIViewProxy ViewProxy; //Oh, shit. I actually have to access the CLI's instance of the CLIView. Fuck.
+
+  ViewProxy.push_input("list_c\t");
+  Controller.Interface = ViewProxy;
+
+  Controller.cli_menu();
+  ViewProxy = Controller.Interface;
+
+  string test = ViewProxy.most_recent_output();
+
+  ASSERT_EQ(test, "You have no classes.\n");
+}
+
+TEST()
+{
+  // Copy and paste the above test once it's fixed. Then change it to test for the list_relationships tab completion
+}
+*/
