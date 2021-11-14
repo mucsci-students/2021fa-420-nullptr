@@ -20,7 +20,7 @@
 
 #include <gtest/gtest.h>
 
-#include "include/CLI.hpp"
+#include "include/UMLCLI.hpp"
 #include "include/UMLClass.hpp"
 #include "include/UMLData.hpp"
 #include "include/UMLDataHistory.hpp"

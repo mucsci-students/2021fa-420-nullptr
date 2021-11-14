@@ -53,79 +53,87 @@ void UMLCLI::cli_menu()
 {
   //--------------------------------------------------------------------
 
+  /*
+  ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+  |**************************************************************|
+  |                           ROOT MENU                          |
+  |**************************************************************|
+  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////
+  */
+
   // Setup CLI's initial root menu
   auto rootMenu = make_unique<Menu>("cli");
 
   // List Classes
   rootMenu -> Insert(
       "list_classes",
-      [&](){ list_classes(); },
+      [&](std::ostream& out){ list_classes(); },
       "Lists all classes the user has created, as well as their attributes.");
 
   // List Relationships
   rootMenu -> Insert(
       "list_relationships",
-      [&](){ list_relationships(); },
+      [&](std::ostream& out){ list_relationships(); },
       "Lists all relationships created by the user. (e.g. [source -> destination])");
 
   // Create Class
   rootMenu -> Insert(
       "create_class",
-      [&](){ create_class(); },
+      [&](std::ostream& out){ create_class(); },
       "User will be prompted to name the class, and then it\'ll be created.");
 
   // Create Relationship
   rootMenu -> Insert(
       "create_relationship",
-      [&](){ create_relationship(); },
+      [&](std::ostream& out){ create_relationship(); },
       "Type in a source class and a destination class to create a relationship between them.");
 
   // Delete Class
   rootMenu -> Insert(
       "delete_class",
-      [&](){ delete_class(); },
+      [&](std::ostream& out){ delete_class(); },
       "User will be prompted to type the name of the class they\'d like to delete.");
 
   // Delete Relationship
   rootMenu -> Insert(
       "delete_relationship",
-      [&](){ delete_relationship(); },
+      [&](std::ostream& out){ delete_relationship(); },
       "User will be prompted to type the source and destination. The relationship will be no more, but the classes will still exist.");
 
   // Rename Class
   rootMenu -> Insert(
       "rename_class",
-      [&](){ rename_class(); },
+      [&](std::ostream& out){ rename_class(); },
       "User will be prompted to type an existing class name, and then the new name they'd like to replace it with.");
 
   // Change Relationship
   rootMenu -> Insert(
       "change_relationship",
-      [&](){ change_relationship(); },
+      [&](std::ostream& out){ change_relationship(); },
       "Supply a source, destination, and new type to replace a preexisting relationship with a new one.");
 
   // Undo
   rootMenu -> Insert(
       "undo",
-      [&](){ undo(); },
+      [&](std::ostream& out){ undo(); },
       "Undo the most recent thing you\'ve done.");
 
   // Redo 
   rootMenu -> Insert(
       "redo",
-      [&](){ redo(); },
+      [&](std::ostream& out){ redo(); },
       "Redo your most recently undone action.");
   
   // Load 
   rootMenu -> Insert(
       "load",
-      [&](){ load_uml(); },
+      [&](std::ostream& out){ load_uml(); },
       "Enter the name of a json file within your build directory to override the current UML diagram with a new model.");
 
   // Save
   rootMenu -> Insert(
       "save",
-      [&](){ save_uml(); },
+      [&](std::ostream& out){ save_uml(); },
       "Enter the name of your UML diagram to save a json representation of it within your build directory.");
 
   // Turn On Color
@@ -141,7 +149,15 @@ void UMLCLI::cli_menu()
       "Disable colors in the CLI.");
 
   //--------------------------------------------------------------------
-  
+
+  /*
+  ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+  |**************************************************************|
+  |                          FIELD MENU                          |
+  |**************************************************************|
+  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////
+  */
+
   // Create submenu for editing fields
   auto fieldMenu = make_unique<Menu>("edit_fields");
 
@@ -155,7 +171,7 @@ void UMLCLI::cli_menu()
             display_class(currentClass);
           }
           else{
-            out << "Class does not exist. Cannot view class.\n"
+            out << "Class does not exist. Cannot view class.\n";
           };
       },
       "View a given class with its fields and methods.");
@@ -169,7 +185,7 @@ void UMLCLI::cli_menu()
             add_field(className);
           }
           else{
-            out << "Class does not exist. Cannot add fields.\n"
+            out << "Class does not exist. Cannot add fields.\n";
           };
       },
       "Add a new field.");
@@ -183,7 +199,7 @@ void UMLCLI::cli_menu()
             delete_field(className);
           }
           else{
-            out << "Class does not exist. Cannot delete fields.\n"
+            out << "Class does not exist. Cannot delete fields.\n";
           };
       },
       "Deletes an existing field.");
@@ -197,7 +213,7 @@ void UMLCLI::cli_menu()
             rename_field(className);
           }
           else{
-            out << "Class does not exist. Cannot rename fields.\n"
+            out << "Class does not exist. Cannot rename fields.\n";
           };
       },
       "Renames an existing field.");
@@ -211,7 +227,7 @@ void UMLCLI::cli_menu()
             change_field(className);
           }
           else{
-            out << "Class does not exist. Cannot change field types.\n"
+            out << "Class does not exist. Cannot change field types.\n";
           };
       },
       "Changes the type of an existing field.");
@@ -219,16 +235,24 @@ void UMLCLI::cli_menu()
   // Undo
   fieldMenu -> Insert(
       "undo",
-      [&](){ undo(); },
+      [&](std::ostream& out){ undo(); },
       "Undo the most recent thing you\'ve done.");
 
   // Redo 
   fieldMenu -> Insert(
       "redo",
-      [&](){ redo(); },
+      [&](std::ostream& out){ redo(); },
       "Redo your most recently undone action.");
 
   //--------------------------------------------------------------------
+
+  /*
+  ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+  |**************************************************************|
+  |                         METHOD MENU                          |
+  |**************************************************************|
+  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////
+  */
 
   // Create submenu for editing methods
   auto methodMenu = make_unique<Menu>("edit_methods");
@@ -243,7 +267,7 @@ void UMLCLI::cli_menu()
             display_class(currentClass);
           }
           else{
-            out << "Class does not exist. Cannot view class.\n"
+            out << "Class does not exist. Cannot view class.\n";
           };
       },
       "View a given class with its fields and methods.");
@@ -257,7 +281,7 @@ void UMLCLI::cli_menu()
             add_method(className);
           }
           else{
-            out << "Class does not exist. Cannot add fields.\n"
+            out << "Class does not exist. Cannot add fields.\n";
           };
       },
       "Add a new method.");
@@ -271,7 +295,7 @@ void UMLCLI::cli_menu()
             delete_method(className);
           }
           else{
-            out << "Class does not exist. Cannot delete fields.\n"
+            out << "Class does not exist. Cannot delete fields.\n";
           };
       },
       "Deletes an existing method.");
@@ -285,7 +309,7 @@ void UMLCLI::cli_menu()
             rename_method(className);
           }
           else{
-            out << "Class does not exist. Cannot rename fields.\n"
+            out << "Class does not exist. Cannot rename fields.\n";
           };
       },
       "Renames an existing method.");
@@ -299,7 +323,7 @@ void UMLCLI::cli_menu()
             change_method(className);
           }
           else{
-            out << "Class does not exist. Cannot change field types.\n"
+            out << "Class does not exist. Cannot change field types.\n";
           };
       },
       "Changes the type of an existing method.");
@@ -307,16 +331,24 @@ void UMLCLI::cli_menu()
   // Undo
   methodMenu -> Insert(
       "undo",
-      [&](){ undo(); },
+      [&](std::ostream& out){ undo(); },
       "Undo the most recent thing you\'ve done.");
 
   // Redo 
   methodMenu -> Insert(
       "redo",
-      [&](){ redo(); },
+      [&](std::ostream& out){ redo(); },
       "Redo your most recently undone action.");
 
   //--------------------------------------------------------------------
+
+  /*
+  ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+  |**************************************************************|
+  |                        PAREMETER MENU                        |
+  |**************************************************************|
+  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////
+  */
 
   // Create sub-submenu for editing parameters
   auto parameterMenu = make_unique<Menu>("edit_parameters");
@@ -331,7 +363,7 @@ void UMLCLI::cli_menu()
             display_class(currentClass);
           }
           else{
-            out << "Class does not exist. Cannot view class.\n"
+            out << "Class does not exist. Cannot view class.\n";
           };
       },
       "View a given class with its fields and methods.");
@@ -351,12 +383,12 @@ void UMLCLI::cli_menu()
               display_method(methodIter);
             }
             else {
-              out << "Method does not exist. Cannot view method.\n"
+              out << "Method does not exist. Cannot view method.\n";
               ErrorStatus = false;
             }
           }
           else{
-            out << "Class does not exist. Cannot view methods.\n"
+            out << "Class does not exist. Cannot view methods.\n";
           };
       },
       "View a given method with its parameters.");
@@ -376,12 +408,12 @@ void UMLCLI::cli_menu()
               add_parameter(className, methodIter);
             }
             else {
-              out << "Method does not exist. Cannot add parameters.\n"
+              out << "Method does not exist. Cannot add parameters.\n";
               ErrorStatus = false;
             }
           }
           else{
-            out << "Class does not exist. Cannot add parameters.\n"
+            out << "Class does not exist. Cannot add parameters.\n";
           };
       },
       "Add a new parameter to a given method.");
@@ -401,12 +433,12 @@ void UMLCLI::cli_menu()
               delete_parameter(className, methodIter);
             }
             else {
-              out << "Method does not exist. Cannot delete parameters.\n"
+              out << "Method does not exist. Cannot delete parameters.\n";
               ErrorStatus = false;
             }
           }
           else{
-            out << "Class does not exist. Cannot delete parameters.\n"
+            out << "Class does not exist. Cannot delete parameters.\n";
           };
       },
       "Delete an existing parameter of a given method.");
@@ -426,12 +458,12 @@ void UMLCLI::cli_menu()
               change_parameter(className, methodIter);
             }
             else {
-              out << "Method does not exist. Cannot change parameter types.\n"
+              out << "Method does not exist. Cannot change parameter types.\n";
               ErrorStatus = false;
             }
           }
           else{
-            out << "Class does not exist. Cannot change parameter types..\n"
+            out << "Class does not exist. Cannot change parameter types.\n";
           };
       },
       "Changes an existing parameter's type within a given method.");
@@ -439,16 +471,24 @@ void UMLCLI::cli_menu()
   // Undo
   parameterMenu -> Insert(
       "undo",
-      [&](){ undo(); },
+      [&](std::ostream& out){ undo(); },
       "Undo the most recent thing you\'ve done.");
 
   // Redo 
   parameterMenu -> Insert(
       "redo",
-      [&](){ redo(); },
+      [&](std::ostream& out){ redo(); },
       "Redo your most recently undone action.");
   
   //--------------------------------------------------------------------
+
+  /*
+  ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+  |**************************************************************|
+  |                        INITIALIZATION                        |
+  |**************************************************************|
+  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////
+  */
 
   // Initialize menus in order of submenuing.
   methodMenu -> Insert(std::move(parameterMenu));
@@ -464,9 +504,9 @@ void UMLCLI::cli_menu()
   LoopScheduler scheduler;
   CliLocalTerminalSession localSession(cli, scheduler, std::cout, 200);
   localSession.ExitAction(
-    [&scheduler](auto& out) // session exit action
+    [&scheduler](auto& out)
     {
-      out << "Exiting CLI...\n";
+      out << "Exiting CLI...\n"; // Session exit action
       scheduler.Stop();
     }
   );
