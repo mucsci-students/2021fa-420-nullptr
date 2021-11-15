@@ -31,14 +31,43 @@ SVG.on(document, 'DOMContentLoaded', function() {
   }
 })
 
+
+
+
+var xval_rect = 150;
+var yval_rect = 150;
 function createClassBox(draw, uclass, x, y)
 {
-  var nested = draw.nested();
-  nested.rect(200,200).attr({ fill: '#f00', opacity: 0.3, width: 150, height: 150  });
+ // var nested = draw.nested().clip();
+ // nested.rect(200,200).attr({ fill: '#f00', opacity: 0.3, width: 150, height: 150});
+  
+
+ var nested = draw.nested()
+
+
+  var rect = nested.rect(xval_rect,yval_rect).radius(10).css({fill: '#f02', resize: 'both', overflow: 'auto'})
+  
+
   var text_y = 20;
   var text_x = 15;
-  nested.text(uclass["name"]).dy(text_y).dx(text_x);
+  
+  var textX_dif = 0;
+  var textY_dif = 0;
+  
+  textX_dif = xval_rect - text_x;
+  textY_dif = yval_rect - text_y;
+ 
+  xval_rect += 10;
+ 
+
+
+ nested.text(uclass["name"]).dy(text_y).dx(text_x);
   text_y += 20;
+  text_x +=20;
+
+while(text_x > xval_rect){
+  xval_rect+= 10;
+}
 
   //fields
   for (let key in uclass["fields"])
@@ -67,9 +96,25 @@ function createClassBox(draw, uclass, x, y)
   //drag event
   nested.draggable().on('dragend', e =>
   {
+     //force textbox back on screen for Y values
+    if(nested.y() < 1){
+    location.href = '/position/' + uclass["name"] + '/' + nested.x() + '/' + 2;
+    }
+    else if(nested.y() > 410){
+      location.href = '/position/' + uclass["name"] + '/' + nested.x() + '/' + 405;
+    }
+    //force textbox back on screen for x values
+    else if(nested.x() < 300){
+      location.href = '/position/' + uclass["name"] + '/' + 325 + '/' + nested.y();
+    }
+    else if(nested.x() > 1125){
+      location.href = '/position/' + uclass["name"] + '/' + 1115 + '/' + nested.y();
+    }
+    else{
     location.href = '/position/' + uclass["name"] + '/' + nested.x() + '/' + nested.y();
+    }
   });
-
+//   width:100vw; of sidebar
   boxes.set(uclass["name"], nested);
 }
 
