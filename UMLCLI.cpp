@@ -21,7 +21,6 @@
 #include <cli/cli.h>
 #include <cli/loopscheduler.h>
 #include <cli/clilocalsession.h>
-#include <cli/clifilesession.h>
 #include <vector>
 #include <algorithm> // std::copy
 #include "include/UMLCLI.hpp"
@@ -66,75 +65,99 @@ void UMLCLI::cli_menu()
 
   // List Classes
   rootMenu -> Insert(
-      "list_classes",
-      [&](std::ostream& out){ list_classes(); },
-      "Lists all classes the user has created, as well as their attributes.");
+    "list_classes",
+    [&](std::ostream& out){ list_classes(); },
+    "Lists all classes the user has created, as well as their attributes.");
 
   // List Relationships
   rootMenu -> Insert(
-      "list_relationships",
-      [&](std::ostream& out){ list_relationships(); },
-      "Lists all relationships created by the user. (e.g. [source -> destination])");
+    "list_relationships",
+    [&](std::ostream& out){ list_relationships(); },
+    "Lists all relationships created by the user. (e.g. [source -> destination])");
 
   // Create Class
   rootMenu -> Insert(
-      "create_class",
-      [&](std::ostream& out){ create_class(); },
-      "User will be prompted to name the class, and then it\'ll be created.");
+    "create_class", {"class_name"},
+    [&](std::ostream& out, string className)
+    {
+      create_class(className);
+    },
+    "Create a class with the name of the given argument.");
 
   // Create Relationship
   rootMenu -> Insert(
-      "create_relationship",
-      [&](std::ostream& out){ create_relationship(); },
-      "Type in a source class and a destination class to create a relationship between them.");
+    "create_relationship", {"source", "destnation", "relship_type"},
+    [&](std::ostream& out, string source, string destination, string relshipType)
+    {
+      create_relationship(source, destination, relshipType);
+    },
+    "Creates a relationship using a source class, destination class, and relationship type (options: aggregation, composition, generalization, realization).");
 
   // Delete Class
   rootMenu -> Insert(
-      "delete_class",
-      [&](std::ostream& out){ delete_class(); },
-      "User will be prompted to type the name of the class they\'d like to delete.");
+    "delete_class", {"class_name"},
+    [&](std::ostream& out, string className)
+    {
+      delete_class(className);
+    },
+    "Delete a class with the name of the given argument.");
 
   // Delete Relationship
   rootMenu -> Insert(
-      "delete_relationship",
-      [&](std::ostream& out){ delete_relationship(); },
-      "User will be prompted to type the source and destination. The relationship will be no more, but the classes will still exist.");
+    "delete_relationship", {"source", "destnation"},
+    [&](std::ostream& out, string source, string destination)
+    {
+      delete_relationship(source, destination);
+    },
+    "Deletes a relationship between a given source class and destination class.");
 
   // Rename Class
   rootMenu -> Insert(
-      "rename_class",
-      [&](std::ostream& out){ rename_class(); },
-      "User will be prompted to type an existing class name, and then the new name they'd like to replace it with.");
+    "create_class", {"old_class_name", "new_class_name"},
+    [&](std::ostream& out, string oldClassName, string newClassName)
+    {
+      rename_class(oldClassName, newClassName);
+    },
+    "Renames class of old_class_name to new_class_name.");
 
   // Change Relationship
   rootMenu -> Insert(
-      "change_relationship",
-      [&](std::ostream& out){ change_relationship(); },
-      "Supply a source, destination, and new type to replace a preexisting relationship with a new one.");
+    "change_relationship", {"source", "destnation", "relship_type"},
+    [&](std::ostream& out, string source, string destination, string relshipType)
+    {
+      change_relationship(source, destination, relshipType);
+    },
+    "Changes a relationship given a source class and destination class to a new relationship type (options: aggregation, composition, generalization, realization).");
 
   // Undo
   rootMenu -> Insert(
-      "undo",
-      [&](std::ostream& out){ undo(); },
-      "Undo the most recent thing you\'ve done.");
+    "undo",
+    [&](std::ostream& out){ undo(); },
+    "Undo the most recent thing you\'ve done.");
 
   // Redo 
   rootMenu -> Insert(
-      "redo",
-      [&](std::ostream& out){ redo(); },
-      "Redo your most recently undone action.");
+    "redo",
+    [&](std::ostream& out){ redo(); },
+    "Redo your most recently undone action.");
   
   // Load 
   rootMenu -> Insert(
-      "load",
-      [&](std::ostream& out){ load_uml(); },
-      "Enter the name of a json file within your build directory to override the current UML diagram with a new model.");
+    "load", {"file_name"},
+    [&](std::ostream& out, string fileName)
+    {
+      load_uml(fileName);
+    },
+    "Enter the name of a json file (no file extension) within your build directory as an argument to override the current UML diagram with a new model.");
 
   // Save
   rootMenu -> Insert(
-      "save",
-      [&](std::ostream& out){ save_uml(); },
-      "Enter the name of your UML diagram to save a json representation of it within your build directory.");
+    "save", {"file_name"},
+    [&](std::ostream& out, string fileName)
+    {
+      save_uml(fileName);
+    },
+    "Enter the name of your UML diagram (no file extension) as an argument to save a json representation of it within your build directory.");
 
   // Turn On Color
   rootMenu -> Insert(
@@ -496,9 +519,6 @@ void UMLCLI::cli_menu()
   rootMenu -> Insert(std::move(methodMenu));
   Cli cli(std::move(rootMenu));
 
-  // Global exit action
-  cli.ExitAction( [](auto& out){ out << "See ya!\n"; } );
-
   // Initialize and run the local CLI session.
   // Until the exit action is called, the scheduler operates on a loop.
   LoopScheduler scheduler;
@@ -570,13 +590,8 @@ void UMLCLI::list_relationships()
  * of attributes.
  * 
  */
-void UMLCLI::create_class()
+void UMLCLI::create_class(string className)
 {
-
-  string className;
-  cout << "Choose a name for your class -> ";
-  cin >> className;
-
   if(Model.doesClassExist(className))
   {
     cout << "That class name already exists. Aborting.\n";
@@ -629,75 +644,45 @@ void UMLCLI::create_class()
  * making a few changes.
  * 
  */
-void UMLCLI::create_relationship()
+void UMLCLI::create_relationship(string source, string destination, string relshipType)
 {
-
-  string sourceClassName;
-  string destinationClassName;
-  string relshipType;
   int typeIndex = -1;
   
-
-  while(1)
-  {
-    cout << "Type in a class name you\'d like to use for the source -> ";
-    cin >> sourceClassName;
-
-    if(!Model.doesClassExist(sourceClassName))
-      cout << "The class \"" << sourceClassName << "\" does not exist.\n";
-
-    else
-      break;
-  }
-
-  while(1)
-  {
-    cout << "Type in a class name you\'d like to use for the destination -> ";
-    cin >> destinationClassName;
-
-    if(!Model.doesClassExist(destinationClassName))
-      cout << "The class \"" << destinationClassName << "\" does not exist.\n";
-    
-    else
-      break;
-  }
-
-  if(Model.doesRelationshipExist(sourceClassName, destinationClassName))
-  {
-    cout << "A relationship already exists between " << sourceClassName << " and " << destinationClassName << ". Aborting.\n";
+  // Check to see if source exists
+  if(!Model.doesClassExist(source)) {
+    cout << "The class \"" << source << "\" does not exist.\n";
     return;
   }
-  
-  // Loop to grab string of type and convert into integer
-  do
-  {
-    cout << "Choose the type of relationship:\n"
-      << "\'A\' or \'Aggregation\'\n" 
-      << "\'C\' or \'Composition\'\n" 
-      << "\'G\' or \'Generalization\'\n" 
-      << "\'R\' or \'Realization\'\n"; 
-    
-    cout << "\nChoice: ";
-    cin >> relshipType;
-    
-    if(!strcasecmp(relshipType.c_str(), "A") || !strcasecmp(relshipType.c_str(), "Aggregation"))
-      typeIndex = 0;
+  // Check to see if destination exists
+  else if(!Model.doesClassExist(destination)) {
+    cout << "The class \"" << destination << "\" does not exist.\n";
+    return;
+  }
+  // Check to see if relationship already exists
+  else if(Model.doesRelationshipExist(source, destination)) {
+    cout << "A relationship already exists between " << source << " and " << destination << ". Aborting.\n";
+    return;
+  }
 
-    else if(!strcasecmp(relshipType.c_str(), "C") || !strcasecmp(relshipType.c_str(), "Composition"))
-      typeIndex = 1;
+  // Check to see if valid type was input
+  else if(!strcasecmp(relshipType.c_str(), "A") || !strcasecmp(relshipType.c_str(), "Aggregation")) {
+    typeIndex = 0;
+  }
+  else if(!strcasecmp(relshipType.c_str(), "C") || !strcasecmp(relshipType.c_str(), "Composition")) {
+    typeIndex = 1;
+  }
+  else if(!strcasecmp(relshipType.c_str(), "G") || !strcasecmp(relshipType.c_str(), "Generalization")) {
+    typeIndex = 2;
+  }
+  else if(!strcasecmp(relshipType.c_str(), "R") || !strcasecmp(relshipType.c_str(), "Realization")) {
+    typeIndex = 3;
+  }
+  else {
+    cout << "Invalid type!\n";
+    return;
+  }
 
-    else if(!strcasecmp(relshipType.c_str(), "G") || !strcasecmp(relshipType.c_str(), "Generalization"))
-      typeIndex = 2;
-
-    else if(!strcasecmp(relshipType.c_str(), "R") || !strcasecmp(relshipType.c_str(), "Realization"))
-      typeIndex = 3;
-
-    else
-      cout << "Invalid type!\n";
-     
-  } while(typeIndex < 0 || typeIndex > 3);
-
-  ERR_CATCH(Model.addRelationship(sourceClassName, destinationClassName, typeIndex));
+  ERR_CATCH(Model.addRelationship(source, destination, typeIndex));
   if(ErrorStatus)
   {
     cout << "Error! Could not add new relationship.\n";
@@ -705,8 +690,8 @@ void UMLCLI::create_relationship()
     return;
   }
 
-  cout << "Relationship added between " << sourceClassName << " and " << destinationClassName
-  << " of type " << Model.getRelationshipType(sourceClassName, destinationClassName) << "\n";
+  cout << "Relationship added between " << source << " and " << destination
+  << " of type " << Model.getRelationshipType(source, destination) << "\n";
   
 }
 
@@ -717,12 +702,8 @@ void UMLCLI::create_relationship()
  * and if it exists, it will be deleted.
  * 
  */
-void UMLCLI::delete_class()
+void UMLCLI::delete_class(string className)
 {
-  string className;
-  cout << "Enter class name to be deleted -> ";
-  cin >> className;
-  
   ERR_CATCH(Model.deleteClass(className));
   if (ErrorStatus)
   {
@@ -740,18 +721,9 @@ void UMLCLI::delete_class()
  * and if the relationship exists, it will be deleted.
  * 
  */
-void UMLCLI::delete_relationship()
+void UMLCLI::delete_relationship(string source, string destination)
 {
-  string sourceClassName;
-  string destinationClassName;
-
-  cout << "Enter the source of the relationship to be deleted -> ";
-  cin >> sourceClassName;
-
-  cout << "Enter the destination of the relationship to be deleted -> ";
-  cin >> destinationClassName;
-
-  ERR_CATCH(Model.deleteRelationship(sourceClassName, destinationClassName));
+  ERR_CATCH(Model.deleteRelationship(source, destination));
 
   if(ErrorStatus)
   {
@@ -770,24 +742,13 @@ void UMLCLI::delete_relationship()
  * they'd like to change it to. Then it gets renamed.
  * 
  */
-void UMLCLI::rename_class()
+void UMLCLI::rename_class(string oldClassName, string newClassName)
 {
-  string oldClassName;
-  string newClassName;
-  
-
-  cout << "Enter the CURRENT name of the class you\'d like to rename. -> ";
-  cin >> oldClassName;
-
   if (!Model.doesClassExist(oldClassName))
   {
     cout << "Error! The class you typed does not exist.\n";
     return;
   }
-  
-  cout << "Enter the new name you\'d like to rename it to. -> ";
-  cin >> newClassName;
-  
   ERR_CATCH(Model.changeClassName(oldClassName, newClassName));
   if(ErrorStatus)
   {
@@ -807,57 +768,43 @@ void UMLCLI::rename_class()
  * and NEW type. Then the relationship type will be changed.
  * 
  */
-void UMLCLI::change_relationship()
+void UMLCLI::change_relationship(string source, string destination, string relshipType)
 {
-  string source;
-  string destination;
-  string relshipType;
   int typeIndex = -1;
-
-  cout << "Type in the source of the relationship whose type you\'d like to change. -> ";
-  cin >> source;
-  if (!Model.doesClassExist(source))
-  {
-    cout << "Error! The class you typed does not exist.\n";
+  
+  // Check to see if source exists
+  if(!Model.doesClassExist(source)) {
+    cout << "The class \"" << source << "\" does not exist.\n";
+    return;
+  }
+  // Check to see if destination exists
+  else if(!Model.doesClassExist(destination)) {
+    cout << "The class \"" << destination << "\" does not exist.\n";
+    return;
+  }
+  // Check to see if relationship already exists
+  else if(Model.doesRelationshipExist(source, destination)) {
+    cout << "A relationship already exists between " << source << " and " << destination << ". Aborting.\n";
     return;
   }
 
-  cout << "Type in the destination. -> ";
-  cin >> destination;
-
-  if (!Model.doesClassExist(destination))
-  {
-    cout << "Error! The class you typed does not exist.\n";
+  // Check to see if valid type was input
+  else if(!strcasecmp(relshipType.c_str(), "A") || !strcasecmp(relshipType.c_str(), "Aggregation")) {
+    typeIndex = 0;
+  }
+  else if(!strcasecmp(relshipType.c_str(), "C") || !strcasecmp(relshipType.c_str(), "Composition")) {
+    typeIndex = 1;
+  }
+  else if(!strcasecmp(relshipType.c_str(), "G") || !strcasecmp(relshipType.c_str(), "Generalization")) {
+    typeIndex = 2;
+  }
+  else if(!strcasecmp(relshipType.c_str(), "R") || !strcasecmp(relshipType.c_str(), "Realization")) {
+    typeIndex = 3;
+  }
+  else {
+    cout << "Invalid type!\n";
     return;
   }
-
-  do
-  {
-    cout << "Choose the type of relationship:\n"
-      << "\'A\' or \'Aggregation\'\n" 
-      << "\'C\' or \'Composition\'\n" 
-      << "\'G\' or \'Generalization\'\n" 
-      << "\'R\' or \'Realization\'\n"; 
-    
-    cout << "\nChoice: ";
-    cin >> relshipType;
-    
-    if(!strcasecmp(relshipType.c_str(), "A") || !strcasecmp(relshipType.c_str(), "Aggregation"))
-      typeIndex = 0;
-
-    else if(!strcasecmp(relshipType.c_str(), "C") || !strcasecmp(relshipType.c_str(), "Composition"))
-      typeIndex = 1;
-
-    else if(!strcasecmp(relshipType.c_str(), "G") || !strcasecmp(relshipType.c_str(), "Generalization"))
-      typeIndex = 2;
-
-    else if(!strcasecmp(relshipType.c_str(), "R") || !strcasecmp(relshipType.c_str(), "Realization"))
-      typeIndex = 3;
-
-    else
-      cout << "Invalid type!\n";
-     
-  } while(typeIndex < 0 || typeIndex > 3);
 
   ERR_CATCH(Model.changeRelationshipType(source, destination, typeIndex));
   if(ErrorStatus)
@@ -876,13 +823,8 @@ void UMLCLI::change_relationship()
  * @brief Saves the user's progress into a json file.
  * 
  */
-void UMLCLI::save_uml()
+void UMLCLI::save_uml(string fileName)
 {
-  // Saves UML diagram to a JSON file in the same directory as the executable
-  cout << "Name of file: ";
-  string fileName;
-  cin >> fileName;
-
   UMLFile file(fileName + ".json");
   file.save(Model);
   cout << "Your file has been saved\n";
@@ -894,13 +836,8 @@ void UMLCLI::save_uml()
  * @brief Loads a json save file, overwriting the current session.
  * 
  */
-void UMLCLI::load_uml()
+void UMLCLI::load_uml(string fileName)
 {
-  // Ask for name of file, and then load UML data given the proper format
-  cout << "Name of file: ";
-  string fileName;
-  cin >> fileName;
-
   UMLFile file(fileName + ".json");
   // Requires unique try catch in order to handle file loading error
   try {

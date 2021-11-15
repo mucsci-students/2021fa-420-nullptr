@@ -128,40 +128,31 @@ class UMLCLI
 
     // User creates and names a class and may give it any number
     // of attributes.
-    void create_class();
+    void create_class(string className);
 
     // Creates a new relationship between classes.
-    void create_relationship();
+    void create_relationship(string source, string destination, string relshipType);
 
     // User will be prompted to type in the class name,
     // and if it exists, it will be deleted.
-    void delete_class();
+    void delete_class(string className);
 
     // User will be prompted to type in the source and destination,
     // and if the relationship exists, it will be deleted.
-    void delete_relationship();
+    void delete_relationship(string source, string destination);
 
     // User types in the current class name, and then the name
     // they'd like to change it to. Then it gets renamed.
-    void rename_class();
+    void rename_class(string oldClassName, string newClassName);
 
     // User will be prompted to type in the source, destination,
     // and NEW type. Then the relationship type will be changed.
-    void change_relationship();
-
-    // Does various things with fields based on user input.
-    void edit_fields();
-
-    // Does various things with methods based on user input.
-    void edit_methods();
-
-    // Does various things with parameters based on user input.
-    void edit_parameters(string className);
+    void change_relationship(string source, string destination, string relshipType);
 
     // Saves the user's progress into a json file.
-    void save_uml();
+    void save_uml(string fileName);
 
     // Loads a json save file, overwriting the current session.
-    void load_uml();
+    void load_uml(string fileName);
    
 };
