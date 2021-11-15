@@ -61,7 +61,7 @@ class UMLCLI
     /********************/
     //Adding
 
-    bool add_field(string className);
+    bool add_field(string className, string fieldName, string fieldType);
     bool add_method(string className);
     bool add_parameter(string className, method_ptr methodIter);
 
@@ -69,7 +69,7 @@ class UMLCLI
     /********************/
     //Deleting
     
-    void delete_field(string className);
+    void delete_field(string className, string fieldName);
     void delete_method(string className);
     void delete_parameter(string className, method_ptr methodIter);
 
@@ -77,14 +77,14 @@ class UMLCLI
     /********************/
     //Renaming
     
-    void rename_field(string className);
+    void rename_field(string className, string fieldNameFrom, string fieldNameTo);
     void rename_method(string className);
     void rename_parameter(method_ptr methodIter);
 
     /********************/
     //Type changing
 
-    void change_field(string className);
+    void change_field(string className, string fieldName, string newFieldType);
     void change_method(string className);
     void change_parameter(string className, method_ptr methodIter);
 

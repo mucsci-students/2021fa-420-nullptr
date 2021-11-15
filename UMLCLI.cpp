@@ -201,11 +201,11 @@ void UMLCLI::cli_menu()
   
   // Add Field
   fieldMenu -> Insert(
-      "add", {"class_name"},
-      [&](std::ostream& out, string className)
+      "add", {"class_name", "field_name", "field_type"},
+      [&](std::ostream& out, string className, string fieldName, string fieldType)
       {
           if (Model.doesClassExist(className)) {
-            add_field(className);
+            add_field(className, fieldName, fieldType);
           }
           else{
             out << "Class does not exist. Cannot add fields.\n";
@@ -215,11 +215,11 @@ void UMLCLI::cli_menu()
   
   // Delete Field
   fieldMenu -> Insert(
-      "delete", {"class_name"},
-      [&](std::ostream& out, string className)
+      "delete", {"class_name", "field_name"},
+      [&](std::ostream& out, string className, string fieldName)
       {
           if (Model.doesClassExist(className)) {
-            delete_field(className);
+            delete_field(className, fieldName);
           }
           else{
             out << "Class does not exist. Cannot delete fields.\n";
@@ -229,11 +229,11 @@ void UMLCLI::cli_menu()
   
   // Rename Field
   fieldMenu -> Insert(
-      "rename", {"class_name"},
-      [&](std::ostream& out, string className)
+      "rename", {"class_name", "field_name_from", "field_name_to"},
+      [&](std::ostream& out, string className, string fieldNameFrom, string fieldNameTo)
       {
           if (Model.doesClassExist(className)) {
-            rename_field(className);
+            rename_field(className, fieldNameFrom, fieldNameTo);
           }
           else{
             out << "Class does not exist. Cannot rename fields.\n";
@@ -243,11 +243,11 @@ void UMLCLI::cli_menu()
   
   // Change Field
   fieldMenu -> Insert(
-      "change", {"class_name"},
-      [&](std::ostream& out, string className)
+      "change", {"class_name", "field_name", "new_field_type"},
+      [&](std::ostream& out, string className, string fieldName, string newFieldType)
       {
           if (Model.doesClassExist(className)) {
-            change_field(className);
+            change_field(className, fieldName, newFieldType);
           }
           else{
             out << "Class does not exist. Cannot change field types.\n";
@@ -608,26 +608,6 @@ void UMLCLI::create_class(string className)
 
   cout << "Successfully added new class \"" << className << "\".\n";
 
-  cout << "How many fields would you like to start with? -> ";
-  size_t fieldCount = user_int_input();
-
-  for(size_t i = 0; i < fieldCount; i++)
-  {
-    cout << "Field " << (i+1) << ":\n";
-    if(!add_field(className))
-      i--;
-  }
-
-  cout << "How many methods would you like to start with? -> ";
-  size_t methodCount = user_int_input();
-
-  for(size_t i = 0; i < methodCount; i++)
-  {
-    cout << "Method " << (i+1) << ":\n";
-    if(!add_method(className))
-    i--;
-  }
-
   UMLClass newClass = Model.getClassCopy(className);
 
   cout << "Overview:\n";
@@ -870,23 +850,8 @@ void UMLCLI::load_uml(string fileName)
  * 
  * @param className 
  */
-bool UMLCLI::add_field(string className)
+bool UMLCLI::add_field(string className, string fieldName, string fieldType)
 {
-  string fieldName;
-  string fieldType;
-
-  cout << "Type a name for the field you\'d like to add. -> ";
-  cin >> fieldName;
-  
-  while(Model.doesFieldExist(className, fieldName))
-  { 
-    cout << "That name is already taken.\nTry a different name. -> ";
-    cin >> fieldName;
-  }
-
-  cout << "What type would you like to give it? -> ";
-  cin >> fieldType;
-
   ERR_CATCH(Model.addClassAttribute(className, std::make_shared<UMLField>(fieldName, fieldType)));
   if (ErrorStatus)
   {
@@ -997,13 +962,9 @@ bool UMLCLI::add_parameter(string className, method_ptr methodIter)
  * 
  * @param className 
  */
-void UMLCLI::delete_field(string className)
+void UMLCLI::delete_field(string className, string fieldName)
 {
-  
   attr_ptr fieldIter;
-  string fieldName;
-  cout << "Type the name of the field you\'d like to delete. -> ";
-  cin >> fieldName;
 
   ERR_CATCH(fieldIter = select_field(className, fieldName));
   ERR_CATCH(Model.removeClassAttribute(className, fieldIter));
@@ -1092,14 +1053,9 @@ void UMLCLI::delete_parameter(string className, method_ptr methodIter)
  * 
  * @param className 
  */
-void UMLCLI::rename_field(string className)
+void UMLCLI::rename_field(string className, string fieldNameFrom, string fieldNameTo)
 {
   attr_ptr fieldIter;
-  string fieldNameFrom;
-  string fieldNameTo;
-
-  cout << "Type the name of the field you\'d like to rename FROM -> ";
-  cin >> fieldNameFrom;
 
   ERR_CATCH(fieldIter = select_field(className, fieldNameFrom));
   if (ErrorStatus)
@@ -1108,18 +1064,14 @@ void UMLCLI::rename_field(string className)
     ErrorStatus = false;
     return;
   }
-
-  cout << "Type the name of the field you\'d like to rename TO -> ";
-  cin >> fieldNameTo;
-
-  while(Model.doesFieldExist(className, fieldNameTo))
+  else if (Model.doesFieldExist(className, fieldNameTo))
   {
-    cout << "That name is already taken.\nTry a different name. -> ";
-    cin >> fieldNameTo;
+    cout << "Error! That field already exists. Aborting...\n";
+    return;
   }
   
   ERR_CATCH(Model.changeAttributeName(className, fieldIter, fieldNameTo))
-  if(ErrorStatus)
+  if (ErrorStatus)
   {
     cout << "Failed to change name. Aborting...\n";
     ErrorStatus = false;
@@ -1211,17 +1163,9 @@ void UMLCLI::rename_parameter(method_ptr methodIter)
  * 
  * @param className 
  */
-void UMLCLI::change_field(string className)
+void UMLCLI::change_field(string className, string fieldName, string newFieldType)
 {
   attr_ptr fieldIter;
-  string fieldName;
-  string newFieldType;
-
-  cout << "Enter the name of the field whose type you\'d like to change. -> ";
-  cin >> fieldName;
-
-  cout << "Enter the NEW type you want to give it. -> ";
-  cin >> newFieldType;
 
   ERR_CATCH(fieldIter = select_field(className, fieldName));
   ERR_CATCH(Model.changeAttributeType(fieldIter, newFieldType));
