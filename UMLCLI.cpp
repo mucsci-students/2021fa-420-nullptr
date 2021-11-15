@@ -22,7 +22,7 @@
 #include <cli/loopscheduler.h>
 #include <cli/clilocalsession.h>
 #include <vector>
-#include <algorithm> // std::copy
+#include <algorithm>
 #include "include/UMLCLI.hpp"
 //--------------------------------------------------------------------
 // Using declarations
@@ -55,13 +55,13 @@ void UMLCLI::cli_menu()
   /*
   ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
   |**************************************************************|
-  |                           ROOT MENU                          |
+  |                           MAIN MENU                          |
   |**************************************************************|
   \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////
   */
 
   // Setup CLI's initial root menu
-  auto rootMenu = make_unique<Menu>("cli");
+  auto rootMenu = make_unique<Menu>("cli", "Main menu for basic UML functions.");
 
   // List Classes
   rootMenu -> Insert(
@@ -182,7 +182,7 @@ void UMLCLI::cli_menu()
   */
 
   // Create submenu for editing fields
-  auto fieldMenu = make_unique<Menu>("edit_fields");
+  auto fieldMenu = make_unique<Menu>("edit_fields", "Submenu for operations on class fields.");
 
   // View Class
   fieldMenu -> Insert(
@@ -278,7 +278,7 @@ void UMLCLI::cli_menu()
   */
 
   // Create submenu for editing methods
-  auto methodMenu = make_unique<Menu>("edit_methods");
+  auto methodMenu = make_unique<Menu>("edit_methods", "Submenu for operations on class methods.");
 
   // View Class
   methodMenu -> Insert(
@@ -374,7 +374,7 @@ void UMLCLI::cli_menu()
   */
 
   // Create sub-submenu for editing parameters
-  auto parameterMenu = make_unique<Menu>("edit_parameters");
+  auto parameterMenu = make_unique<Menu>("edit_parameters", "Submenu for operations on method parameters.");
 
   // View Class
   parameterMenu -> Insert(
@@ -618,10 +618,6 @@ void UMLCLI::create_class(string className)
 
 /**
  * @brief Creates a new relationship between classes.
- * 
- * This one might be difficult. I may have to
- * fundamentally change this code, rather than simply
- * making a few changes.
  * 
  */
 void UMLCLI::create_relationship(string source, string destination, string relshipType)
