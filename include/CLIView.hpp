@@ -105,10 +105,10 @@ class CLIView
     string get_user_input();
 
     int user_int_input();  
-}
+};
 
 // This class will be called by Tests.cpp
 class CLIViewProxy: public CLIView
 {   
 
-}
+};
