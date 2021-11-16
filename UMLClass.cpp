@@ -146,9 +146,9 @@ bool UMLClass::checkAttribute(std::shared_ptr<UMLAttribute> attribute)
 				list<UMLParameter> params1 = std::dynamic_pointer_cast<UMLMethod>(classAttributes[i])->getParam();
 				list<UMLParameter> params2 = std::dynamic_pointer_cast<UMLMethod>(attribute)->getParam();
 				// Parameters are equal, so this breaks overload rules
-        if (params1 == params2) {
-          return true;
-        }
+				if (params1 == params2) {
+					return true;
+				}
 			}
       // Else, the given attribute existing doesn't cause the method to break overloading rules. Continue looping
     }
