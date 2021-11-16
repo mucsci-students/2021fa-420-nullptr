@@ -53,14 +53,14 @@ var yval_rect = 150;
   nested.text(uclass["name"]).dy(text_y).dx(text_x);
 
 
-  const textElement = document.querySelector('text')  
-const bbox = textElement.getBBox();  
-const {width} = bbox;  
-var w =console.log(width);
-if(width >=150){
+// const textElement = document.querySelector('text')  
+//const bbox = textElement.getBBox();  
+//const {width} = bbox;  
+//var w =console.log(width);
+//if(width >=150){
     
-  xval_rect += 10;
-}
+//  xval_rect += 10;
+//}
 
 
 
