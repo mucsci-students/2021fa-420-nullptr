@@ -50,9 +50,6 @@ using namespace std;
  */
 void UMLCLI::cli_menu()
 {
-  // Initialize global variables used for handling overloads
-  clear_selected_method();
-
   //--------------------------------------------------------------------
 
   /*
@@ -78,18 +75,18 @@ void UMLCLI::cli_menu()
     [&](std::ostream& out){ list_relationships(); },
     "Lists all relationships created by the user. (e.g. [source -> destination])");
 
-  // Create Class
+  // Add Class
   rootMenu -> Insert(
-    "create_class", {"class_name"},
+    "add_class", {"class_name"},
     [&](std::ostream& out, string className)
     {
       create_class(className);
     },
     "Create a class with the name of the given argument.");
 
-  // Create Relationship
+  // Add Relationship
   rootMenu -> Insert(
-    "create_relationship", {"source", "destnation", "relship_type"},
+    "add_relationship", {"source", "destnation", "relship_type"},
     [&](std::ostream& out, string source, string destination, string relshipType)
     {
       create_relationship(source, destination, relshipType);
@@ -116,7 +113,7 @@ void UMLCLI::cli_menu()
 
   // Rename Class
   rootMenu -> Insert(
-    "create_class", {"old_class_name", "new_class_name"},
+    "rename_class", {"old_class_name", "new_class_name"},
     [&](std::ostream& out, string oldClassName, string newClassName)
     {
       rename_class(oldClassName, newClassName);
@@ -204,8 +201,8 @@ void UMLCLI::cli_menu()
   
   // Add Field
   fieldMenu -> Insert(
-      "add", {"class_name", "field_name", "field_type"},
-      [&](std::ostream& out, string className, string fieldName, string fieldType)
+      "add", {"class_name", "field_type", "field_name"},
+      [&](std::ostream& out, string className, string fieldType, string fieldName)
       {
           if (Model.doesClassExist(className)) {
             add_field(className, fieldName, fieldType);
@@ -282,22 +279,20 @@ void UMLCLI::cli_menu()
   // Create submenu for editing methods
   auto methodMenu = make_unique<Menu>("edit_methods", "Submenu for operations on class methods.");
 
-  // Select Method
+   // Select Method
   methodMenu -> Insert(
     "select_method", {"class_name", "method_name", "method_number"},
     [&](std::ostream& out, string className, string methodName, int methodNumber)
     {
         if (Model.doesClassExist(className)) {
           // Check to see if method we're attempting to select exists
-          ERR_CATCH(SelectedMethod = select_overload(className, methodName, methodNumber));
+          method_ptr methodIter;
+          ERR_CATCH(methodIter = select_overload(className, methodName, methodNumber));
           if (!ErrorStatus) { 
             out << "Method " << methodName << " selected.\n";
             cout << "Overview:\n";
-            display_method(className, SelectedMethod);
-
-            // Setup global variables
-            MethodClassName = methodName;
-            MethodSelected = true;
+            display_method(className, methodIter);
+            store_selected_method(className, methodIter);
           }
           else {
             out << "Method does not exist. Cannot select method.\n";
@@ -313,10 +308,15 @@ void UMLCLI::cli_menu()
 
   // View Selected Method
   methodMenu -> Insert(
-    "view_selected_method", {},
+    "view_selected", {},
     [&](std::ostream& out)
     {
-      display_method(MethodClassName, SelectedMethod);
+      if (!MethodSelected) {
+        out << "No method selected. Cannot view selected method..\n";
+      }
+      else {
+        display_method(MethodClassName, SelectedMethod);
+      };
     },
     "View the currently selected method.");
 
@@ -337,8 +337,8 @@ void UMLCLI::cli_menu()
   
   // Add Method
   methodMenu -> Insert(
-    "add", {"class_name", "method_name", "method_type"},
-    [&](std::ostream& out, string className, string methodName, string methodType)
+    "add", {"class_name", "method_type", "method_name"},
+    [&](std::ostream& out, string className, string methodType, string methodName)
     {
         if (Model.doesClassExist(className)) {
           add_method(className, methodName, methodType);
@@ -430,7 +430,7 @@ void UMLCLI::cli_menu()
           if (!ErrorStatus) { 
             out << "Method " << methodName << " selected.\n";
             cout << "Overview:\n";
-            display_method(className, SelectedMethod);
+            display_method(className, methodIter);
             store_selected_method(className, methodIter);
           }
           else {
@@ -447,7 +447,7 @@ void UMLCLI::cli_menu()
   
   // View Selected Method
   parameterMenu -> Insert(
-    "view_selected_method", {},
+    "view_selected", {},
     [&](std::ostream& out)
     {
       display_method(MethodClassName, SelectedMethod);
@@ -496,8 +496,8 @@ void UMLCLI::cli_menu()
   
   // Add Parameter
   parameterMenu -> Insert(
-      "add", {"param_name", "param_type"},
-      [&](std::ostream& out, string paramName, string paramType)
+      "add", {"param_type", "param_name"},
+      [&](std::ostream& out, string paramType, string paramName)
       {
         if (!MethodSelected) {
           out << "No method selected. Cannot add parameter.\n";
@@ -571,6 +571,10 @@ void UMLCLI::cli_menu()
   |**************************************************************|
   \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////
   */
+
+  // Initialize global variables
+  ErrorStatus = false;
+  clear_selected_method();
 
   // Initialize menus in order of submenuing.
   methodMenu -> Insert(std::move(parameterMenu));
@@ -1442,8 +1446,8 @@ int UMLCLI::method_number(string className, method_ptr method)
     {
       method_ptr element = std::dynamic_pointer_cast<UMLMethod>(attributeIter);
       methodMatches.push_back(element);
-      // methodNumber - 1 should equal overload location in vector
-      if(methodNumber - 1 == methodMatches.size()) {
+      // Should have reached element when the number matches the size
+      if(methodNumber == (int) methodMatches.size()) {
         return element;
       }
     }
