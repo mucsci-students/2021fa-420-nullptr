@@ -50,6 +50,9 @@ using namespace std;
  */
 void UMLCLI::cli_menu()
 {
+  // Initialize global variables used for handling overloads
+  clear_selected_method();
+
   //--------------------------------------------------------------------
 
   /*
@@ -132,14 +135,14 @@ void UMLCLI::cli_menu()
   // Undo
   rootMenu -> Insert(
     "undo",
-    [&](std::ostream& out){ undo(); },
-    "Undo the most recent thing you\'ve done.");
+    [&](std::ostream& out){ clear_selected_method(); undo(); },
+    "Undo the most recent thing you\'ve done. WARNING: Also clears your selected method.");
 
   // Redo 
   rootMenu -> Insert(
     "redo",
-    [&](std::ostream& out){ redo(); },
-    "Redo your most recently undone action.");
+    [&](std::ostream& out){ clear_selected_method(); redo(); },
+    "Redo your most recently undone action. WARNING: Also clears your selected method.");
   
   // Load 
   rootMenu -> Insert(
@@ -208,7 +211,7 @@ void UMLCLI::cli_menu()
             add_field(className, fieldName, fieldType);
           }
           else{
-            out << "Class does not exist. Cannot add fields.\n";
+            out << "Class does not exist. Cannot add field.\n";
           };
       },
       "Add a new field.");
@@ -222,7 +225,7 @@ void UMLCLI::cli_menu()
             delete_field(className, fieldName);
           }
           else{
-            out << "Class does not exist. Cannot delete fields.\n";
+            out << "Class does not exist. Cannot delete field.\n";
           };
       },
       "Deletes an existing field.");
@@ -236,7 +239,7 @@ void UMLCLI::cli_menu()
             rename_field(className, fieldNameFrom, fieldNameTo);
           }
           else{
-            out << "Class does not exist. Cannot rename fields.\n";
+            out << "Class does not exist. Cannot rename field.\n";
           };
       },
       "Renames an existing field.");
@@ -250,23 +253,22 @@ void UMLCLI::cli_menu()
             change_field(className, fieldName, newFieldType);
           }
           else{
-            out << "Class does not exist. Cannot change field types.\n";
+            out << "Class does not exist. Cannot change field type.\n";
           };
       },
       "Changes the type of an existing field.");
     
   // Undo
   fieldMenu -> Insert(
-      "undo",
-      [&](std::ostream& out){ undo(); },
-      "Undo the most recent thing you\'ve done.");
+    "undo",
+    [&](std::ostream& out){ clear_selected_method(); undo(); },
+    "Undo the most recent thing you\'ve done. WARNING: Also clears your selected method.");
 
   // Redo 
   fieldMenu -> Insert(
-      "redo",
-      [&](std::ostream& out){ redo(); },
-      "Redo your most recently undone action.");
-
+    "redo",
+    [&](std::ostream& out){ clear_selected_method(); redo(); },
+    "Redo your most recently undone action. WARNING: Also clears your selected method.");
   //--------------------------------------------------------------------
 
   /*
@@ -280,88 +282,128 @@ void UMLCLI::cli_menu()
   // Create submenu for editing methods
   auto methodMenu = make_unique<Menu>("edit_methods", "Submenu for operations on class methods.");
 
+  // Select Method
+  methodMenu -> Insert(
+    "select_method", {"class_name", "method_name", "method_number"},
+    [&](std::ostream& out, string className, string methodName, int methodNumber)
+    {
+        if (Model.doesClassExist(className)) {
+          // Check to see if method we're attempting to select exists
+          ERR_CATCH(SelectedMethod = select_overload(className, methodName, methodNumber));
+          if (!ErrorStatus) { 
+            out << "Method " << methodName << " selected.\n";
+            cout << "Overview:\n";
+            display_method(className, SelectedMethod);
+
+            // Setup global variables
+            MethodClassName = methodName;
+            MethodSelected = true;
+          }
+          else {
+            out << "Method does not exist. Cannot select method.\n";
+            out << "Make sure you are selecting the correct method number.\n";
+            out << "This number be found by viewing the class and observing the final number placed next to a method.\n";
+          }
+        }
+        else{
+          out << "Class does not exist. Cannot select method.\n";
+        };
+    },
+    "Select a method for use in other operations.");
+
+  // View Selected Method
+  methodMenu -> Insert(
+    "view_selected_method", {},
+    [&](std::ostream& out)
+    {
+      display_method(MethodClassName, SelectedMethod);
+    },
+    "View the currently selected method.");
+
   // View Class
   methodMenu -> Insert(
-      "view", {"class_name"},
-      [&](std::ostream& out, string className)
-      {
-          if (Model.doesClassExist(className)) {
-            UMLClass currentClass = Model.getClassCopy(className);
-            display_class(currentClass);
-          }
-          else{
-            out << "Class does not exist. Cannot view class.\n";
-          };
-      },
-      "View a given class with its fields and methods.");
+    "view_class", {"class_name"},
+    [&](std::ostream& out, string className)
+    {
+        if (Model.doesClassExist(className)) {
+          UMLClass currentClass = Model.getClassCopy(className);
+          display_class(currentClass);
+        }
+        else{
+          out << "Class does not exist. Cannot view class.\n";
+        };
+    },
+    "View a given class with its fields and methods.");
   
   // Add Method
   methodMenu -> Insert(
-      "add", {"class_name"},
-      [&](std::ostream& out, string className)
-      {
-          if (Model.doesClassExist(className)) {
-            add_method(className);
-          }
-          else{
-            out << "Class does not exist. Cannot add fields.\n";
-          };
-      },
-      "Add a new method.");
+    "add", {"class_name", "method_name", "method_type"},
+    [&](std::ostream& out, string className, string methodName, string methodType)
+    {
+        if (Model.doesClassExist(className)) {
+          add_method(className, methodName, methodType);
+        }
+        else{
+          out << "Class does not exist. Cannot add method.\n";
+        };
+    },
+    "Add a new method.");
   
   // Delete Method
   methodMenu -> Insert(
-      "delete", {"class_name"},
-      [&](std::ostream& out, string className)
-      {
-          if (Model.doesClassExist(className)) {
-            delete_method(className);
-          }
-          else{
-            out << "Class does not exist. Cannot delete fields.\n";
-          };
-      },
-      "Deletes an existing method.");
+    "delete", {},
+    [&](std::ostream& out)
+    {
+      if (!MethodSelected) {
+        out << "No method selected. Cannot delete method.\n";
+      }
+      else {
+        delete_method();
+        // Clear global variables, as method no longer exists
+        clear_selected_method();
+      };
+    },
+    "Deletes the method selected by select_method.");
   
   // Rename Method
   methodMenu -> Insert(
-      "rename", {"class_name"},
-      [&](std::ostream& out, string className)
-      {
-          if (Model.doesClassExist(className)) {
-            rename_method(className);
-          }
-          else{
-            out << "Class does not exist. Cannot rename fields.\n";
-          };
+    "rename", {"new_method_name"},
+    [&](std::ostream& out, string newMethodName)
+    {
+        if (!MethodSelected) {
+          out << "No method selected. Cannot rename method.\n";
+        }
+        else {
+          rename_method(newMethodName);
+        }
       },
-      "Renames an existing method.");
+    "Renames the method selected by select_method to new_method_name.");
   
   // Change Method
   methodMenu -> Insert(
-      "change", {"class_name"},
-      [&](std::ostream& out, string className)
-      {
-          if (Model.doesClassExist(className)) {
-            change_method(className);
-          }
-          else{
-            out << "Class does not exist. Cannot change field types.\n";
-          };
-      },
-      "Changes the type of an existing method.");
+    "change", {"new_method_type"},
+    [&](std::ostream& out, string newMethodType)
+    {
+        if (!MethodSelected) {
+          out << "No method selected. Cannot change method type.\n";
+        }
+        else {
+          change_method(newMethodType);
+        }
+    },
+    "Changes the type of the method selected by select_method to new_method_type.");
     
   // Undo
   methodMenu -> Insert(
-      "undo",
-      [&](std::ostream& out){ undo(); },
-      "Undo the most recent thing you\'ve done.");
+    "undo",
+    [&](std::ostream& out){ clear_selected_method(); undo(); },
+    "Undo the most recent thing you\'ve done. WARNING: Also clears your selected method.");
 
   // Redo 
   methodMenu -> Insert(
-      "redo",
-      [&](std::ostream& out){ redo(); },
-      "Redo your most recently undone action.");
+    "redo",
+    [&](std::ostream& out){ clear_selected_method(); redo(); },
+    "Redo your most recently undone action. WARNING: Also clears your selected method.");
 
   //--------------------------------------------------------------------
 
@@ -376,34 +418,70 @@ void UMLCLI::cli_menu()
   // Create sub-submenu for editing parameters
   auto parameterMenu = make_unique<Menu>("edit_parameters", "Submenu for operations on method parameters.");
 
+  // Select Method
+  parameterMenu -> Insert(
+    "select_method", {"class_name", "method_name", "method_number"},
+    [&](std::ostream& out, string className, string methodName, int methodNumber)
+    {
+        if (Model.doesClassExist(className)) {
+          // Check to see if method we're attempting to select exists
+          method_ptr methodIter;
+          ERR_CATCH(methodIter = select_overload(className, methodName, methodNumber));
+          if (!ErrorStatus) { 
+            out << "Method " << methodName << " selected.\n";
+            cout << "Overview:\n";
+            display_method(className, SelectedMethod);
+            store_selected_method(className, methodIter);
+          }
+          else {
+            out << "Method does not exist. Cannot select method.\n";
+            out << "Make sure you are selecting the correct method number.\n";
+            out << "This number be found by viewing the class and observing the final number placed next to a method.\n";
+          }
+        }
+        else{
+          out << "Class does not exist. Cannot select method.\n";
+        };
+    },
+    "Select a method for use in other operations.");
+  
+  // View Selected Method
+  parameterMenu -> Insert(
+    "view_selected_method", {},
+    [&](std::ostream& out)
+    {
+      display_method(MethodClassName, SelectedMethod);
+    },
+    "View the currently selected method.");
+
   // View Class
   parameterMenu -> Insert(
-      "view_class", {"class_name"},
-      [&](std::ostream& out, string className)
-      {
-          if (Model.doesClassExist(className)) {
-            UMLClass currentClass = Model.getClassCopy(className);
-            display_class(currentClass);
-          }
-          else{
-            out << "Class does not exist. Cannot view class.\n";
-          };
-      },
-      "View a given class with its fields and methods.");
+    "view_class", {"class_name"},
+    [&](std::ostream& out, string className)
+    {
+        if (Model.doesClassExist(className)) {
+          UMLClass currentClass = Model.getClassCopy(className);
+          display_class(currentClass);
+        }
+        else{
+          out << "Class does not exist. Cannot view class.\n";
+        };
+    },
+    "View a given class with its fields and methods.");
 
   // View Method
   parameterMenu -> Insert(
-      "view_method", {"class_name", "method_name"},
-      [&](std::ostream& out, string className, string methodName)
+      "view_method", {"class_name", "method_name", "method_number"},
+      [&](std::ostream& out, string className, string methodName, int methodNumber)
       {
           // Only perform method find if class was found
           if (Model.doesClassExist(className)) {
             // Check if method exists and store into pointer.
             method_ptr methodIter;
-            ERR_CATCH(methodIter = select_method(className, methodName));
+            ERR_CATCH(methodIter = select_overload(className, methodName, methodNumber));
             // Only perform action if method was found
             if(!ErrorStatus) {
-              display_method(methodIter);
+              display_method(className, methodIter);
             }
             else {
               out << "Method does not exist. Cannot view method.\n";
@@ -418,90 +496,71 @@ void UMLCLI::cli_menu()
   
   // Add Parameter
   parameterMenu -> Insert(
-      "add", {"class_name", "method_name"},
-      [&](std::ostream& out, string className, string methodName)
+      "add", {"param_name", "param_type"},
+      [&](std::ostream& out, string paramName, string paramType)
       {
-          // Only perform method find if class was found
-          if (Model.doesClassExist(className)) {
-            // Check if method exists and store into pointer.
-            method_ptr methodIter;
-            ERR_CATCH(methodIter = select_method(className, methodName));
-            // Only perform action if method was found
-            if(!ErrorStatus) {
-              add_parameter(className, methodIter);
-            }
-            else {
-              out << "Method does not exist. Cannot add parameters.\n";
-              ErrorStatus = false;
-            }
-          }
-          else{
-            out << "Class does not exist. Cannot add parameters.\n";
-          };
+        if (!MethodSelected) {
+          out << "No method selected. Cannot add parameter.\n";
+        }
+        else {
+          add_parameter(paramName, paramType);
+        }
       },
       "Add a new parameter to a given method.");
   
   // Delete Parameter
   parameterMenu -> Insert(
-      "delete", {"class_name", "method_name"},
-      [&](std::ostream& out, string className, string methodName)
+      "delete", {"param_name"},
+      [&](std::ostream& out, string paramName)
       {
-          // Only perform method find if class was found
-          if (Model.doesClassExist(className)) {
-            // Check if method exists and store into pointer.
-            method_ptr methodIter;
-            ERR_CATCH(methodIter = select_method(className, methodName));
-            // Only perform action if method was found
-            if(!ErrorStatus) {
-              delete_parameter(className, methodIter);
-            }
-            else {
-              out << "Method does not exist. Cannot delete parameters.\n";
-              ErrorStatus = false;
-            }
-          }
-          else{
-            out << "Class does not exist. Cannot delete parameters.\n";
-          };
+        if (!MethodSelected) {
+          out << "No method selected. Cannot delete parameter.\n";
+        }
+        else {
+          delete_parameter(paramName);
+        }
+      },
+      "Delete an existing parameter of a given method.");
+  
+  // Delete Parameter
+  parameterMenu -> Insert(
+      "rename", {"param_name_old", "param_name_new"},
+      [&](std::ostream& out, string paramNameOld, string paramNameNew)
+      {
+        if (!MethodSelected) {
+          out << "No method selected. Cannot rename parameter.\n";
+        }
+        else {
+          rename_parameter(paramNameOld, paramNameNew);
+        }
       },
       "Delete an existing parameter of a given method.");
   
   // Change Parameter
   parameterMenu -> Insert(
-      "change", {"class_name", "method_name"},
-      [&](std::ostream& out, string className, string methodName)
+      "change", {"param_name", "new_param_type"},
+      [&](std::ostream& out, string paramName, string newParamType)
       {
-          // Only perform method find if class was found
-          if (Model.doesClassExist(className)) {
-            // Check if method exists and store into pointer.
-            method_ptr methodIter;
-            ERR_CATCH(methodIter = select_method(className, methodName));
-            // Only perform action if method was found
-            if(!ErrorStatus) {
-              change_parameter(className, methodIter);
-            }
-            else {
-              out << "Method does not exist. Cannot change parameter types.\n";
-              ErrorStatus = false;
-            }
-          }
-          else{
-            out << "Class does not exist. Cannot change parameter types.\n";
-          };
+        if (!MethodSelected) {
+          out << "No method selected. Cannot change parameter type.\n";
+        }
+        else {
+          change_parameter(paramName, newParamType);
+        }
       },
       "Changes an existing parameter's type within a given method.");
   
   // Undo
   parameterMenu -> Insert(
-      "undo",
-      [&](std::ostream& out){ undo(); },
-      "Undo the most recent thing you\'ve done.");
+    "undo",
+    [&](std::ostream& out){ clear_selected_method(); undo(); },
+    "Undo the most recent thing you\'ve done. WARNING: Also clears your selected method.");
 
   // Redo 
   parameterMenu -> Insert(
-      "redo",
-      [&](std::ostream& out){ redo(); },
-      "Redo your most recently undone action.");
+    "redo",
+    [&](std::ostream& out){ clear_selected_method(); redo(); },
+    "Redo your most recently undone action. WARNING: Also clears your selected method.");
   
   //--------------------------------------------------------------------
 
@@ -872,17 +931,8 @@ bool UMLCLI::add_field(string className, string fieldName, string fieldType)
  * 
  * @param className 
  */
-bool UMLCLI::add_method(string className)
+bool UMLCLI::add_method(string className, string methodName, string methodType)
 {
-  string methodName;
-  string methodType;
-
-  cout << "Type a name for the method you\'d like to add. -> ";
-  cin >> methodName;
-
-  cout << "What type would you like to give it? -> ";
-  cin >> methodType;
-  
   auto newMethod = std::make_shared<UMLMethod>(methodName, methodType, list<UMLParameter>());
   
   ERR_CATCH(Model.addClassAttribute(className, newMethod));
@@ -894,18 +944,9 @@ bool UMLCLI::add_method(string className)
   }
 
   cout << "You have added the method \"" << methodName << "\" to the class \"" << className << "\".\n";
-  cout << "How many parameters would you like to give this method? -> ";
-  size_t parameterCount = user_int_input();
-
-  for(int i = 0; i < parameterCount; i++)
-  {
-    cout << "Parameter " << (i+1) << ":\n";
-    if(!add_parameter(className, newMethod))
-      i--;
-  }
 
   cout << "Overview:\n";
-  display_method(newMethod);
+  display_method(className, newMethod);
   return true;
 }
 
@@ -919,25 +960,9 @@ bool UMLCLI::add_method(string className)
  * @return true 
  * @return false 
  */
-bool UMLCLI::add_parameter(string className, method_ptr methodIter)
+bool UMLCLI::add_parameter(string paramName, string paramType)
 {
-  string paramName;
-  string paramType;
-
-  cout << "Type a name for your parameter -> ";
-  cin >> paramName;
-
-  while(Model.doesParameterExist(methodIter, paramName))
-  {
-    cout << "That name is already taken.\nTry a different name. -> ";
-    cin >> paramName;
-  }
-
-  cout << "What type would you like to give it? -> ";
-  cin >> paramType;
-  
-
-  ERR_CATCH(Model.addParameter(className, methodIter, paramName, paramType));
+  ERR_CATCH(Model.addParameter(MethodClassName, SelectedMethod, paramName, paramType));
   if(ErrorStatus)
   {
     cout << "Error! The parameter \"" << paramName << "\" could not be created.\n";
@@ -984,25 +1009,10 @@ void UMLCLI::delete_field(string className, string fieldName)
  * 
  * @param className 
  */
-void UMLCLI::delete_method(string className)
+void UMLCLI::delete_method()
 {
-  method_ptr methodIter;
-  string methodName;
-
-  cout << "Type the name of the method you\'d like to delete. -> ";
-  cin >> methodName;
-
-  ERR_CATCH(methodIter = select_method(className, methodName));
-  if(ErrorStatus)
-  {
-    cout << "Error! The method you typed does not exist.\n";
-    ErrorStatus = false;
-    return;
-  }
-
-  attr_ptr attIter = std::dynamic_pointer_cast<UMLAttribute>(methodIter);
-  
-  ERR_CATCH(Model.removeClassAttribute(className, attIter));
+  string methodName = SelectedMethod->getAttributeName();
+  ERR_CATCH(Model.removeClassAttribute(MethodClassName, SelectedMethod));
   if (ErrorStatus)
   {
     cout << "Error! Could not delete method.\n";
@@ -1022,13 +1032,9 @@ void UMLCLI::delete_method(string className)
  * 
  * @param methodIter
  */
-void UMLCLI::delete_parameter(string className, method_ptr methodIter)
+void UMLCLI::delete_parameter(string paramName)
 {
-  string paramName;
-  cout << "Type the name of the parameter you\'d like to delete. -> ";
-  cin >> paramName;
-
-  ERR_CATCH(Model.deleteParameter(className, methodIter, paramName))
+  ERR_CATCH(Model.deleteParameter(MethodClassName, SelectedMethod, paramName))
   if(ErrorStatus)
   {
     cout << "Error! Couldn't find parameter.\n";
@@ -1044,10 +1050,13 @@ void UMLCLI::delete_parameter(string className, method_ptr methodIter)
 //RENAMING
 
 /**
- * @brief User types in the old name, then the new name, and
- * then it gets renamed.
+ * @brief Given a class name, an old field name, and a new field 
+ * name, renames a given field named fieldNameFrom to a field 
+ * with the name of fieldNameTo.
  * 
  * @param className 
+ * @param fieldNameFrom
+ * @param fieldNameTo
  */
 void UMLCLI::rename_field(string className, string fieldNameFrom, string fieldNameTo)
 {
@@ -1085,31 +1094,11 @@ void UMLCLI::rename_field(string className, string fieldNameFrom, string fieldNa
  * a different function). Then they type in the new name,
  * and it gets renamed.
  * 
- * @param className 
+ * @param newMethodName
  */
-void UMLCLI::rename_method(string className)
+void UMLCLI::rename_method(string newMethodName)
 {
-  method_ptr methodIter;
-  string methodNameFrom;
-  string methodNameTo;
-
-  cout << "Type the name of the method you\'d like to rename FROM -> ";
-  cin >> methodNameFrom;
-
-  ERR_CATCH(methodIter = select_method(className, methodNameFrom))
-  if(ErrorStatus)
-  {
-    cout << "Error! The method you typed does not exist.\n";
-    ErrorStatus = false;
-    return;
-  }
-
-  cout << "Type the name of the method you\'d like to rename TO -> ";
-  cin >> methodNameTo;
-
-  attr_ptr attIter = std::dynamic_pointer_cast<UMLAttribute>(methodIter);
-
-  ERR_CATCH(Model.changeAttributeName(className, attIter, methodNameTo));
+  ERR_CATCH(Model.changeAttributeName(MethodClassName, SelectedMethod, newMethodName));
   if (ErrorStatus)
   {
     cout << "Failed to rename method. Aborting...\n";
@@ -1128,18 +1117,9 @@ void UMLCLI::rename_method(string className)
  * 
  * @param methodIter
  */
-void UMLCLI::rename_parameter(method_ptr methodIter)
+void UMLCLI::rename_parameter(string paramNameOld, string paramNameNew)
 {
-  string paramNameFrom;
-  string paramNameTo;
-
-  cout << "Type the name of the parameter you\'d like to rename FROM -> ";
-  cin >> paramNameFrom;
-  
-  cout << "Type the name of the parameter you\'d like to rename TO -> ";
-  cin >> paramNameTo;
-  
-  ERR_CATCH(Model.changeParameterName(methodIter, paramNameFrom, paramNameTo));
+  ERR_CATCH(Model.changeParameterName(SelectedMethod, paramNameOld, paramNameNew));
   if (ErrorStatus)
   {
     cout << "Error! Could not change name.\n";
@@ -1158,6 +1138,8 @@ void UMLCLI::rename_parameter(method_ptr methodIter)
  * The field's type is then changed accordingly.
  * 
  * @param className 
+ * @param fieldName
+ * @param newFieldType
  */
 void UMLCLI::change_field(string className, string fieldName, string newFieldType)
 {
@@ -1183,31 +1165,11 @@ void UMLCLI::change_field(string className, string fieldName, string newFieldTyp
  * user then types in the new type. The field's type is then
  * changed accordingly.
  * 
- * @param className 
+ * @param newMethodType 
  */
-void UMLCLI::change_method(string className)
+void UMLCLI::change_method(string newMethodType)
 {
-  method_ptr methodIter;
-  string methodName;
-  string newMethodType;
- 
-  cout << "Type the name of the method whose type you\'d like to change. -> ";
-  cin >> methodName;
-  
-  cout << "Enter the NEW type you want to give it. -> ";
-  cin >> newMethodType;
-
-  ERR_CATCH(methodIter = select_method(className, methodName));
-  if(ErrorStatus)
-  {
-    cout << "Method couldn\'t be found.\n";
-    ErrorStatus = false;
-    return;
-  }
-
-  attr_ptr attIter = std::dynamic_pointer_cast<UMLAttribute>(methodIter);
-
-  ERR_CATCH(Model.changeAttributeType(attIter, newMethodType));
+  ERR_CATCH(Model.changeAttributeType(SelectedMethod, newMethodType));
   if (ErrorStatus)
   {
     cout << "Couldn\'t change method.\n";
@@ -1224,20 +1186,12 @@ void UMLCLI::change_method(string className)
  * @brief User types in the name, and then the new type.
  * The parameter's type is then changed accordingly.
  * 
+ * @param className
  * @param methodIter 
  */
-void UMLCLI::change_parameter(string className, method_ptr methodIter)
+void UMLCLI::change_parameter(string paramName, string newParamType)
 {
-  string paramName;
-  string newParamType;
-
-  cout << "Type the name of the parameter whose type you\'d like to change. -> ";
-  cin >> paramName;
-
-  cout << "Enter the NEW type you want to give it. -> ";
-  cin >> newParamType;
-
-  ERR_CATCH(Model.changeParameterType(className, methodIter, paramName, newParamType));
+  ERR_CATCH(Model.changeParameterType(MethodClassName, SelectedMethod, paramName, newParamType));
   if (ErrorStatus)
   {
     cout << "Couldn\'t change parameter type.\n";
@@ -1288,7 +1242,10 @@ void UMLCLI::display_class(UMLClass currentClass)
   //Methods
   for(auto methodIter : currentClass.getAttributes())
   {
-    display_method(methodIter);
+    if(methodIter->identifier() == "method") {
+      shared_ptr<UMLMethod> castMethodIter = std::dynamic_pointer_cast<UMLMethod>(methodIter);
+      display_method(currentClass.getName(), castMethodIter);
+    }
   } 
   
   cout << "}\n";
@@ -1301,29 +1258,29 @@ void UMLCLI::display_class(UMLClass currentClass)
 /**
  * @brief Prints out methods in the following format:
  * 
- * void m1(int p1, string p2, bool p3)
+ * void m1(int p1, string p2, bool p3) (num)
+ * Num represents the count of overloads, to be used in selecting
+ * an overload within the CLI's select_method option.
  * 
+ * @param className
  * @param methodIter 
  */
-void UMLCLI::display_method(attr_ptr methodIter)
+void UMLCLI::display_method(string className, method_ptr methodIter)
 {
-  if(methodIter->identifier() == "method")
+  cout << "     ";
+  cout << methodIter->getType() << " " << methodIter->getAttributeName() << "(";
+  
+  //Parameters
+  size_t paramCount = 0;
+  for (auto param : (std::dynamic_pointer_cast<UMLMethod>(methodIter))->getParam())
   {
-    cout << "     ";
-    cout << methodIter->getType() << " " << methodIter->getAttributeName() << "(";
+    paramCount++;
+    if (paramCount > 1)
+      cout << ", ";
     
-    //Parameters
-    size_t paramCount = 0;
-    for (auto param : (std::dynamic_pointer_cast<UMLMethod>(methodIter))->getParam())
-    {
-      paramCount++;
-      if (paramCount > 1)
-        cout << ", ";
-      
-      cout << param.getType() << " " << param.getName();
-    }
-    cout << ")\n";
+    cout << param.getType() << " " << param.getName();
   }
+  cout << ") (" << method_number(className, std::dynamic_pointer_cast<UMLMethod>(methodIter)) << ")\n";
 }
 
 /*************************/
@@ -1394,70 +1351,6 @@ void UMLCLI::redo()
 /**************************************************************/
 //MISC.
 
-/**
- * IMPORTANT: In Sprint 4, this function will be split in 2. The part that
- * takes in user input remain here, and the other portion will be relocated
- * to UMLData and return a map of unsigned ints and shared method pointers.
- * 
- * @brief Searches the entire vector of attributes by name.
- * 
- * If there is a match, store the reference in a new vector.
- * 
- * Iterate through the NEW vector and print each method with its parameters.
- * - A number will be labeled next to each method, and the user will choose
- *   by typing in the corresponding number.
- * 
- * @param className 
- * @param methodName 
- * @return method_ptr
- */
-method_ptr UMLCLI::select_method(string className, string methodName)
-{
-  vector<method_ptr> methodMatches;
-
-  vector<attr_ptr> allAttributes = Model.getClassAttributes(className);
-
-  //Search the entire attribute vector and put matches in methodMatches
-  for(auto attributeIter : allAttributes)
-  {
-    if(attributeIter->identifier() == "method" && attributeIter->getAttributeName() == methodName)
-    {
-      method_ptr element = std::dynamic_pointer_cast<UMLMethod>(attributeIter);
-      methodMatches.push_back(element);
-    }
-  }
-
-  if (methodMatches.size() == 0)
-  {
-    throw std::runtime_error("Couldn\'t find method.");
-    return nullptr;
-  }
-
-  else if (methodMatches.size() == 1)
-    return methodMatches[0];
-
-  cout << "This method is overloaded. Which one would you like to choose?\n";
-  for(size_t i = 0; i < methodMatches.size(); i++)
-  {
-    cout << "[" << i+1 << "] ";
-    display_method(methodMatches[i]);
-    cout << "\n";
-  }
- 
-  while(1)
-  {
-    size_t userChoice = user_int_input();
-
-    if(userChoice > methodMatches.size() || userChoice == 0)
-    {
-      cout << "Invalid input! Please enter a number between 1 and "
-      << methodMatches.size() << "\n";
-    }
-    else
-      return methodMatches[userChoice-1];
-  }
-}
-
 /*************************/
 
 /**
@@ -1481,3 +1374,112 @@ attr_ptr UMLCLI::select_field(string className, string fieldName)
   throw std::runtime_error("Couldn\'t find field.");
   return nullptr;
 }
+
+/*************************/
+
+/**
+ * @brief Searches the entire vector of attributes by name.
+ * 
+ * If there is a match, store the reference in a new vector. If that
+ * match also shares the same parameters, it should return the vector index
+ * that the new method was stored into.
+ * 
+ * @param className 
+ * @param methodName 
+ * @return int
+ */
+int UMLCLI::method_number(string className, method_ptr method) 
+{
+  vector<method_ptr> methodMatches;
+  vector<attr_ptr> allAttributes = Model.getClassAttributes(className);
+
+  // Search the entire attribute vector and put matches in methodMatches
+  for(auto attributeIter : allAttributes)
+  {
+    // Check if there was a match
+    if(attributeIter->identifier() == "method" && attributeIter->getAttributeName() == method->getAttributeName())
+    {
+      method_ptr element = std::dynamic_pointer_cast<UMLMethod>(attributeIter);
+      // If these share the same parameters, return the appropriate overload integer.
+      if (element->getParam() == method->getParam()) {
+        // Should be displaced by 1 postion of where it would be in the vector
+        return ((int) methodMatches.size()) + 1;
+      }
+      // If no match, continue creation of array
+      methodMatches.push_back(element);
+    }
+  }
+
+  // If made past loop, the method cannot exist within the data.
+  throw std::runtime_error("Couldn\'t find method.");
+  return -1;
+}
+
+/*************************/
+
+/**
+ * @brief Searches the entire vector of attributes by name.
+ * 
+ * If there is a match, store the reference in a new vector. If that
+ * match also shares the same parameters, it should return the vector index
+ * that the new method was stored into.
+ * 
+ * @param className 
+ * @param methodName 
+ * @param methodNumber
+ * @return method_ptr
+ */
+ method_ptr UMLCLI::select_overload(string className, string methodName, int methodNumber) 
+ {
+  vector<method_ptr> methodMatches;
+  vector<attr_ptr> allAttributes = Model.getClassAttributes(className);
+
+  //Search the entire attribute vector and put matches in methodMatches
+  for(auto attributeIter : allAttributes)
+  {
+    if(attributeIter->identifier() == "method" && attributeIter->getAttributeName() == methodName)
+    {
+      method_ptr element = std::dynamic_pointer_cast<UMLMethod>(attributeIter);
+      methodMatches.push_back(element);
+      // methodNumber - 1 should equal overload location in vector
+      if(methodNumber - 1 == methodMatches.size()) {
+        return element;
+      }
+    }
+  }
+
+  // If made past loop, the method cannot exist within the data.
+  throw std::runtime_error("Couldn\'t find method.");
+  return nullptr;
+ }
+
+/*************************/
+
+/**
+ * @brief Stores the selected method within global variables and 
+ * toggles global bool MethodSelected so that CLI functions can use
+ * the selected method.
+ * 
+ * @param className 
+ * @param method
+ */
+ void UMLCLI::store_selected_method(string className, method_ptr method)
+ {
+   MethodSelected = true;
+   MethodClassName = className;
+   SelectedMethod = method;
+ }
+
+ /*************************/
+
+/**
+ * @brief Clears selected method from global variables and untoggles
+ * global bool MethodSelected so certain functions cannot be used.
+ * 
+ */
+ void UMLCLI::clear_selected_method()
+ {
+   MethodSelected = false;
+   MethodClassName = "";
+   SelectedMethod = nullptr;
+ }

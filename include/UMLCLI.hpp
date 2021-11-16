@@ -52,6 +52,13 @@ class UMLCLI
     // Error check to prevent 'success' print 
     bool ErrorStatus;
 
+    // Bool to see if a method is stored for the view (for the sake of handling overloads)
+    bool MethodSelected;
+
+    // UMLMethod shared ptr storing currently selected method (for sake of handling overloads), as well as its class name
+    string MethodClassName;
+    method_ptr SelectedMethod;
+
     // Main UML data object storing UML stuff
     UMLData Model;
 
@@ -62,37 +69,37 @@ class UMLCLI
     //Adding
 
     bool add_field(string className, string fieldName, string fieldType);
-    bool add_method(string className);
-    bool add_parameter(string className, method_ptr methodIter);
+    bool add_method(string className, string methodName, string methodType);
+    bool add_parameter(string paramName, string paramType);
 
 
     /********************/
     //Deleting
     
     void delete_field(string className, string fieldName);
-    void delete_method(string className);
-    void delete_parameter(string className, method_ptr methodIter);
+    void delete_method();
+    void delete_parameter(string paramName);
 
 
     /********************/
     //Renaming
     
     void rename_field(string className, string fieldNameFrom, string fieldNameTo);
-    void rename_method(string className);
-    void rename_parameter(method_ptr methodIter);
+    void rename_method(string newMethodName);
+    void rename_parameter(string paramNameOld, string paramNameNew);
 
     /********************/
     //Type changing
 
     void change_field(string className, string fieldName, string newFieldType);
-    void change_method(string className);
-    void change_parameter(string className, method_ptr methodIter);
+    void change_method(string newMethodType);
+    void change_parameter(string paramName, string newParamType);
 
     /********************/
     //Display functions
 
     void display_class(UMLClass currentClass);
-    void display_method(attr_ptr methodIter); 
+    void display_method(string className, method_ptr methodIter); 
     void display_relationship(string source, string destination, string rType);
     
     /********************/
@@ -110,9 +117,18 @@ class UMLCLI
 
     /********************/
     //Misc.
-
-    method_ptr select_method(string className, string methodName);
+    
+    // Field selection
     attr_ptr select_field(string className, string fieldName);
+
+    // Selected method handlers 
+    void store_selected_method(string className, method_ptr method);
+    void clear_selected_method();
+
+    // Overload handlers
+    int method_number(string className, method_ptr method);
+    method_ptr select_overload(string className, string methodName, int overloadNumber);
+    
 
   public:
     
