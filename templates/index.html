@@ -151,7 +151,7 @@
       {% for class in classes %}
           element = document.getElementById('{{ class.name }}classedit');
           element.addEventListener("click", () => {
-              document.getElementById("{{ class.name }}class").innerHTML =
+            document.getElementById("{{ class.name }}class").innerHTML =
                   "<form action='/edit/class/{{ class.name }}' method='GET'>" +
                       "<input type='text' id='cname' name='cname' value='{{ class.name }}'>" +
                       "<input type='submit' value='edit class'>"

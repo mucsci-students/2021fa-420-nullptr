@@ -1,8 +1,6 @@
-
 var boxes = new Map();
 var classesJson;
 var relationshipsJson;
-
 SVG.on(document, 'DOMContentLoaded', function() {
   var draw = SVG().addTo('svg');
   //classes
@@ -34,40 +32,40 @@ SVG.on(document, 'DOMContentLoaded', function() {
 
 
 
-var xval_rect = 150;
-var yval_rect = 150;
+
 function createClassBox(draw, uclass, x, y)
 {
- // var nested = draw.nested().clip();
- // nested.rect(200,200).attr({ fill: '#f00', opacity: 0.3, width: 150, height: 150});
+  var xval_rect = 150;
+var yval_rect = 150;
+  
   
 
- var nested = draw.nested()
+  var nested = draw.nested()
+  var rect = nested.rect(xval_rect,yval_rect).radius(10).css({fill: '#f02', resize: 'both', overflow: 'auto', stroke: 'black'});
 
 
-  var rect = nested.rect(xval_rect,yval_rect).radius(10).css({fill: '#f02', resize: 'both', overflow: 'auto'})
-  
+
+ 
+
 
   var text_y = 20;
-  var text_x = 15;
-  
-  var textX_dif = 0;
-  var textY_dif = 0;
-  
-  textX_dif = xval_rect - text_x;
-  textY_dif = yval_rect - text_y;
- 
+  var text_x = 10;
+  nested.text(uclass["name"]).dy(text_y).dx(text_x);
+
+
+  const textElement = document.querySelector('text')  
+const bbox = textElement.getBBox();  
+const {width} = bbox;  
+var w =console.log(width);
+if(width >=150){
+    
   xval_rect += 10;
- 
-
-
- nested.text(uclass["name"]).dy(text_y).dx(text_x);
-  text_y += 20;
-  text_x +=20;
-
-while(text_x > xval_rect){
-  xval_rect+= 10;
 }
+
+
+
+
+
 
   //fields
   for (let key in uclass["fields"])
@@ -76,7 +74,6 @@ while(text_x > xval_rect){
     nested.text(field["type"] + " " + field["name"]).dy(text_y).dx(text_x);
     text_y += 20;
   }
-
   //methods
   for (let key in uclass["methods"])
   {
@@ -114,6 +111,7 @@ while(text_x > xval_rect){
     location.href = '/position/' + uclass["name"] + '/' + nested.x() + '/' + nested.y();
     }
   });
+
 //   width:100vw; of sidebar
   boxes.set(uclass["name"], nested);
 }
