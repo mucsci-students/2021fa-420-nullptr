@@ -136,10 +136,6 @@ bool UMLClass::checkAttribute(std::shared_ptr<UMLAttribute> attribute)
 		return false;
 	}
 	else if (attribute->identifier() == "method") {
-		// Booolean to check status of parameters when checking 2 methods
-		// When true, the current observed types of the param signature are identical
-		bool equalParameter = false;
-		
 		for (int i = 0; i < classAttributes.size(); ++i) {
 			// If they share the same name but the other one is a field, then the attribute cannot exist
 			if (classAttributes[i]->getAttributeName() == attribute->getAttributeName() && classAttributes[i]->identifier() == "field") {
@@ -149,40 +145,13 @@ bool UMLClass::checkAttribute(std::shared_ptr<UMLAttribute> attribute)
 			else if (classAttributes[i]->getAttributeName() == attribute->getAttributeName() && classAttributes[i]->identifier() == "method"){
 				list<UMLParameter> params1 = std::dynamic_pointer_cast<UMLMethod>(classAttributes[i])->getParam();
 				list<UMLParameter> params2 = std::dynamic_pointer_cast<UMLMethod>(attribute)->getParam();
-				auto param2 = params2.begin();
-
-				if (params1.empty() && params2.empty()) {
-					// Cannot overload a method with no parameters with another with no parameters
-					return true;
-				}
-
-				// Compare parameters in params1 with param2 iterator 
-				for (UMLParameter param : params1) {
-					if (param2 == params2.end() || param.getType() != param2->getType()) {
-						// Param1 has more parameters, or the types are not identical.
-						// Therefore, overload rules are being followed.
-						equalParameter = false;
-						break;
-					}
-					else {
-						// Iterate through param2 if params are equal at this stage
-						equalParameter = true;
-						param2 = std::next(param2);
-					}
-				}
-
-        // Params2 is bigger, so the params lists aren't duplicates.
-        if (param2 != params2.end()) {
-          equalParameter = false;
-        } 
-
-				// If true, both methods have identical parameter types. Rules are broken
-				if (equalParameter) {
-					return true;
-				}
-				// Otherwise, loop through attributes continues
+				// Parameters are equal, so this breaks overload rules
+        if (params1 == params2) {
+          return true;
+        }
 			}
-		}
+      // Else, the given attribute existing doesn't cause the method to break overloading rules. Continue looping
+    }
 		// If reached, the overloaded methods are valid overloads.
 		return false;
 	}
