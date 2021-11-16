@@ -61,86 +61,8 @@ void UMLCLI::cli_menu()
   */
 
   // Setup CLI's initial root menu
-  auto rootMenu = make_unique<Menu>("cli", "Main menu for basic UML functions.");
+  auto rootMenu = make_unique<Menu>("uml", "Main menu for basic UML functions.");
 
-  // List Classes
-  rootMenu -> Insert(
-    "list_classes",
-    [&](std::ostream& out){ list_classes(); },
-    "Lists all classes the user has created, as well as their attributes.");
-
-  // List Relationships
-  rootMenu -> Insert(
-    "list_relationships",
-    [&](std::ostream& out){ list_relationships(); },
-    "Lists all relationships created by the user. (e.g. [source -> destination])");
-
-  // Add Class
-  rootMenu -> Insert(
-    "add_class", {"class_name"},
-    [&](std::ostream& out, string className)
-    {
-      create_class(className);
-    },
-    "Create a class with the name of the given argument.");
-
-  // Add Relationship
-  rootMenu -> Insert(
-    "add_relationship", {"source", "destnation", "relship_type"},
-    [&](std::ostream& out, string source, string destination, string relshipType)
-    {
-      create_relationship(source, destination, relshipType);
-    },
-    "Creates a relationship using a source class, destination class, and relationship type (options: aggregation, composition, generalization, realization).");
-
-  // Delete Class
-  rootMenu -> Insert(
-    "delete_class", {"class_name"},
-    [&](std::ostream& out, string className)
-    {
-      delete_class(className);
-    },
-    "Delete a class with the name of the given argument.");
-
-  // Delete Relationship
-  rootMenu -> Insert(
-    "delete_relationship", {"source", "destnation"},
-    [&](std::ostream& out, string source, string destination)
-    {
-      delete_relationship(source, destination);
-    },
-    "Deletes a relationship between a given source class and destination class.");
-
-  // Rename Class
-  rootMenu -> Insert(
-    "rename_class", {"old_class_name", "new_class_name"},
-    [&](std::ostream& out, string oldClassName, string newClassName)
-    {
-      rename_class(oldClassName, newClassName);
-    },
-    "Renames class of old_class_name to new_class_name.");
-
-  // Change Relationship
-  rootMenu -> Insert(
-    "change_relationship", {"source", "destnation", "relship_type"},
-    [&](std::ostream& out, string source, string destination, string relshipType)
-    {
-      change_relationship(source, destination, relshipType);
-    },
-    "Changes a relationship given a source class and destination class to a new relationship type (options: aggregation, composition, generalization, realization).");
-
-  // Undo
-  rootMenu -> Insert(
-    "undo",
-    [&](std::ostream& out){ clear_selected_method(); undo(); },
-    "Undo the most recent thing you\'ve done. WARNING: Also clears your selected method.");
-
-  // Redo 
-  rootMenu -> Insert(
-    "redo",
-    [&](std::ostream& out){ clear_selected_method(); redo(); },
-    "Redo your most recently undone action. WARNING: Also clears your selected method.");
-  
   // Load 
   rootMenu -> Insert(
     "load", {"file_name"},
@@ -171,6 +93,112 @@ void UMLCLI::cli_menu()
       [](std::ostream& out){ out << "Colors OFF\n"; SetNoColor(); },
       "Disable colors in the CLI.");
 
+  // Undo
+  rootMenu -> Insert(
+    "undo",
+    [&](std::ostream& out){ clear_selected_method(); undo(); },
+    "Undo the most recent thing you\'ve done. WARNING: Also clears your selected method.");
+
+  // Redo 
+  rootMenu -> Insert(
+    "redo",
+    [&](std::ostream& out){ clear_selected_method(); redo(); },
+    "Redo your most recently undone action. WARNING: Also clears your selected method.");
+
+
+  //--------------------------------------------------------------------
+
+  /*
+  ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+  |**************************************************************|
+  |                           CLASS MENU                         |
+  |**************************************************************|
+  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////
+  */
+
+  // Create submenu for class operations
+  auto classMenu = make_unique<Menu>("class", "Menu for operations on classes.");
+
+  // List Classes
+  classMenu -> Insert(
+    "list",
+    [&](std::ostream& out){ list_classes(); },
+    "Lists all classes the user has created, as well as their attributes.");
+  
+  // Add Class
+  classMenu -> Insert(
+    "add", {"class_name"},
+    [&](std::ostream& out, string className)
+    {
+      create_class(className);
+    },
+    "Create a class with the name of the given argument.");
+  
+  // Delete Class
+  classMenu -> Insert(
+    "delete", {"class_name"},
+    [&](std::ostream& out, string className)
+    {
+      delete_class(className);
+    },
+    "Delete a class with the name of the given argument.");
+  
+  // Rename Class
+  classMenu -> Insert(
+    "rename_class", {"old_class_name", "new_class_name"},
+    [&](std::ostream& out, string oldClassName, string newClassName)
+    {
+      rename_class(oldClassName, newClassName);
+    },
+    "Renames class of old_class_name to new_class_name.");
+  
+  //--------------------------------------------------------------------
+
+  /*
+  ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+  |**************************************************************|
+  |                      RELATIONSHIP MENU                       |
+  |**************************************************************|
+  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////
+  */
+
+  // Create submenu for class operations
+  auto relationshipMenu = make_unique<Menu>("relationships", "Menu for operations on relationships.");
+
+  // List Relationships
+  relationshipMenu -> Insert(
+    "list",
+    [&](std::ostream& out){ list_relationships(); },
+    "Lists all relationships created by the user. (e.g. [source -> destination])");
+  
+  // Add Relationship
+  relationshipMenu -> Insert(
+    "add", {"source", "destination", "relship_type"},
+    [&](std::ostream& out, string source, string destination, string relshipType)
+    {
+      create_relationship(source, destination, relshipType);
+    },
+    "Creates a relationship using a source class, destination class, and relationship type (options: aggregation, composition, generalization, realization).");
+  
+  // Delete Relationship
+  relationshipMenu -> Insert(
+    "delete", {"source", "destination"},
+    [&](std::ostream& out, string source, string destination)
+    {
+      delete_relationship(source, destination);
+    },
+    "Deletes a relationship between a given source class and destination class.");
+  
+  // Change Relationship
+  relationshipMenu -> Insert(
+    "change", {"source", "destination", "relship_type"},
+    [&](std::ostream& out, string source, string destination, string relshipType)
+    {
+      change_relationship(source, destination, relshipType);
+    },
+    "Changes a relationship given a source class and destination class to a new relationship type (options: aggregation, composition, generalization, realization).");
+
+
   //--------------------------------------------------------------------
 
   /*
@@ -182,78 +210,78 @@ void UMLCLI::cli_menu()
   */
 
   // Create submenu for editing fields
-  auto fieldMenu = make_unique<Menu>("edit_fields", "Submenu for operations on class fields.");
+  auto fieldMenu = make_unique<Menu>("field", "Menu for operations on class fields.");
 
   // View Class
   fieldMenu -> Insert(
-      "view", {"class_name"},
-      [&](std::ostream& out, string className)
-      {
-          if (Model.doesClassExist(className)) {
-            UMLClass currentClass = Model.getClassCopy(className);
-            display_class(currentClass);
-          }
-          else{
-            out << "Class does not exist. Cannot view class.\n";
-          };
-      },
-      "View a given class with its fields and methods.");
+    "view", {"class_name"},
+    [&](std::ostream& out, string className)
+    {
+      if (Model.doesClassExist(className)) {
+        UMLClass currentClass = Model.getClassCopy(className);
+        display_class(currentClass);
+      }
+      else{
+        out << "Class does not exist. Cannot view class.\n";
+      };
+    },
+    "View a given class with its fields and methods.");
   
   // Add Field
   fieldMenu -> Insert(
-      "add", {"class_name", "field_type", "field_name"},
-      [&](std::ostream& out, string className, string fieldType, string fieldName)
-      {
-          if (Model.doesClassExist(className)) {
-            add_field(className, fieldName, fieldType);
-          }
-          else{
-            out << "Class does not exist. Cannot add field.\n";
-          };
-      },
-      "Add a new field.");
+    "add", {"class_name", "field_type", "field_name"},
+    [&](std::ostream& out, string className, string fieldType, string fieldName)
+    {
+      if (Model.doesClassExist(className)) {
+        add_field(className, fieldName, fieldType);
+      }
+      else{
+        out << "Class does not exist. Cannot add field.\n";
+      };
+    },
+    "Add a new field.");
   
   // Delete Field
   fieldMenu -> Insert(
-      "delete", {"class_name", "field_name"},
-      [&](std::ostream& out, string className, string fieldName)
-      {
-          if (Model.doesClassExist(className)) {
-            delete_field(className, fieldName);
-          }
-          else{
-            out << "Class does not exist. Cannot delete field.\n";
-          };
-      },
-      "Deletes an existing field.");
+    "delete", {"class_name", "field_name"},
+    [&](std::ostream& out, string className, string fieldName)
+    {
+      if (Model.doesClassExist(className)) {
+        delete_field(className, fieldName);
+      }
+      else{
+        out << "Class does not exist. Cannot delete field.\n";
+      };
+    },
+    "Deletes an existing field.");
   
   // Rename Field
   fieldMenu -> Insert(
-      "rename", {"class_name", "field_name_from", "field_name_to"},
-      [&](std::ostream& out, string className, string fieldNameFrom, string fieldNameTo)
-      {
-          if (Model.doesClassExist(className)) {
-            rename_field(className, fieldNameFrom, fieldNameTo);
-          }
-          else{
-            out << "Class does not exist. Cannot rename field.\n";
-          };
-      },
-      "Renames an existing field.");
+    "rename", {"class_name", "field_name", "new_field_name"},
+    [&](std::ostream& out, string className, string fieldName, string newFieldName)
+    {
+      if (Model.doesClassExist(className)) {
+        rename_field(className, fieldName, newFieldName);
+      }
+      else{
+        out << "Class does not exist. Cannot rename field.\n";
+      };
+    },
+    "Renames an existing field.");
   
   // Change Field
   fieldMenu -> Insert(
-      "change", {"class_name", "field_name", "new_field_type"},
-      [&](std::ostream& out, string className, string fieldName, string newFieldType)
-      {
-          if (Model.doesClassExist(className)) {
-            change_field(className, fieldName, newFieldType);
-          }
-          else{
-            out << "Class does not exist. Cannot change field type.\n";
-          };
-      },
-      "Changes the type of an existing field.");
+    "change", {"class_name", "field_name", "new_field_type"},
+    [&](std::ostream& out, string className, string fieldName, string newFieldType)
+    {
+      if (Model.doesClassExist(className)) {
+        change_field(className, fieldName, newFieldType);
+      }
+      else{
+        out << "Class does not exist. Cannot change field type.\n";
+      };
+    },
+    "Changes the type of an existing field.");
     
   // Undo
   fieldMenu -> Insert(
@@ -266,6 +294,7 @@ void UMLCLI::cli_menu()
     "redo",
     [&](std::ostream& out){ clear_selected_method(); redo(); },
     "Redo your most recently undone action. WARNING: Also clears your selected method.");
+
   //--------------------------------------------------------------------
 
   /*
@@ -277,44 +306,45 @@ void UMLCLI::cli_menu()
   */
 
   // Create submenu for editing methods
-  auto methodMenu = make_unique<Menu>("edit_methods", "Submenu for operations on class methods.");
+  auto methodMenu = make_unique<Menu>("method", "Menu for operations on class methods.");
 
    // Select Method
   methodMenu -> Insert(
-    "select_method", {"class_name", "method_name", "method_number"},
+    "select", {"class_name", "method_name", "method_number"},
     [&](std::ostream& out, string className, string methodName, int methodNumber)
     {
-        if (Model.doesClassExist(className)) {
-          // Check to see if method we're attempting to select exists
-          method_ptr methodIter;
-          ERR_CATCH(methodIter = select_overload(className, methodName, methodNumber));
-          if (!ErrorStatus) { 
-            out << "Method " << methodName << " selected.\n";
-            cout << "Overview:\n";
-            display_method(className, methodIter);
-            store_selected_method(className, methodIter);
-          }
-          else {
-            out << "Method does not exist. Cannot select method.\n";
-            out << "Make sure you are selecting the correct method number.\n";
-            out << "This number be found by viewing the class and observing the final number placed next to a method.\n";
-          }
+      if (Model.doesClassExist(className)) {
+        // Check to see if method we're attempting to select exists
+        method_ptr methodIter;
+        ERR_CATCH(methodIter = select_overload(className, methodName, methodNumber));
+        if (!ErrorStatus) { 
+          out << "Method " << methodName << " selected.\n";
+          cout << "Overview:\n";
+          display_method(className, methodIter);
+          store_selected_method(className, methodIter);
         }
-        else{
-          out << "Class does not exist. Cannot select method.\n";
-        };
+        else {
+          out << "Cannot select method.\n";
+          out << "Make sure you are selecting the correct method number.\n";
+          out << "This number be found by viewing the class and observing the final number placed next to a method.\n";
+        }
+      }
+      else{
+        out << "Class does not exist. Cannot select method.\n";
+      };
     },
     "Select a method for use in other operations.");
 
   // View Selected Method
   methodMenu -> Insert(
-    "view_selected", {},
+    "view_select", {},
     [&](std::ostream& out)
     {
       if (!MethodSelected) {
         out << "No method selected. Cannot view selected method..\n";
       }
       else {
+        out << "CLASS: " << MethodClassName << "\n";
         display_method(MethodClassName, SelectedMethod);
       };
     },
@@ -325,13 +355,13 @@ void UMLCLI::cli_menu()
     "view_class", {"class_name"},
     [&](std::ostream& out, string className)
     {
-        if (Model.doesClassExist(className)) {
-          UMLClass currentClass = Model.getClassCopy(className);
-          display_class(currentClass);
-        }
-        else{
-          out << "Class does not exist. Cannot view class.\n";
-        };
+      if (Model.doesClassExist(className)) {
+        UMLClass currentClass = Model.getClassCopy(className);
+        display_class(currentClass);
+      }
+      else{
+        out << "Class does not exist. Cannot view class.\n";
+      };
     },
     "View a given class with its fields and methods.");
   
@@ -340,12 +370,12 @@ void UMLCLI::cli_menu()
     "add", {"class_name", "method_type", "method_name"},
     [&](std::ostream& out, string className, string methodType, string methodName)
     {
-        if (Model.doesClassExist(className)) {
-          add_method(className, methodName, methodType);
-        }
-        else{
-          out << "Class does not exist. Cannot add method.\n";
-        };
+      if (Model.doesClassExist(className)) {
+        add_method(className, methodName, methodType);
+      }
+      else{
+        out << "Class does not exist. Cannot add method.\n";
+      };
     },
     "Add a new method.");
   
@@ -370,12 +400,12 @@ void UMLCLI::cli_menu()
     "rename", {"new_method_name"},
     [&](std::ostream& out, string newMethodName)
     {
-        if (!MethodSelected) {
-          out << "No method selected. Cannot rename method.\n";
-        }
-        else {
-          rename_method(newMethodName);
-        }
+      if (!MethodSelected) {
+        out << "No method selected. Cannot rename method.\n";
+      }
+      else {
+        rename_method(newMethodName);
+      }
       },
     "Renames the method selected by select_method to new_method_name.");
   
@@ -384,12 +414,12 @@ void UMLCLI::cli_menu()
     "change", {"new_method_type"},
     [&](std::ostream& out, string newMethodType)
     {
-        if (!MethodSelected) {
-          out << "No method selected. Cannot change method type.\n";
-        }
-        else {
-          change_method(newMethodType);
-        }
+      if (!MethodSelected) {
+        out << "No method selected. Cannot change method type.\n";
+      }
+      else {
+        change_method(newMethodType);
+      }
     },
     "Changes the type of the method selected by select_method to new_method_type.");
     
@@ -416,41 +446,47 @@ void UMLCLI::cli_menu()
   */
 
   // Create sub-submenu for editing parameters
-  auto parameterMenu = make_unique<Menu>("edit_parameters", "Submenu for operations on method parameters.");
+  auto parameterMenu = make_unique<Menu>("parameter", "Menu for operations on method parameters.");
 
   // Select Method
   parameterMenu -> Insert(
-    "select_method", {"class_name", "method_name", "method_number"},
+    "select", {"class_name", "method_name", "method_number"},
     [&](std::ostream& out, string className, string methodName, int methodNumber)
     {
-        if (Model.doesClassExist(className)) {
-          // Check to see if method we're attempting to select exists
-          method_ptr methodIter;
-          ERR_CATCH(methodIter = select_overload(className, methodName, methodNumber));
-          if (!ErrorStatus) { 
-            out << "Method " << methodName << " selected.\n";
-            cout << "Overview:\n";
-            display_method(className, methodIter);
-            store_selected_method(className, methodIter);
-          }
-          else {
-            out << "Method does not exist. Cannot select method.\n";
-            out << "Make sure you are selecting the correct method number.\n";
-            out << "This number be found by viewing the class and observing the final number placed next to a method.\n";
-          }
+      if (Model.doesClassExist(className)) {
+        // Check to see if method we're attempting to select exists
+        method_ptr methodIter;
+        ERR_CATCH(methodIter = select_overload(className, methodName, methodNumber));
+        if (!ErrorStatus) { 
+          out << "Method " << methodName << " selected.\n";
+          cout << "Overview:\n";
+          display_method(className, methodIter);
+          store_selected_method(className, methodIter);
         }
-        else{
-          out << "Class does not exist. Cannot select method.\n";
-        };
+        else {
+          out << "Cannot select method.\n";
+          out << "Make sure you are selecting the correct method number.\n";
+          out << "This number be found by viewing the class and observing the final number placed next to a method.\n";
+        }
+      }
+      else{
+        out << "Class does not exist. Cannot select method.\n";
+      };
     },
     "Select a method for use in other operations.");
   
   // View Selected Method
   parameterMenu -> Insert(
-    "view_selected", {},
+    "view_select", {},
     [&](std::ostream& out)
     {
-      display_method(MethodClassName, SelectedMethod);
+      if (!MethodSelected) {
+        out << "No method selected. Cannot view selected method..\n";
+      }
+      else {
+        out << "CLASS: " << MethodClassName << "\n";
+        display_method(MethodClassName, SelectedMethod);
+      };
     },
     "View the currently selected method.");
 
@@ -459,96 +495,96 @@ void UMLCLI::cli_menu()
     "view_class", {"class_name"},
     [&](std::ostream& out, string className)
     {
-        if (Model.doesClassExist(className)) {
-          UMLClass currentClass = Model.getClassCopy(className);
-          display_class(currentClass);
-        }
-        else{
-          out << "Class does not exist. Cannot view class.\n";
-        };
+      if (Model.doesClassExist(className)) {
+        UMLClass currentClass = Model.getClassCopy(className);
+        display_class(currentClass);
+      }
+      else{
+        out << "Class does not exist. Cannot view class.\n";
+      };
     },
     "View a given class with its fields and methods.");
 
   // View Method
   parameterMenu -> Insert(
-      "view_method", {"class_name", "method_name", "method_number"},
-      [&](std::ostream& out, string className, string methodName, int methodNumber)
-      {
-          // Only perform method find if class was found
-          if (Model.doesClassExist(className)) {
-            // Check if method exists and store into pointer.
-            method_ptr methodIter;
-            ERR_CATCH(methodIter = select_overload(className, methodName, methodNumber));
-            // Only perform action if method was found
-            if(!ErrorStatus) {
-              display_method(className, methodIter);
-            }
-            else {
-              out << "Method does not exist. Cannot view method.\n";
-              ErrorStatus = false;
-            }
-          }
-          else{
-            out << "Class does not exist. Cannot view methods.\n";
-          };
-      },
-      "View a given method with its parameters.");
+    "view_method", {"class_name", "method_name", "method_number"},
+    [&](std::ostream& out, string className, string methodName, int methodNumber)
+    {
+      // Only perform method find if class was found
+      if (Model.doesClassExist(className)) {
+        // Check if method exists and store into pointer.
+        method_ptr methodIter;
+        ERR_CATCH(methodIter = select_overload(className, methodName, methodNumber));
+        // Only perform action if method was found
+        if(!ErrorStatus) {
+          display_method(className, methodIter);
+        }
+        else {
+          out << "Method does not exist. Cannot view method.\n";
+          ErrorStatus = false;
+        }
+      }
+      else{
+        out << "Class does not exist. Cannot view methods.\n";
+      };
+    },
+    "View a given method with its parameters.");
   
   // Add Parameter
   parameterMenu -> Insert(
-      "add", {"param_type", "param_name"},
-      [&](std::ostream& out, string paramType, string paramName)
-      {
-        if (!MethodSelected) {
-          out << "No method selected. Cannot add parameter.\n";
-        }
-        else {
-          add_parameter(paramName, paramType);
-        }
-      },
-      "Add a new parameter to a given method.");
+    "add", {"param_type", "param_name"},
+    [&](std::ostream& out, string paramType, string paramName)
+    {
+      if (!MethodSelected) {
+        out << "No method selected. Cannot add parameter.\n";
+      }
+      else {
+        add_parameter(paramName, paramType);
+      }
+    },
+    "Add a new parameter to a method. Requires a selected method.");
+
+  // Delete Parameter
+  parameterMenu -> Insert(
+    "delete", {"param_name"},
+    [&](std::ostream& out, string paramName)
+    {
+      if (!MethodSelected) {
+        out << "No method selected. Cannot delete parameter.\n";
+      }
+      else {
+        delete_parameter(paramName);
+      }
+    },
+    "Delete an existing parameter of a method. Requires a selected method.");
   
   // Delete Parameter
   parameterMenu -> Insert(
-      "delete", {"param_name"},
-      [&](std::ostream& out, string paramName)
-      {
-        if (!MethodSelected) {
-          out << "No method selected. Cannot delete parameter.\n";
-        }
-        else {
-          delete_parameter(paramName);
-        }
-      },
-      "Delete an existing parameter of a given method.");
-  
-  // Delete Parameter
-  parameterMenu -> Insert(
-      "rename", {"param_name_old", "param_name_new"},
-      [&](std::ostream& out, string paramNameOld, string paramNameNew)
-      {
-        if (!MethodSelected) {
-          out << "No method selected. Cannot rename parameter.\n";
-        }
-        else {
-          rename_parameter(paramNameOld, paramNameNew);
-        }
-      },
-      "Delete an existing parameter of a given method.");
+    "rename", {"param_name_old", "param_name_new"},
+    [&](std::ostream& out, string paramNameOld, string paramNameNew)
+    {
+      if (!MethodSelected) {
+        out << "No method selected. Cannot rename parameter.\n";
+      }
+      else {
+        rename_parameter(paramNameOld, paramNameNew);
+      }
+    },
+    "Delete an existing parameter of a method. Requires a selected method.");
   
   // Change Parameter
   parameterMenu -> Insert(
-      "change", {"param_name", "new_param_type"},
-      [&](std::ostream& out, string paramName, string newParamType)
-      {
-        if (!MethodSelected) {
-          out << "No method selected. Cannot change parameter type.\n";
-        }
-        else {
-          change_parameter(paramName, newParamType);
-        }
-      },
-      "Changes an existing parameter's type within a given method.");
+    "change", {"param_name", "new_param_type"},
+    [&](std::ostream& out, string paramName, string newParamType)
+    {
+      if (!MethodSelected) {
+        out << "No method selected. Cannot change parameter type.\n";
+      }
+      else {
+        change_parameter(paramName, newParamType);
+      }
+    },
+    "Changes an existing parameter's type within a method. Requires a selected method.");
   
   // Undo
   parameterMenu -> Insert(
@@ -577,9 +613,14 @@ void UMLCLI::cli_menu()
   clear_selected_method();
 
   // Initialize menus in order of submenuing.
+  
   methodMenu -> Insert(std::move(parameterMenu));
+  rootMenu -> Insert(std::move(classMenu));
+  rootMenu -> Insert(std::move(relationshipMenu));
   rootMenu -> Insert(std::move(fieldMenu));
   rootMenu -> Insert(std::move(methodMenu));
+
+  // Initialize CLI that starts at root menu.
   Cli cli(std::move(rootMenu));
 
   // Initialize and run the local CLI session.
@@ -1488,3 +1529,5 @@ int UMLCLI::method_number(string className, method_ptr method)
    MethodClassName = "";
    SelectedMethod = nullptr;
  }
+
+  /*************************/
