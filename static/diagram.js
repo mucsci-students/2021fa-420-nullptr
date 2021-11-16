@@ -1,10 +1,35 @@
-
 var boxes = new Map();
 var classesJson;
 var relationshipsJson;
 
+
+var panzoom;
+
+//keeps track of current panning and zooming
+var pan_x;
+var pan_y;
+var zoom;
+
 SVG.on(document, 'DOMContentLoaded', function() {
   var draw = SVG().addTo('svg');
+
+  //add panning and zooming
+  panzoom = svgPanZoom('#umldiagram', {
+    onZoom: function(newZoom) {
+      zoom = newZoom;
+      alert(zoom);
+    },
+    onPan: function(newPan) {
+      pan_x = newPan.x;
+      pan_y = newPan.y;
+    }
+  });
+
+  alert(zoom);
+  panzoom.zoomAtPoint(zoom, {x: pan_x, y: pan_y});
+
+  draw.rect(0, 0).attr({ fill: '#FFF', width: 3000, height: 3000});
+
   //classes
   for (let key in classesJson)
   {
@@ -67,14 +92,52 @@ function createClassBox(draw, uclass, x, y)
   //drag event
   nested.draggable().on('dragend', e =>
   {
-    location.href = '/position/' + uclass["name"] + '/' + nested.x() + '/' + nested.y();
+    location.href = '/position/' + uclass["name"] + '/' + Math.floor(nested.x()) + '/' + Math.floor(nested.y());
   });
 
   boxes.set(uclass["name"], nested);
 }
 
-function setJsonText(classes_in, relationships_in)
+function sendDiagramInfo(classes_in, relationships_in, screenPos)
 {
   classesJson = classes_in;
   relationshipsJson = relationships_in;
+  pan_x = screenPos["x"];
+  pan_y = screenPos["y"];
+  zoom = screenPos["zoom"];
+}
+
+function getDiagramImage()
+{
+  var canvas = document.getElementById("umlcanvas");
+  canvas.height = 1500;
+  canvas.width = 3000;
+  const ctx = canvas.getContext("2d");
+  drawInlineSVG(document.getElementById('umldiagram'), ctx, function() {
+    img = canvas.toDataURL();
+    download(img);
+  });
+}
+
+function download(file, name)
+{
+  var link = document.createElement("a");
+  link.download = name;
+  link.href = file;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  delete link;
+}
+
+function drawInlineSVG(svgElement, ctx, callback) {
+  var svgURL = new XMLSerializer().serializeToString(svgElement);
+  var img = new Image();
+  img.onload = function() {
+    ctx.drawImage(this, 0, 0);
+    callback();
+  }
+
+  img.src = 'data:image/svg+xml; charset=utf8, ' + encodeURIComponent(svgURL);
+
 }

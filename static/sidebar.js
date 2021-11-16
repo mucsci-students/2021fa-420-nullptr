@@ -5,4 +5,5 @@ function toggleSidebar() {
   } else {
     x.style.display = "none";
   }
+  getDiagramImage();
 }

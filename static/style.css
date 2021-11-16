@@ -1,20 +1,15 @@
 body{
-  background-color: black;
+  background-color: #0D1117;
+  overflow:hidden;
 }
 svg {
-  margin-top:50px;
-  width:100vw;
-  height:100vh;
-  background-color:#FFF;
-  max-width:100%;
   z-index:-1;
   position:absolute;
   left:0;
   top:0;
 }
 .sidebar
-{
-  margin-top:50px;
+{ 
   height:100vh;
   background-color:black;
   overflow-x:auto;
@@ -34,5 +29,10 @@ body h1, h2, h3, h4, h5 {
 body form
 {
   font-size:15px;
+}
+
+#umlcanvas
+{
+  display:none;
 }
 
