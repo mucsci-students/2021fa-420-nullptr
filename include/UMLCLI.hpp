@@ -101,13 +101,6 @@ class UMLCLI
     void display_class(UMLClass currentClass);
     void display_method(string className, method_ptr methodIter); 
     void display_relationship(string source, string destination, string rType);
-    
-    /********************/
-    //Input parsing
-
-    size_t user_int_input();
-    string tab_completion();
-
 
     /********************/
     //Undo/Redo

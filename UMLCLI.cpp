@@ -693,6 +693,7 @@ void UMLCLI::list_relationships()
  * @brief User creates and names a class and may give it any number
  * of attributes.
  * 
+ * @param className
  */
 void UMLCLI::create_class(string className)
 {
@@ -723,6 +724,9 @@ void UMLCLI::create_class(string className)
 /**
  * @brief Creates a new relationship between classes.
  * 
+ * @param source
+ * @param destination
+ * @param relshipType
  */
 void UMLCLI::create_relationship(string source, string destination, string relshipType)
 {
@@ -781,6 +785,7 @@ void UMLCLI::create_relationship(string source, string destination, string relsh
  * @brief User will be prompted to type in the class name,
  * and if it exists, it will be deleted.
  * 
+ * @param className
  */
 void UMLCLI::delete_class(string className)
 {
@@ -800,6 +805,8 @@ void UMLCLI::delete_class(string className)
  * @brief User will be prompted to type in the source and destination,
  * and if the relationship exists, it will be deleted.
  * 
+ * @param source
+ * @param destination
  */
 void UMLCLI::delete_relationship(string source, string destination)
 {
@@ -821,6 +828,8 @@ void UMLCLI::delete_relationship(string source, string destination)
  * @brief User types in the current class name, and then the name
  * they'd like to change it to. Then it gets renamed.
  * 
+ * @param oldClassName
+ * @param newClassName
  */
 void UMLCLI::rename_class(string oldClassName, string newClassName)
 {
@@ -847,6 +856,9 @@ void UMLCLI::rename_class(string oldClassName, string newClassName)
  * @brief User will be prompted to type in the source, destination,
  * and NEW type. Then the relationship type will be changed.
  * 
+ * @param source
+ * @param destination
+ * @param relshipType 
  */
 void UMLCLI::change_relationship(string source, string destination, string relshipType)
 {
@@ -902,6 +914,7 @@ void UMLCLI::change_relationship(string source, string destination, string relsh
 /**
  * @brief Saves the user's progress into a json file.
  * 
+ * @param fileName
  */
 void UMLCLI::save_uml(string fileName)
 {
@@ -915,6 +928,7 @@ void UMLCLI::save_uml(string fileName)
 /**
  * @brief Loads a json save file, overwriting the current session.
  * 
+ * @param fileName
  */
 void UMLCLI::load_uml(string fileName)
 {
@@ -949,6 +963,8 @@ void UMLCLI::load_uml(string fileName)
  * is created.
  * 
  * @param className 
+ * @param fieldName
+ * @param fieldType
  */
 bool UMLCLI::add_field(string className, string fieldName, string fieldType)
 {
@@ -975,6 +991,8 @@ bool UMLCLI::add_field(string className, string fieldName, string fieldType)
  * it, and they can name and assign types to them accordingly.
  * 
  * @param className 
+ * @param methodName
+ * @param methodType
  */
 bool UMLCLI::add_method(string className, string methodName, string methodType)
 {
@@ -1001,9 +1019,9 @@ bool UMLCLI::add_method(string className, string methodName, string methodType)
  * @brief User types in parameter name and type, and the
  * parameter is created accordingly.
  * 
- * @param methodIter
- * @return true 
- * @return false 
+ * @param paramName
+ * @param paramType
+ * @return bool
  */
 bool UMLCLI::add_parameter(string paramName, string paramType)
 {
@@ -1027,6 +1045,7 @@ bool UMLCLI::add_parameter(string paramName, string paramType)
  * gets deleted.
  * 
  * @param className 
+ * @param fieldName
  */
 void UMLCLI::delete_field(string className, string fieldName)
 {
@@ -1052,7 +1071,6 @@ void UMLCLI::delete_field(string className, string fieldName)
  * method is overloaded, they can specify which one (in
  * a different function). The method is then deleted.
  * 
- * @param className 
  */
 void UMLCLI::delete_method()
 {
@@ -1075,7 +1093,7 @@ void UMLCLI::delete_method()
  * @brief User types in the name of the parameter and it
  * gets deleted.
  * 
- * @param methodIter
+ * @param paramName
  */
 void UMLCLI::delete_parameter(string paramName)
 {
@@ -1160,7 +1178,8 @@ void UMLCLI::rename_method(string newMethodName)
  * @brief User types in the old name, then the new name, and
  * then it gets renamed.
  * 
- * @param methodIter
+ * @param paramNameOld
+ * @param paramNameNew
  */
 void UMLCLI::rename_parameter(string paramNameOld, string paramNameNew)
 {
@@ -1231,8 +1250,8 @@ void UMLCLI::change_method(string newMethodType)
  * @brief User types in the name, and then the new type.
  * The parameter's type is then changed accordingly.
  * 
- * @param className
- * @param methodIter 
+ * @param paramName
+ * @param newParamType 
  */
 void UMLCLI::change_parameter(string paramName, string newParamType)
 {
@@ -1346,28 +1365,6 @@ void UMLCLI::display_relationship(string source, string destination, string rTyp
   cout << "TYPE        : " << rType << "\n";
   cout << "SOURCE      : " << source << "\n";
   cout << "DESTINATION : " << destination << "\n";
-}
-
-/**************************************************************/
-//INPUT PARSING
-
-/**
- * @brief Takes in user input and makes sure it's
- * an unsigned int (size_t).
- * 
- * @return size_t 
- */
-size_t UMLCLI::user_int_input()
-{
-  size_t num;
-
-  while(!(cin >> num))
-  {
-    cin.clear();
-    cin.ignore(1000, '\n');
-    cout << "Invalid input. Try again (input a number): ";
-  }
-  return num;
 }
 
 /**************************************************************/
