@@ -2,7 +2,6 @@ var boxes = new Map();
 var lines = new Array();
 var classesJson;
 var relationshipsJson;
-
 SVG.on(document, 'DOMContentLoaded', function() {
   var draw = SVG().addTo('svg');
 
@@ -52,14 +51,31 @@ function clearLines()
   })
 }
 
+
+
+
+
 function createClassBox(draw, uclass, x, y)
 {
   var nested = draw.nested();
-  nested.rect(200,200).attr({ fill: '#f00', opacity: 0.3, width: 150, height: 150  }).front();
+ // nested.rect(200,200).attr({ fill: '#f00', opacity: 0.3, width: 150, height: 150  }).front();
+  var xval_rect = 150;
+  var yval_rect = 150;
+  var nested = draw.nested()
+  var rect = nested.rect(xval_rect,yval_rect).radius(10).css({fill: '#f02', resize: 'both', overflow: 'auto', stroke: 'black'});
+
   var text_y = 20;
-  var text_x = 15;
+  var text_x = 10;
   nested.text(uclass["name"]).dy(text_y).dx(text_x);
-  text_y += 20;
+
+// const textElement = document.querySelector('text')  
+//const bbox = textElement.getBBox();  
+//const {width} = bbox;  
+//var w =console.log(width);
+//if(width >=150){
+    
+//  xval_rect += 10;
+//}
 
   //fields
   for (let key in uclass["fields"])
@@ -68,7 +84,6 @@ function createClassBox(draw, uclass, x, y)
     nested.text(field["type"] + " " + field["name"]).dy(text_y).dx(text_x);
     text_y += 20;
   }
-
   //methods
   for (let key in uclass["methods"])
   {
@@ -90,6 +105,20 @@ function createClassBox(draw, uclass, x, y)
   //drag event
   nested.draggable().on('dragend', e =>
   {
+    //force textbox back on screen for Y values
+    if(nested.y() < 0){
+      nested.y(1);
+    }
+    else if(nested.y() > 1500){
+      nested.y(1500);
+    }
+    //force textbox back on screen for x values
+    else if(nested.x() < 0){
+      nested.x(1)
+    }
+    else if(nested.x() > 3000){
+      nested.x(3000);
+    }
     request = new XMLHttpRequest();
     request.open("GET", '/position/' + uclass["name"] + '/' + Math.floor(nested.x()) + '/' + Math.floor(nested.y(), true));
     request.send();
@@ -99,7 +128,7 @@ function createClassBox(draw, uclass, x, y)
   nested.draggable().on('dragmove', e => {
     drawLines(draw);
   });
-
+    
 }
 
 function sendDiagramInfo(classes_in, relationships_in)
@@ -140,5 +169,4 @@ function drawInlineSVG(svgElement, ctx, callback) {
   }
 
   img.src = 'data:image/svg+xml; charset=utf8, ' + encodeURIComponent(svgURL);
-
 }

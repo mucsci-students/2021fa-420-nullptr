@@ -46,7 +46,7 @@ UMLData::UMLData(const vector<UMLClass>& vclass)
 {
   for (UMLClass uclass : vclass)
   {
-    addClass(uclass);
+    addClassObject(uclass);
   }
 }
 
@@ -284,10 +284,10 @@ json UMLData::getJson()
  * 
  * @param classIn 
  */
-void UMLData::addClass(const UMLClass& classIn)
+void UMLData::addClassObject(const UMLClass& classIn)
 {
   //check if already exists
-  if (doesClassExist(classIn))
+  if (doesClassExist(classIn.getName()))
     throw std::runtime_error("Class name already exists");
   if (!isValidName(classIn.getName()))
     throw std::runtime_error("Class name not valid");
@@ -306,23 +306,7 @@ void UMLData::addClass(const UMLClass& classIn)
  */
 void UMLData::addClass(string name)
 {
-  addClass(UMLClass(name));
-}
-
-
-/************************************/
-
-
-/**
- * @brief Takes in name and vector of attributes and creates class 
- * and adds to vector of classes.
- * 
- * @param name 
- * @param attributes 
- */
-void UMLData::addClass(string name, vector<UMLAttribute> attributes)
-{
-  addClass(UMLClass(name, attributes));
+  addClassObject(UMLClass(name));
 }
 
 
@@ -343,25 +327,6 @@ void UMLData::addRelationship(string srcName, string destName, int type)
   if (type < 0 || type > 3) 
     throw std::runtime_error("Invalid type");
   addRelationship(UMLRelationship(getClass(srcName), getClass(destName), type));
-}
-
-
-/************************************/
-
-
-/**
- * @brief Adds class attribute to specified className.
- * 
- * @param className 
- * @param attribute 
- */
-void UMLData::addClassAttribute(string className, UMLAttribute attribute)
-{
-  if (!isValidName(attribute.getAttributeName()))
-    throw std::runtime_error("Attribute name is not valid");
-  else if (!isValidName(attribute.getType()))
-    throw std::runtime_error("Attribute type is not valid");
-  getClass(className).addAttribute(attribute);
 }
 
 
@@ -487,26 +452,6 @@ void UMLData::deleteRelationship(string srcName, string destName)
 }
 
 
-/************************************/
-
-
-/**
- * @brief Removes className class attribute by the name.
- * 
- * @param className 
- * @param attributeName 
- */
-void UMLData::removeClassAttribute(string className, string attributeName)
-{
-  for (attr_ptr attr : getClass(className).getAttributes()) {
-    if (attr->getAttributeName() == attributeName) {
-      getClass(className).deleteAttribute(attributeName);
-      return;
-    }
-  }
-  throw std::runtime_error("Attribute does not exist");
-}
-
 
 /************************************/
 
@@ -566,26 +511,6 @@ void UMLData::changeClassName(string oldName, string newName)
     throw std::runtime_error("New class name is not valid");
   getClass(oldName).changeName(newName);
   //change name in relationship
-}
-
-
-/************************************/
-
-
-/**
- * @brief Changes class attribute by the new attribute name.
- * 
- * @param className 
- * @param oldAttributeName 
- * @param newAttributeName 
- */
-void UMLData::changeAttributeName(string className, string oldAttributeName, string newAttributeName)
-{
-  if (findAttribute(newAttributeName, getClassAttributes(className)) >= 0)
-    throw std::runtime_error("Attribute name already exists");
-  if (!isValidName(newAttributeName))
-    throw std::runtime_error("New attribute name is not valid");
-  getClass(className).changeAttributeName(oldAttributeName, newAttributeName);
 }
 
 
@@ -759,25 +684,6 @@ bool UMLData::doesClassExist(const string& name)
 
 
 /**
- * @brief Checks if class exists with classes list (class argument)
- * 
- * @param uclass 
- * @return true 
- * @return false 
- */
-bool UMLData::doesClassExist(const UMLClass& uclass)
-{
-  list<UMLClass>::iterator findIter = findClass(uclass);
-  if (findIter == classes.end())
-    return false;
-  return true;
-}
-
-
-/************************************/
-
-
-/**
  * @brief Checks to see if relationship exists.
  * 
  * @param source 
@@ -918,63 +824,27 @@ void UMLData::deleteParameter(method_ptr method, string paramName)
   method->deleteParameter(paramName);
 }
 
+
 /************************************/
 
+
 /**
- * @brief Used for comparing overloaded methods to see
- * if they're valid. Takes in 2 method pointers, and 
- * compares their parameters by type. Returns false if 
- * the methods are EXACT duplicates, or if their return 
- * types are different.
+ * @brief THIS WILL BE DELETED!!!!!!!!!!!!!!
  * 
- * Returns false:
- * 
- * void method(int param1, string param2, bool param3)
- * void method(int param1, string param2, bool param3)
- * ---------------------------------------------------
- * void method(int param1)
- * string method()
- * ---------------------------------------------------
- * void method(int param1, string param2, bool param3)
- * void method(int paramOne, string bloop, bool thingy)
- * 
- * Returns true:
- * 
- * void method(int param1, bool param2, string param3)
- * void method(string param1, int param2, bool param3)
- * ---------------------------------------------------
- * void method(int param1, string param2, bool param3)
- * void method(int param1, string param2)
- * 
- * @param method1 
- * @param method2 
- * @return true 
- * @return false 
- *
-bool UMLData::compareMethods(method_ptr method1, method_ptr method2)
+ * @param className 
+ * @param attributeName 
+ */
+void UMLData::removeClassAttribute(string className, string attributeName)
 {
-
-  if(method1->getType() != method2->getType())
-    return false;
-
-  list paramList1 = method1->getParam();
-  list paramList2 = method2->getParam();
-
-  if(paramList1.size() != paramList2.size())
-    return true;
-
-  auto param2 = paramList2.begin();
-  for(auto param1 = paramList1.begin(); param1 == paramList1.end(); ++param1)
-  {
-    if(param1->getType() != param2->getType())
-      return true;
-
-    ++param2;
+  for (attr_ptr attr : getClass(className).getAttributes()) {
+    if (attr->getAttributeName() == attributeName) {
+      getClass(className).deleteAttribute(attributeName);
+      return;
+    }
   }
-
-  return false; 
+  throw std::runtime_error("Attribute does not exist");
 }
-*/
+
 
 
 /*

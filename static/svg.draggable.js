@@ -56,6 +56,10 @@
       this.drag = this.drag.bind(this);
       this.startDrag = this.startDrag.bind(this);
       this.endDrag = this.endDrag.bind(this);
+      
+      
+     
+     
     } // Enables or disabled drag based on input
 
 
@@ -66,6 +70,7 @@
           this.el.on('mousedown.drag', this.startDrag);
           this.el.on('touchstart.drag', this.startDrag);
         } else {
+          
           this.el.off('mousedown.drag');
           this.el.off('touchstart.drag');
         }
@@ -117,14 +122,18 @@
         var box = this.box,
             lastClick = this.lastClick;
         var currentClick = this.el.point(getCoordsFromEvent(ev));
+        
         var x = box.x + (currentClick.x - lastClick.x);
         var y = box.y + (currentClick.y - lastClick.y);
         var newBox = new svg_js.Box(x, y, box.w, box.h);
+     
+      
         if (this.el.dispatch('dragmove', {
           event: ev,
           handler: this,
           box: newBox
         }).defaultPrevented) return;
+        
         this.move(x, y);
         return newBox;
       }
@@ -134,6 +143,7 @@
         // Svg elements bbox depends on their content even though they have
         // x, y, width and height - strange!
         // Thats why we handle them the same as groups
+        
         if (this.el.type === 'svg') {
           svg_js.G.prototype.move.call(this.el, x, y);
         } else {

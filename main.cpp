@@ -6,7 +6,7 @@
 
 //--------------------------------------------------------------------
 // System includes
-#include "include/CLI.hpp"
+#include "include/UMLCLI.hpp"
 #include "include/UMLAttribute.hpp"
 #include "include/UMLClass.hpp"
 #include "include/UMLData.hpp"
@@ -22,7 +22,7 @@ int main(int argc, char** argv)
     // Parameter check to see if user wants CLI or GUI
     if (argc > 1) {
         if (string(argv[1]) == "--cli") {
-          CLI newInterface;
+          UMLCLI newInterface;
           newInterface.cli_menu();
       }
     } else {

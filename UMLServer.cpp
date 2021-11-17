@@ -115,6 +115,7 @@ void UMLServer::start (int port)
     R"(/edit/parameter/(\w+)/(\d+)/(\w+))",
     [&] (const httplib::Request& req, httplib::Response& res) {
       std::string className = req.matches[1].str();
+      
       int methodIndex = std::stoi (req.matches[2].str());
       std::string oldParamName = req.matches[3].str();
 
@@ -162,6 +163,7 @@ void UMLServer::start (int port)
           [&] (const httplib::Request& req, httplib::Response& res) {
             std::string uclass = req.matches[1].str();
             std::string attribute = req.matches[2].str();
+            
             ERR_ADD (data.removeClassAttribute (uclass, attribute));
             res.set_redirect ("/");
           });
@@ -204,7 +206,7 @@ void UMLServer::start (int port)
   });
   svr.Get ("/help", [&] (const httplib::Request& req, httplib::Response& res) {
     inja::Environment env;
-    inja::Template temp = env.parse_template ("../helpGUI.txt");
+    inja::Template temp = env.parse_template ("../helpGUI.html");
     json j = data.getJson();
     j["errors"] = errors;
     errors.clear();
@@ -241,8 +243,11 @@ void UMLServer::start (int port)
   svr.Get (R"(/position/(\w+)/(\d+)/(\d+))",
           [&] (const httplib::Request& req, httplib::Response& res) {
             std::string className = req.matches[1].str();
+           
             int x = std::stoi (req.matches[2].str());
             int y = std::stoi (req.matches[3].str());
+          
+          
             data.getClass (className).setX (x);
             data.getClass (className).setY (y);
             history.save (data);
