@@ -67,6 +67,7 @@ function createClassBox(draw, uclass, x, y)
   var text_y = 20;
   var text_x = 10;
   nested.text(uclass["name"]).dy(text_y).dx(text_x);
+  text_y += 20;
 
 // const textElement = document.querySelector('text')  
 //const bbox = textElement.getBBox();  
@@ -110,18 +111,21 @@ function createClassBox(draw, uclass, x, y)
       nested.y(1);
     }
     else if(nested.y() > 1500){
-      nested.y(1500);
+      nested.y(1300);
     }
     //force textbox back on screen for x values
     else if(nested.x() < 0){
       nested.x(1)
     }
     else if(nested.x() > 3000){
-      nested.x(3000);
+      nested.x(2700);
     }
     request = new XMLHttpRequest();
     request.open("GET", '/position/' + uclass["name"] + '/' + Math.floor(nested.x()) + '/' + Math.floor(nested.y(), true));
     request.send();
+
+    drawLines(draw);
+
   });
 
   //redraw lines after move
