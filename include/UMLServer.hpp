@@ -23,6 +23,8 @@ class UMLServer
     // No private methods
 
   public:
+    //holds screen position for gui
+
     // Controller management for the GUI
     void start (int port);
     

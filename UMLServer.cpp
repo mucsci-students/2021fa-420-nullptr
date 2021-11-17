@@ -254,10 +254,21 @@ void UMLServer::start (int port)
             res.set_redirect ("/");
           });
 
-  
+  svr.Get("/stream", [&](const httplib::Request &req, httplib::Response &res) {
+    const size_t DATA_CHUNK_SIZE = 4;
+    auto test = new std::string("abcdefg");
+    res.set_content_provider(
+      test->size(), // Content length
+      "text/plain", // Content type
+      [test, DATA_CHUNK_SIZE](size_t offset, size_t length, httplib::DataSink &sink) {
+        const auto &d = *test;
+        sink.write(&d[offset], std::min(length, DATA_CHUNK_SIZE));
+        return true; // return 'false' if you want to cancel the process.
+      },
+    [test](bool success) { delete test; });
+  });
 
   std::cout << "running at http:://localhost:60555/" << std::endl;
-
   svr.listen ("localhost", port);
 }
 

@@ -1,8 +1,15 @@
 var boxes = new Map();
+var lines = new Array();
 var classesJson;
 var relationshipsJson;
 SVG.on(document, 'DOMContentLoaded', function() {
   var draw = SVG().addTo('svg');
+
+  //add panning and zooming
+  svgPanZoom('#umldiagram');
+
+  draw.rect(0, 0).attr({ fill: '#FFF', width: 3000, height: 1500}).back();
+
   //classes
   for (let key in classesJson)
   {
@@ -19,15 +26,30 @@ SVG.on(document, 'DOMContentLoaded', function() {
     }
     createClassBox(draw, uclass, pos_x, pos_y);
   }
-  //relationships
+
+  drawLines(draw);
+})
+
+//draw relationship lines
+function drawLines(draw)
+{
   for (let relKey in relationshipsJson)
   {
+    clearLines();
     let relationship = relationshipsJson[relKey];
     let source = boxes.get(relationship["source"]);
     let dest = boxes.get(relationship["destination"]);
-    draw.line(source.x()+100, source.y()+100, dest.x()+100, dest.y()+100).stroke({ color: 'blue', width: 10, linecap: 'round' }).back()
+    let line = draw.line(source.x()+100, source.y()+100, dest.x()+100, dest.y()+100).stroke({ color: 'blue', width: 10, linecap: 'round' });
+    lines.push(line);
   }
-})
+}
+
+function clearLines()
+{
+  lines.forEach(function (line) {
+    line.remove();
+  })
+}
 
 
 
@@ -35,23 +57,17 @@ SVG.on(document, 'DOMContentLoaded', function() {
 
 function createClassBox(draw, uclass, x, y)
 {
+  var nested = draw.nested();
+ // nested.rect(200,200).attr({ fill: '#f00', opacity: 0.3, width: 150, height: 150  }).front();
   var xval_rect = 150;
-var yval_rect = 150;
-  
-  
-
+  var yval_rect = 150;
   var nested = draw.nested()
   var rect = nested.rect(xval_rect,yval_rect).radius(10).css({fill: '#f02', resize: 'both', overflow: 'auto', stroke: 'black'});
-
-
-
- 
-
 
   var text_y = 20;
   var text_x = 10;
   nested.text(uclass["name"]).dy(text_y).dx(text_x);
-
+  text_y += 20;
 
 // const textElement = document.querySelector('text')  
 //const bbox = textElement.getBBox();  
@@ -61,11 +77,6 @@ var yval_rect = 150;
     
 //  xval_rect += 10;
 //}
-
-
-
-
-
 
   //fields
   for (let key in uclass["fields"])
@@ -90,34 +101,76 @@ var yval_rect = 150;
     text_y += 20;
   }
   nested.x(x).y(y);
+  boxes.set(uclass["name"], nested);
+
   //drag event
   nested.draggable().on('dragend', e =>
   {
-     //force textbox back on screen for Y values
-    if(nested.y() < 1){
-    location.href = '/position/' + uclass["name"] + '/' + nested.x() + '/' + 2;
+    //force textbox back on screen for Y values
+    if(nested.y() < 0){
+      nested.y(1);
     }
-    else if(nested.y() > 410){
-      location.href = '/position/' + uclass["name"] + '/' + nested.x() + '/' + 405;
+    else if(nested.y() > 1500){
+      nested.y(1300);
     }
     //force textbox back on screen for x values
-    else if(nested.x() < 300){
-      location.href = '/position/' + uclass["name"] + '/' + 325 + '/' + nested.y();
+    else if(nested.x() < 0){
+      nested.x(1)
     }
-    else if(nested.x() > 1125){
-      location.href = '/position/' + uclass["name"] + '/' + 1115 + '/' + nested.y();
+    else if(nested.x() > 3000){
+      nested.x(2700);
     }
-    else{
-    location.href = '/position/' + uclass["name"] + '/' + nested.x() + '/' + nested.y();
-    }
+    request = new XMLHttpRequest();
+    request.open("GET", '/position/' + uclass["name"] + '/' + Math.floor(nested.x()) + '/' + Math.floor(nested.y(), true));
+    request.send();
+
+    drawLines(draw);
+
   });
 
-//   width:100vw; of sidebar
-  boxes.set(uclass["name"], nested);
+  //redraw lines after move
+  nested.draggable().on('dragmove', e => {
+    drawLines(draw);
+  });
+    
 }
 
-function setJsonText(classes_in, relationships_in)
+function sendDiagramInfo(classes_in, relationships_in)
 {
   classesJson = classes_in;
   relationshipsJson = relationships_in;
+}
+
+function getDiagramImage()
+{
+  var canvas = document.getElementById("umlcanvas");
+  canvas.height = 1500;
+  canvas.width = 3000;
+  const ctx = canvas.getContext("2d");
+  drawInlineSVG(document.getElementById('umldiagram'), ctx, function() {
+    img = canvas.toDataURL();
+    download(img);
+  });
+}
+
+function download(file, name)
+{
+  var link = document.createElement("a");
+  link.download = name;
+  link.href = file;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  delete link;
+}
+
+function drawInlineSVG(svgElement, ctx, callback) {
+  var svgURL = new XMLSerializer().serializeToString(svgElement);
+  var img = new Image();
+  img.onload = function() {
+    ctx.drawImage(this, 0, 0);
+    callback();
+  }
+
+  img.src = 'data:image/svg+xml; charset=utf8, ' + encodeURIComponent(svgURL);
 }
