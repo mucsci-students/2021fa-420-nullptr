@@ -3,29 +3,11 @@ var lines = new Array();
 var classesJson;
 var relationshipsJson;
 
-
-var panzoom;
-
-//keeps track of current panning and zooming
-var pan_x;
-var pan_y;
-var zoom;
-
 SVG.on(document, 'DOMContentLoaded', function() {
   var draw = SVG().addTo('svg');
 
   //add panning and zooming
-  panzoom = svgPanZoom('#umldiagram', {
-    onZoom: function(newZoom) {
-      zoom = newZoom;
-    },
-    onPan: function(newPan) {
-      pan_x = newPan.x;
-      pan_y = newPan.y;
-    }
-  });
-
-  panzoom.zoomAtPoint(zoom, {x: pan_x, y: pan_y});
+  svgPanZoom('#umldiagram');
 
   draw.rect(0, 0).attr({ fill: '#FFF', width: 3000, height: 1500}).back();
 
@@ -120,13 +102,10 @@ function createClassBox(draw, uclass, x, y)
 
 }
 
-function sendDiagramInfo(classes_in, relationships_in, screenPos)
+function sendDiagramInfo(classes_in, relationships_in)
 {
   classesJson = classes_in;
   relationshipsJson = relationships_in;
-  pan_x = screenPos["x"];
-  pan_y = screenPos["y"];
-  zoom = screenPos["zoom"];
 }
 
 function getDiagramImage()

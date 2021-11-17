@@ -4,6 +4,3 @@
 [submodule "inja"]
 	path = inja
 	url = https://github.com/pantor/inja.git
-[submodule "lunasvg"]
-	path = lunasvg
-	url = https://github.com/sammycage/lunasvg
