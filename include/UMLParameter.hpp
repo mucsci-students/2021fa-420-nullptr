@@ -38,5 +38,5 @@ class UMLParameter
 		void changeType(string newType);
 
 		// Operator overload to compare parameters by name
-		bool operator==(const UMLParameter& other) {return (this->getName() == other.getName());}
+		bool operator==(const UMLParameter& other) const {return (this->getType() == other.getType());}
 };

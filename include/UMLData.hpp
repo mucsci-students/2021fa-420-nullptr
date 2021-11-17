@@ -125,19 +125,13 @@ class UMLData
 
 
     // Takes in class and adds it to vector
-    void addClass(const UMLClass& classIn);
+    void addClassObject(const UMLClass& classIn);
 
     // Takes in string name and creates class and adds to classes vector
     void addClass(string name);
 
-    // Takes in name and vector of attributes and creates class and adds to vector of classes
-    void addClass(string name, vector<UMLAttribute> attributes);
-
     // Takes in src string, dest string, and type int creates relationship and adds to relationships vector
     void addRelationship(string srcName, string destName, int type);
-
-    // Adds class attribute to specified className
-    void addClassAttribute(string className, UMLAttribute attribute);
 
     // Adds class attribute to specified className using a smart pointer
     void addClassAttribute(string className, attr_ptr attribute);
@@ -156,9 +150,6 @@ class UMLData
     // Deletes relationshp based on two strings
     void deleteRelationship(string srcName, string destName);
 
-    // Removes className class attribute by the name
-    void removeClassAttribute(string className, string attributeName);
-
     // Removes className class attribute by smart pointer
     void removeClassAttribute(string className, attr_ptr attr);
 
@@ -173,9 +164,6 @@ class UMLData
     // Changes class name from old name to new name
     void changeClassName(string oldName, string newName);
 
-    // Changes className class attribute by the new attribute name
-    void changeAttributeName(string className, string oldAttributeName, string newAttributeName);
-
     // Overload of changeAttributeName to work with a smart pointer
     void changeAttributeName(string className, attr_ptr attribute, string newAttributeName);
 
@@ -186,7 +174,6 @@ class UMLData
 
     /********************************/
     //Type Changing
-
 
     // Modifies relationship type given a new relationship type 
     void changeRelationshipType(const string& srcName, const string& destName, int newType);
@@ -205,9 +192,6 @@ class UMLData
     // Checks if class exists within classses list (string argument) 
     bool doesClassExist(const string& name);
 
-    // Checks if class exists with classes list (class argument)
-    bool doesClassExist(const UMLClass& uclass);
-
     // Checks to see if relationship exists.
     bool doesRelationshipExist(string source, string destination);
 
@@ -222,6 +206,7 @@ class UMLData
 
     // Gets class reference for the given name
     UMLClass& getClass(string name);
+
     // Checks if identifier name is valid
     bool isValidName(string name);
 
@@ -234,8 +219,8 @@ class UMLData
     //DO NOT USE THIS VERSION!
     void deleteParameter(method_ptr method, string paramName);
 
-    // Checks if overloaded methods have duplicate parameters.
-    //bool compareMethods(method_ptr method1, method_ptr method2);
+    // THIS WILL BE DELETED!!!!!!
+    void removeClassAttribute(string className, string attributeName);
 
 
   private:

@@ -58,6 +58,8 @@ For a user guide, access helpCLI.txt within the cloned repository to see expande
 
 [svgdotjs - svg.draggable.js](https://github.com/svgdotjs/svg.draggable.js) ([MIT License](https://raw.githubusercontent.com/svgdotjs/svg.draggable.js/master/LICENSE))
 
+[daniele77  - cli](https://github.com/daniele77/cli) ([Boost Software License 1.0](https://raw.githubusercontent.com/daniele77/cli/master/LICENSE))
+
 ## Authors
 [DHDodo](https://github.com/DHDodo) - Briar Sauble
 
