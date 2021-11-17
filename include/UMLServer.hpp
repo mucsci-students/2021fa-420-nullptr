@@ -24,12 +24,6 @@ class UMLServer
 
   public:
     //holds screen position for gui
-    struct screenPos
-    {
-      int zoomLevel = 1;
-      int x = 0;
-      int y = 0;
-    };
 
     // Controller management for the GUI
     void start (int port);

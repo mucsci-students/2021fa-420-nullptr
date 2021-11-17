@@ -53,12 +53,6 @@ void UMLServer::start (int port)
     j["success"] = success;
     success.clear();
     j["files"] = UMLFile::listSaves();
-
-    j["screenpos"]["zoom"] = 0.5;
-    j["screenpos"]["x"] = 50;
-    j["screenpos"]["y"] = 50;
-
-
     res.set_content (env.render (temp, j), "text/html");
   });
 
@@ -254,18 +248,6 @@ void UMLServer::start (int port)
             history.save (data);
             res.set_redirect ("/");
           });
-
-    //screenpos/zoom/x/y
-    // svr.Get (R"(/screenpos/(\d+)/(\d+)/(\d+))",
-    //       [&] (const httplib::Request& req, httplib::Response& res) {
-    //         int zoom = std::stoi (req.matches[1].str());
-    //         int x = std::stoi (req.matches[2].str());
-    //         int y = std::stoi (req.matches[3].str());
-    //         screenPos->zoomLevel = zoom;
-    //         screenPos->x = x;
-    //         screenPos->y = y;
-    //         res.set_redirect ("/");
-    //   });
 
   svr.Get("/stream", [&](const httplib::Request &req, httplib::Response &res) {
     const size_t DATA_CHUNK_SIZE = 4;

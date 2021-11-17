@@ -1,4 +1,5 @@
 var boxes = new Map();
+var lines = new Array();
 var classesJson;
 var relationshipsJson;
 
@@ -17,7 +18,6 @@ SVG.on(document, 'DOMContentLoaded', function() {
   panzoom = svgPanZoom('#umldiagram', {
     onZoom: function(newZoom) {
       zoom = newZoom;
-      alert(zoom);
     },
     onPan: function(newPan) {
       pan_x = newPan.x;
@@ -25,10 +25,9 @@ SVG.on(document, 'DOMContentLoaded', function() {
     }
   });
 
-  alert(zoom);
   panzoom.zoomAtPoint(zoom, {x: pan_x, y: pan_y});
 
-  draw.rect(0, 0).attr({ fill: '#FFF', width: 3000, height: 3000});
+  draw.rect(0, 0).attr({ fill: '#FFF', width: 3000, height: 1500}).back();
 
   //classes
   for (let key in classesJson)
@@ -46,20 +45,35 @@ SVG.on(document, 'DOMContentLoaded', function() {
     }
     createClassBox(draw, uclass, pos_x, pos_y);
   }
-  //relationships
+
+  drawLines(draw);
+})
+
+//draw relationship lines
+function drawLines(draw)
+{
   for (let relKey in relationshipsJson)
   {
+    clearLines();
     let relationship = relationshipsJson[relKey];
     let source = boxes.get(relationship["source"]);
     let dest = boxes.get(relationship["destination"]);
-    draw.line(source.x()+100, source.y()+100, dest.x()+100, dest.y()+100).stroke({ color: 'blue', width: 10, linecap: 'round' }).back()
+    let line = draw.line(source.x()+100, source.y()+100, dest.x()+100, dest.y()+100).stroke({ color: 'blue', width: 10, linecap: 'round' });
+    lines.push(line);
   }
-})
+}
+
+function clearLines()
+{
+  lines.forEach(function (line) {
+    line.remove();
+  })
+}
 
 function createClassBox(draw, uclass, x, y)
 {
   var nested = draw.nested();
-  nested.rect(200,200).attr({ fill: '#f00', opacity: 0.3, width: 150, height: 150  });
+  nested.rect(200,200).attr({ fill: '#f00', opacity: 0.3, width: 150, height: 150  }).front();
   var text_y = 20;
   var text_x = 15;
   nested.text(uclass["name"]).dy(text_y).dx(text_x);
@@ -89,13 +103,21 @@ function createClassBox(draw, uclass, x, y)
     text_y += 20;
   }
   nested.x(x).y(y);
+  boxes.set(uclass["name"], nested);
+
   //drag event
   nested.draggable().on('dragend', e =>
   {
-    location.href = '/position/' + uclass["name"] + '/' + Math.floor(nested.x()) + '/' + Math.floor(nested.y());
+    request = new XMLHttpRequest();
+    request.open("GET", '/position/' + uclass["name"] + '/' + Math.floor(nested.x()) + '/' + Math.floor(nested.y(), true));
+    request.send();
   });
 
-  boxes.set(uclass["name"], nested);
+  //redraw lines after move
+  nested.draggable().on('dragmove', e => {
+    drawLines(draw);
+  });
+
 }
 
 function sendDiagramInfo(classes_in, relationships_in, screenPos)
