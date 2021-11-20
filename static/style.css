@@ -1,7 +1,11 @@
+/*
+SIDE BAR AND BANNER FORMATTING START-------------------------------------------------------------------------------------------
+*/
 body{
   background-color: #0D1117;
   overflow:hidden;
 }
+
 svg {
   z-index:-1;
   position:absolute;
@@ -12,9 +16,9 @@ svg {
 { 
   height:100vh;
   width: 25vw;
-  background-color:black;
+  background-color:#555;
   overflow-x:auto;
-  color:gray;
+  color:white;
 }
 
 .class-table
@@ -37,6 +41,81 @@ body form
   display:none;
 }
 
+.welcomeBanner{
+  color: white;
+  position:absolute; 
+   
+  
+  width: 13%;
+  height: auto; 
+  border:white; 
+  border-radius: 5px;
+  align-content: center;
+  border-style: double;
+  border-color: #0D1117; 
+  
+  left: 39%;
+  top: 0%;
+  border-style: solid; 
+  font-size: large; 
+  background-color: #555;
+
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
+  font-style:italic;
+  font-weight: 500;
+  
+}
+
+
+.buttonnn{
+  background-color: #555; 
+  color: white; 
+  border-radius: 5px;
+  border-style: solid; 
+ 
+
+}
+.titless{
+  color: white; 
+  font-style: italic;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
+  
+}
+.entryFields{
+  background-color : gray; 
+}
+.form-control{
+  background-color : gray; 
+  color: white;
+}
+.buttonnnPNG{
+  background-color: #555; 
+  color: white; 
+  border-radius: 5px;
+  border-style: solid;
+  position:absolute; 
+  right: 24%;
+  top: 3%;
+  font-size: medium;
+}
+.buttonnnToggle{
+  background-color: #555; 
+  color: white; 
+  border-radius: 5px;
+  border-style: double;
+  border-color: black; 
+  font-size: large;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
+  font-style:italic;
+  font-weight: 300;
+}
+/*
+SIDE BAR AND BANNER FORMATTING END-------------------------------------------------------------------------------------------
+*/
+
 /*
 HELP FILE FORMATTING START-------------------------------------------------------------------------------------------
 */
@@ -58,10 +137,23 @@ HELP FILE FORMATTING START------------------------------------------------------
   font-size: x-large;
   font-style: italic;
 }
+
+
+.buttonnnHelp{
+  background-color: #555; 
+  color: white; 
+  border-radius: 5px;
+  border-style: solid;
+  position:absolute; 
+  right: 10%;
+  top: 3%;
+  font-size: medium;
+}
 /*
 HELP FILE FORMATTING END-------------------------------------------------------------------------------------------
 */
 .class.name {
   resize: both;
   overflow: auto;
+
 } 
