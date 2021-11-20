@@ -326,7 +326,7 @@ void UMLCLI::cli_menu()
     "View the currently selected method.");
 
   // View Method
-  parameterMenu -> Insert(
+  methodMenu -> Insert(
     "view_method", {"class_name", "method_name", "method_number"},
     [&](std::ostream& out, string className, string methodName, int methodNumber)
     {
