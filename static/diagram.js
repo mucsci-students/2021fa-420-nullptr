@@ -39,7 +39,7 @@ function drawLines(draw)
     let relationship = relationshipsJson[relKey];
     let source = boxes.get(relationship["source"]);
     let dest = boxes.get(relationship["destination"]);
-    let line = draw.line(source.x()+100, source.y()+100, dest.x()+100, dest.y()+100).stroke({ color: 'blue', width: 10, linecap: 'round' });
+    let line = draw.line(source.x()+100, source.y()+150, dest.x()+100, dest.y()+150).stroke({ color: 'black', width: 10, linecap: 'round' });
     lines.push(line);
   }
 }
@@ -62,7 +62,7 @@ function createClassBox(draw, uclass, x, y)
   var xval_rect = 150;
   var yval_rect = 150;
   var nested = draw.nested()
-  var rect = nested.rect(xval_rect,yval_rect).radius(10).css({fill: '#f02', resize: 'both', overflow: 'auto', stroke: 'black'});
+  var rect = nested.rect(xval_rect,yval_rect).radius(10).css({fill: '#555', resize: 'both', overflow: 'auto', stroke: 'black'});
 
   var text_y = 20;
   var text_x = 10;
