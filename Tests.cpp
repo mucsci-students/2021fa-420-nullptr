@@ -19,6 +19,8 @@
 /************************************************************/
 
 #include <gtest/gtest.h>
+#include "cli/cli.h"
+#include "cli/clifilesession.h"
 
 #include "include/UMLCLI.hpp"
 #include "include/UMLClass.hpp"
@@ -27,10 +29,14 @@
 #include "include/UMLMethod.hpp"
 #include "include/UMLParameter.hpp"
 #include "include/UMLRelationship.hpp"
+#include "include/CLITest.hpp"
 
 #include <iostream>
 #include <memory>
 #include <string>
+
+using namespace std;
+using namespace cli;
 
 /* 
 **************************
@@ -667,16 +673,25 @@ TEST (UMLFileTest, AddComponentsTest)
 TEST (UMLDataAddClassTest, AddClassAndGetCopy)
 {
   UMLData data;
-  data.addClassObject (UMLClass ("test"));
-  ASSERT_EQ ("test", data.getClassCopy ("test").getName());
+  data.addClassObject(UMLClass("test"));
+  ASSERT_EQ("test", data.getClassCopy ("test").getName());
 }
 
 // Shouldn't be able to add a class that already exists
 TEST (UMLDataAddClassTest, AddClassThatAlreadyExists)
 {
   UMLData data;
-  data.addClassObject (UMLClass ("test"));
-  ERR_CHECK (data.addClassObject (UMLClass ("test")), "Class name already exists");
+  data.addClassObject(UMLClass ("test"));
+  ERR_CHECK(data.addClassObject (UMLClass ("test")), "Class name already exists");
+}
+
+// Should be able to delete a class and then check with delete that it doesn't exist
+TEST (UMLRemoveClassTest, RemoveClass) 
+{
+  UMLData data;
+  data.addClassObject(UMLClass("test"));
+  data.deleteClass("test");
+  ERR_CHECK (data.deleteClass("test"), "Class not found");
 }
 
 // Shouldn't be able to remove a class that doesn't exist
@@ -1146,7 +1161,37 @@ TEST (UndoRedoTest, RedoAfterClassDeletedUndo)
 
 // ****************************************************
 
-// Tests for CLI (CLI.CPP)
+// Functions for tests for CLI (from test_cli.cpp)
 // **************************
 
-// Need a way to grab the stream of characters.
+TEST (CLITest, AddClassWithCLI)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "class add bob");
+
+  // See if Bob was added.
+  ASSERT_EQ("bob", interface.return_model().getClassCopy("bob").getName());
+}
+
+TEST (CLITest, DeleteClassWithCLI)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  // You can use multiple user_inputs for testing commands.
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "class delete bob");
+
+  // Shouldn't be able to find bob
+  ERR_CHECK (interface.return_model().getClassCopy("bob"), "Class not found");
+}

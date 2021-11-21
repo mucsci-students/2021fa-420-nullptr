@@ -18,7 +18,6 @@
 
 //--------------------------------------------------------------------
 // System includes
-#include <cli/cli.h>
 #include <cli/loopscheduler.h>
 #include <cli/clilocalsession.h>
 #include <vector>
@@ -44,11 +43,13 @@ using namespace std;
 */
 
 /**
- * @brief Takes in user input and calls different functions based on
- * what command the user types.
+ * @brief Generates a menu for use in the command line interface.
+ * Returns the CLI in question to be used within different types
+ * of CLI sessions.
  * 
+ * @return Cli
  */
-void UMLCLI::cli_menu()
+Cli UMLCLI::cli_menu()
 {
   //--------------------------------------------------------------------
 
@@ -506,9 +507,24 @@ void UMLCLI::cli_menu()
   // Initialize CLI that starts at root menu.
   Cli cli(std::move(rootMenu));
 
+  return cli;
+}
+
+/************************************/
+
+/**
+ * @brief Creates an instance of the CLI using a LoopScheduler
+ * and a CliLocalTerminalSession, that will run when main is
+ * called. Also includes various exit actions.
+ * 
+ */
+void UMLCLI::start()
+{
+  cout << "Welcome to UML++!\n"; // Session start action
   // Initialize and run the local CLI session.
   // Until the exit action is called, the scheduler operates on a loop.
   LoopScheduler scheduler;
+  Cli cli = cli_menu();
   CliLocalTerminalSession localSession(cli, scheduler, std::cout, 200);
   localSession.ExitAction(
     [&scheduler](auto& out)
@@ -519,8 +535,6 @@ void UMLCLI::cli_menu()
   );
   scheduler.Run();
 }
-
-/************************************/
 
 /**
  * @brief Lists all classes the user has created.
@@ -864,9 +878,7 @@ bool UMLCLI::add_field(string className, string fieldName, string fieldType)
 }
 
 
-
 /*************************/
-
 
 /**
  * @brief User types in the method name and type, and the method 
@@ -1396,18 +1408,29 @@ int UMLCLI::method_number(string className, method_ptr method)
    SelectedMethod = method;
  }
 
- /*************************/
+/*************************/
 
 /**
  * @brief Clears selected method from global variables and untoggles
  * global bool MethodSelected so certain functions cannot be used.
  * 
  */
- void UMLCLI::clear_selected_method()
- {
-   MethodSelected = false;
-   MethodClassName = "";
-   SelectedMethod = nullptr;
- }
+void UMLCLI::clear_selected_method()
+{
+  MethodSelected = false;
+  MethodClassName = "";
+  SelectedMethod = nullptr;
+}
 
-  /*************************/
+/*************************/
+
+/**
+ * @brief Returns a copy of the UMLData object being used by the 
+ * CLI for the sake of testing.
+ *
+ * @return UMLData
+ */
+UMLData UMLCLI::return_model() 
+{
+  return Model;
+}

@@ -26,7 +26,8 @@ add_library(umllib
   UMLParameter.cpp
   UMLRelationship.cpp
   UMLServer.cpp
-  UMLCLI.cpp)
+  UMLCLI.cpp
+  CLITest.cpp)
 
 target_include_directories(umllib PUBLIC "${PROJECT_SOURCE_DIR}/include")
 
