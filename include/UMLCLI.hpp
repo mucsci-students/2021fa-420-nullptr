@@ -7,6 +7,7 @@
 
 //--------------------------------------------------------------------
 // System includes
+#include <cli/cli.h>
 #include <string>
 #include "UMLClass.hpp"
 #include "UMLAttribute.hpp"
@@ -33,6 +34,7 @@
  using std::list;
  using std::shared_ptr;
  using std::map;
+ using namespace cli;
 //--------------------------------------------------------------------
 
 /********************/
@@ -127,7 +129,10 @@ class UMLCLI
     
     // Takes in user input and calls different functions based on
     // what command the user typed.
-    void cli_menu();
+    Cli cli_menu();
+
+    // Begins a CLI for use in main.
+    void start();
 
     // Lists all classes the user has created.
     void list_classes();
@@ -163,5 +168,7 @@ class UMLCLI
 
     // Loads a json save file, overwriting the current session.
     void load_uml(string fileName);
-   
+
+    // Returns a copy of the current UMLData object for use in testing.
+    UMLData return_model();
 };

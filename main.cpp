@@ -23,7 +23,7 @@ int main(int argc, char** argv)
     if (argc > 1) {
         if (string(argv[1]) == "--cli") {
           UMLCLI newInterface;
-          newInterface.cli_menu();
+          newInterface.start();
       }
     } else {
       UMLServer newServer;
