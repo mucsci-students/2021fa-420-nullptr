@@ -1,6 +1,6 @@
-# 2021fa-420-nullptr ![workflow](https://github.com/mucsci-students/2021fa-420-nullptr/actions/workflows/cmake.yml/badge.svg)
+# | UML++ | 2021fa-420-nullptr ![workflow](https://github.com/mucsci-students/2021fa-420-nullptr/actions/workflows/cmake.yml/badge.svg)
 
-UML++ is a C++ editor of UML class diagrams.
+UML++ is a C++ & Javascript editor and generator of UML class diagrams.
 
 ## Features
 
@@ -9,6 +9,7 @@ UML++ is a C++ editor of UML class diagrams.
 - Add and delete four types of relationships between classes (aggregation, composition, generalization, realization).
 - View classes and diagram through a command line or graphical interface.
 - Save and load JSON files that store UML class diagram information.
+- Save images of generated UML class diagrams within the GUI.
 
 ## Dependencies
 
@@ -36,11 +37,11 @@ cmake --build build --parallel
 cd build
 ```
 5. For CLI, use "--cli" argument. The interface will open in your command line. 
-For a user guide, access helpCLI.txt within the cloned repository to see expanded information on different commands.
+For help, type 'help' in the command line or see USER_GUIDE.md.
 ```
 ./project --cli
 ```
-6. For GUI, provide no argument. Open port 60555 and enter interface in your browser through localhost:60555. When running, press "help" to enter a webpage that provides a user guide for using the GUI interface.
+6. For GUI, provide no argument. Open port 60555 and enter interface in your browser through localhost:60555. When running, press "help" to enter a webpage that provides a user guide for using the GUI interface. Further information about the GUI can be found in USER_GUIDE.md.
 ```
 ./project
 ```
@@ -54,11 +55,13 @@ For a user guide, access helpCLI.txt within the cloned repository to see expande
 
 [inja - pantor](https://github.com/pantor/inja) ([MIT License](https://raw.githubusercontent.com/pantor/inja/master/LICENSE))
 
-[svgdotjs - svg.js](https://github.com/svgdotjs/svg.js) ([MIT License](https://raw.githubusercontent.com/svgdotjs/svg.js/master/LICENSE.txt))
+[svg.js - svgdotjs](https://github.com/svgdotjs/svg.js) ([MIT License](https://raw.githubusercontent.com/svgdotjs/svg.js/master/LICENSE.txt))
 
-[svgdotjs - svg.draggable.js](https://github.com/svgdotjs/svg.draggable.js) ([MIT License](https://raw.githubusercontent.com/svgdotjs/svg.draggable.js/master/LICENSE))
+[svg.draggable.js - svtdotjs](https://github.com/svgdotjs/svg.draggable.js) ([MIT License](https://raw.githubusercontent.com/svgdotjs/svg.draggable.js/master/LICENSE))
 
-[daniele77  - cli](https://github.com/daniele77/cli) ([Boost Software License 1.0](https://raw.githubusercontent.com/daniele77/cli/master/LICENSE))
+[svg-pan-zoom - bumbu](https://github.com/bumbu/svg-pan-zoom) ([BSD 2-Clause "Simplified" License](https://raw.githubusercontent.com/bumbu/svg-pan-zoom/master/LICENSE))
+
+[cli - daniele77](https://github.com/daniele77/cli) ([Boost Software License 1.0](https://raw.githubusercontent.com/daniele77/cli/master/LICENSE))
 
 ## Authors
 [DHDodo](https://github.com/DHDodo) - Briar Sauble
