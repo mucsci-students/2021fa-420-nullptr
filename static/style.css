@@ -44,8 +44,6 @@ body form
 .welcomeBanner{
   color: white;
   position:absolute; 
-   
-  
   width: 13%;
   height: auto; 
   border:white; 
@@ -53,34 +51,27 @@ body form
   align-content: center;
   border-style: double;
   border-color: #0D1117; 
-  
   left: 39%;
   top: 0%;
   border-style: solid; 
   font-size: large; 
   background-color: #555;
-
-  -webkit-text-stroke-width: 1px;
-  -webkit-text-stroke-color: black;
-  font-style:italic;
-  font-weight: 500;
-  
+  font-style:italic;  
 }
-
 
 .buttonnn{
   background-color: #555; 
   color: white; 
   border-radius: 5px;
   border-style: solid; 
- 
-
+}
+.buttonnn:hover{
+  color: black;
 }
 .titless{
   color: white; 
   font-style: italic;
-  -webkit-text-stroke-width: 1px;
-  -webkit-text-stroke-color: black;
+  
   
 }
 .entryFields{
@@ -100,6 +91,9 @@ body form
   top: 3%;
   font-size: medium;
 }
+.buttonnnPNG:hover{
+  color: black;
+}
 .buttonnnToggle{
   background-color: #555; 
   color: white; 
@@ -107,10 +101,11 @@ body form
   border-style: double;
   border-color: black; 
   font-size: large;
-  -webkit-text-stroke-width: 1px;
-  -webkit-text-stroke-color: black;
   font-style:italic;
-  font-weight: 300;
+}
+
+.buttonnnToggle:hover{
+  color: black;
 }
 /*
 SIDE BAR AND BANNER FORMATTING END-------------------------------------------------------------------------------------------
@@ -149,6 +144,10 @@ HELP FILE FORMATTING START------------------------------------------------------
   top: 3%;
   font-size: medium;
 }
+.buttonnnHelp:hover{
+  color: black;
+}
+
 /*
 HELP FILE FORMATTING END-------------------------------------------------------------------------------------------
 */
