@@ -128,6 +128,8 @@ Cli UMLCLI::cli_menu()
     "delete", {"class_name"},
     [&](std::ostream& out, string className)
     {
+      // Make sure no more method is selected if it is owned by the deleted class
+      if (className == MethodClassName) clear_selected_method();
       delete_class(className);
     },
     "Delete a class with the name of the given argument.");
@@ -495,7 +497,7 @@ Cli UMLCLI::cli_menu()
   // Initialize CLI that starts at root menu.
   Cli cli(std::move(rootMenu));
   SetColor();
-  
+
   return cli;
 }
 
