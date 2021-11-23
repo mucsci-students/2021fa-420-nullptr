@@ -12,7 +12,11 @@ SVG.on(document, 'DOMContentLoaded', function() {
     dblClickZoomEnabled: false
   });
 
-  draw.rect(0, 0).attr({ fill: '#FFF', width: 3000, height: 1500}).back();
+  background_rect = draw.rect(0, 0).attr({ fill: '#FFF', width: 3000, height: 1500}).back();
+
+  background_rect.dblclick(function() {
+    window.location.href = "/change/view/all";
+  });
 
   //classes
   for (let key in classesJson)
@@ -74,8 +78,7 @@ function drawLines(draw)
      rectt.x(averagex);
      rectt.y(averagey+145);
     
-    const relationshipTypee = document.getElementsByClassName("relationshipType").item(index).innerHTML;
-    nested1.text(relationshipTypee).dy(text_y).dx(text_x).css({  fill: '#FFF' });
+    nested1.text(relationship["type"]).dy(text_y).dx(text_x).css({  fill: '#FFF' });
     
     index++;
     text_y += 20;
@@ -88,6 +91,12 @@ function drawLines(draw)
      else{
       nested1.polyline('60,70 10,50  60,20').css({fill: '#555'}).stroke({ color: '#000', width: 4, linecap: 'round', linejoin: 'round' }).x(averagex -47).y(averagey + 132);
     }
+
+    //focus on relationship on sidebar
+    nested1.dblclick(function() {
+      window.location.href = "/change/view/relationship/" + relationship["source"] + "/" + relationship["destination"];
+    });
+
     lines.push(nested1);
   }
 }
@@ -157,7 +166,7 @@ function createClassBox(draw, uclass, x, y)
       nested.y(1300);
     }
     //force textbox back on screen for x values
-    else if(nested.x() < 0){
+    if (nested.x() < 0){
       nested.x(1)
     }
     else if(nested.x() > 3000){
@@ -191,6 +200,11 @@ function createClassBox(draw, uclass, x, y)
   nested.draggable().on('dragmove', e => {
     drawLines(draw);
    // drawRelBox(draw);
+  });
+
+  //change the sidebar view if double clicked 
+  nested.dblclick(function() {
+    window.location.href = "/change/view/class/" + uclass["name"];
   });
     
 }

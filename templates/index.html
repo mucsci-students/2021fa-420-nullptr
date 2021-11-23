@@ -27,13 +27,6 @@
  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" 
  integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous">
  </script>
- 
-
-
-
-
-
-
 
     <button type="button"  onclick="toggleSidebar()" name="button"  id ="togglebutton"  class="buttonnnToggle">Toggle Editor Panel</button>
     <div id="umlsidebar" class="container col-xs-4 sidebar">
@@ -43,113 +36,151 @@
         {% for succ in success %}
             <p style="color:green;font-size: 30px;">{{ succ }}</p>
         {% endfor %}
-        <a class="buttonnnHelp"  href="/help">Help </a>
 
-        <h3 >
+        <h3 class="sidebar-links">
             
             
             <a class="buttonnn" href="/undo" >Undo</a> 
-            <a class="buttonnn" href="/redo" >Redo</a></h3>
+            <a class="buttonnn" href="/redo" >Redo</a>
+            <a class="buttonnn" href="/change/view/save" >Save/Load</a>
+            <a class="buttonnn"  href="/help">Help </a>
+        </h3>
         <hr>
-        {% for class in classes %}
-
-            <h4 style="font-weight: bold; " id="{{ class.name }}class"><span>Class: {{ class.name }}</span> 
-                <button class="buttonnn" id="{{ class.name }}classedit">Edit</button> 
-                <a  class="buttonnn" href="/delete/class/{{ class.name }}">Delete</a>
-            </h4>
-        <div class="attr">
-            <h5 class="titless">Fields:</h5>
-            
-            {% for field in class.fields %}
-                <h5 id="{{class.name}}{{ field.name }}field">{{ field.type }} {{ field.name }}
-                     <button   class="buttonnn" id="{{class.name}}{{ field.name }}fieldedit">Edit</button> 
-                     <a   class="buttonnn" href="/delete/attribute/{{ class.name }}/{{ field.name }}">Delete</a>
-                </h5>
+        {% if view.object != "all" %}
+            <h5><a class="buttonnn" href="/change/view/all">back</a></h5>
+        {% endif %}
+        {%if view.object == "all" %}
+            <h1 class="titless">Classes:</h1>
+            {% for class in classes %}
+                <div class = "row">
+                    <div class="col-xs-3">
+                        <h5>{{class.name}}</h5> 
+                    </div>
+                    <div class="col-xs-9">
+                        <h5><a class="buttonnn" href="/change/view/class/{{ class.name }}">Edit</a> <a  class="buttonnn" href="/delete/class/{{ class.name }}">Delete</a></h5>
+                    </div>
+                </div>    
             {% endfor %}
-            <div class="form-group">
-              <form style="margin-top: 10px;" action="/add/field/{{ class.name }}" method="GET">
-                <label for="ftype">Field type:</label>
-                <input class="form-control" type="text" id="ftype" name="ftype">
-                <label for="fname">Field name:</label>
-                <input class="form-control" type="text" id="fname" name="fname">
-                <input type="submit" class='buttonnn' value="Add Field">
-              </form>
-            </div>
-            <h5 class="titless">Methods:</h5>
-           
-            {% for method in class.methods %}
-    
-                <h4 id="{{class.name}}{{ method.index }}">{{ method.return_type }} {{ method.name }}()
-                    <button id="{{class.name}}{{ method.index }}edit"  class='buttonnn'>Edit</button> 
-                    <a href="/delete/attribute/{{ class.name }}/{{ method.name }}"  class='buttonnn'>Delete</a>
-                </h4>
-                <!--parameters-->
-                <h5 class="titless">Params</h5>
-                {% for param in method.params %}
-                    <p id="{{class.name}}{{method.index}}{{ param.name }}param">{{param.type}} {{param.name}} <button class="buttonnn"  id="{{class.name}}{{method.index}}{{ param.name }}paramedit" >Edit</button><a  class="buttonnn" href="/delete/parameter/{{ class.name }}/{{ method.index }}/{{ param.name }}">Delete</a></p>
-                {% endfor %}
-                <div class="form-group">
-                <form action="/add/parameter/{{ class.name }}/{{ method.index }}" method="GET">
-                    <label for="ptype">Parameter type:</label>
-                    <input class="form-control" type="text" id="ptype" name="ptype">
-                    <label for="pname">Parameter name:</label>
-                    <input class="form-control" type="text" id="panme" name="pname">
-                    <input type="submit"  class="buttonnn" value="Add Parameter">
-                </form>
-              </div>
-            {% endfor %}
-            <div class="form-group">
-            <form style="margin-top: 20px;" action="/add/method/{{ class.name }}" method="GET">
-                <label for="mtype">Method type:</label>
-                <input class="form-control" type="text" id="mtype" name="mtype">
-                <label for="mname">Method name:</label>
-                <input class="form-control" type="text" id="mname" name="mname">
-                <input type="submit"   class="buttonnn"  value="Add Method">
+            <form style="font-size: 20px;margin-top: 20px;" action="/add/class" method="GET" >
+                <label for="cname">Class name:</label>
+                <input type="text"  class="form-control" id="cname" name="cname">
+                <input type="submit" class="buttonnn" value="Add Class">
             </form>
-          </div>
-        </div>
-        <hr>
-        {% endfor %}
-        <form style="font-size: 20px;margin-top: 20px;" action="/add/class" method="GET" >
-            <label for="cname">Class name:</label>
-            <input type="text"  class="form-control" id="cname" name="cname">
-            <input type="submit" class="buttonnn" value="Add Class">
-        </form>
-        <h1 class="titless">Relationships:</h1>
-        {% for relationship in relationships %}
-            <h3 id="{{ relationship.destination}}{{ relationship.source }}">{{relationship.source}} -> {{relationship.destination}} type:
-                <a class="relationshipType"> {{relationship.type}} </a>
-                <button id="{{ relationship.destination}}{{ relationship.source }}edit" class="buttonnn">Edit</button>
-                <a href="/delete/relationship/{{relationship.source}}/{{relationship.destination}}" class="buttonnn">Delete</a>
-             
-            </h3>
-        {% endfor %}
-        <form action="/add/relationship" method="GET">
-          <div class="form-group">
-            <label for="cname">Source:</label>
-            <input class="form-control" type="text" id="source" name="source">
-            <label for="cname">Destination:</label>
-            <input class="form-control" type="text" id="dest" name="dest">
-            <label for="reltype">Type:</label>
-            <select class="form-control" name="reltype" id="reltype">
-                <option value="0">Aggregation</option>
-                <option value="1">Composition</option>
-                <option value="2">Generalization</option>
-                <option value="3">Realization</option>
-            </select>
-            <input type="submit"  class="buttonnn"  value="Add Relationship">
-          </div>
-        </form>
+            <h1 class="titless">Relationships:</h1>
+            {% for relationship in relationships %}
+                <h3 id="{{ relationship.destination}}{{ relationship.source }}">{{relationship.source}} -> {{relationship.destination}} type:
+                    <a class="relationshipType"> {{relationship.type}} </a>
+                    <a href="/change/view/relationship/{{relationship.source}}/{{relationship.destination}}" class="buttonnn">Edit</a>
+                    <a href="/delete/relationship/{{relationship.source}}/{{relationship.destination}}" class="buttonnn">Delete</a>
+                
+                </h3>
+            {% endfor %}
+            <form action="/add/relationship" method="GET">
+            <div class="form-group">
+                <label for="cname">Source:</label>
+                <input class="form-control" type="text" id="source" name="source">
+                <label for="cname">Destination:</label>
+                <input class="form-control" type="text" id="dest" name="dest">
+                <label for="reltype">Type:</label>
+                <select class="form-control" name="reltype" id="reltype">
+                    <option value="0">Aggregation</option>
+                    <option value="1">Composition</option>
+                    <option value="2">Generalization</option>
+                    <option value="3">Realization</option>
+                </select>
+                <input type="submit"  class="buttonnn"  value="Add Relationship">
+            </div>
+            </form>
+        {% endif %}
+
+            <!--start class view-->
+        {% if view.object == "class" %}
+            {% for class in classes %}
+                {% if class.name == view.name %}
+                        <h4 style="font-weight: bold; " id="{{ class.name }}class"><span>Class: {{ class.name }}</span> 
+                            <button class="buttonnn" id="{{ class.name }}classedit">Edit Name</button> 
+                            <a class="buttonnn" href="/delete/class/{{ class.name }}">Delete</a>
+                        </h4>
+                    <div class="attr">
+                        <h5 class="titless">Fields:</h5>
+                        
+                        {% for field in class.fields %}
+                            <h5 id="{{class.name}}{{ field.name }}field">{{ field.type }} {{ field.name }}
+                                <button   class="buttonnn" id="{{class.name}}{{ field.name }}fieldedit">Edit</button> 
+                                <a   class="buttonnn" href="/delete/attribute/{{ class.name }}/{{ field.name }}">Delete</a>
+                            </h5>
+                        {% endfor %}
+                        <div class="form-group">
+                        <form style="margin-top: 10px;" action="/add/field/{{ class.name }}" method="GET">
+                            <label for="ftype">Field type:</label>
+                            <input class="form-control" type="text" id="ftype" name="ftype">
+                            <label for="fname">Field name:</label>
+                            <input class="form-control" type="text" id="fname" name="fname">
+                            <input type="submit" class='buttonnn' value="Add Field">
+                        </form>
+                        </div>
+                        <h5 class="titless">Methods:</h5>
+                    
+                        {% for method in class.methods %}
+                
+                            <h4 id="{{class.name}}{{ method.index }}">{{ method.return_type }} {{ method.name }}()
+                                <button id="{{class.name}}{{ method.index }}edit"  class='buttonnn'>Edit</button> 
+                                <a href="/delete/attribute/{{ class.name }}/{{ method.name }}"  class='buttonnn'>Delete</a>
+                            </h4>
+                            <!--parameters-->
+                            <h5 class="titless">Params</h5>
+                            {% for param in method.params %}
+                                <p id="{{class.name}}{{method.index}}{{ param.name }}param">{{param.type}} {{param.name}} <button class="buttonnn"  id="{{class.name}}{{method.index}}{{ param.name }}paramedit" >Edit</button><a  class="buttonnn" href="/delete/parameter/{{ class.name }}/{{ method.index }}/{{ param.name }}">Delete</a></p>
+                            {% endfor %}
+                            <div class="form-group">
+                            <form action="/add/parameter/{{ class.name }}/{{ method.index }}" method="GET">
+                                <label for="ptype">Parameter type:</label>
+                                <input class="form-control" type="text" id="ptype" name="ptype">
+                                <label for="pname">Parameter name:</label>
+                                <input class="form-control" type="text" id="panme" name="pname">
+                                <input type="submit"  class="buttonnn" value="Add Parameter">
+                            </form>
+                        </div>
+                        {% endfor %}
+                        <div class="form-group">
+                        <form style="margin-top: 20px;" action="/add/method/{{ class.name }}" method="GET">
+                            <label for="mtype">Method type:</label>
+                            <input class="form-control" type="text" id="mtype" name="mtype">
+                            <label for="mname">Method name:</label>
+                            <input class="form-control" type="text" id="mname" name="mname">
+                            <input type="submit"   class="buttonnn"  value="Add Method">
+                        </form>
+                    </div>
+                    </div>
+                    <hr>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        {% if view.object == "relationship" %}
+             {% for relationship in relationships %}
+                    {% if relationship.source == view.name%}
+                        {% if relationship.destination == view.name2 %}
+                            <h3 id="{{ relationship.destination}}{{ relationship.source }}">{{relationship.source}} -> {{relationship.destination}} type:
+                                <a class="relationshipType"> {{relationship.type}} </a>
+                                <button id="{{ relationship.destination}}{{ relationship.source }}edit" class="buttonnn">Edit</button>
+                                <a href="/delete/relationship/{{relationship.source}}/{{relationship.destination}}" class="buttonnn">Delete</a>           
+                            </h3>
+                        {% endif %}
+                    {% endif %}
+            {% endfor %}
+        {%endif%}
+        {% if view.object == "save" or view.object == "all" %}
         <h1 class="titless">Save</h1>
 
         <button onclick="save();" class="buttonnn">Save JSON</button>
-        <button onClick="getDiagramImage();" class="buttonnnPNG">Save PNG</button>
+        <button onClick="getDiagramImage();" class="buttonnn">Save PNG</button>
        
         <h1 class="titless">Load File:</h1>
         <form action="/load" method="POST" enctype="multipart/form-data">
             <input type="file" class="form-control-file"  name="load" id="load">
             <input type="submit" class="buttonnn" value="Load">
         </form>
+        {% endif %}
     </body>
     </div>
     <svg width="3000px" height="1500px" viewBox="0 0 3000 1500" id="umldiagram"></svg>
@@ -157,62 +188,70 @@
     <canvas id="umlcanvas"></canvas>
     <script>
         //make the textbox extendable here
-      {% for class in classes %}
-          element = document.getElementById('{{ class.name }}classedit');
-          element.addEventListener("click", () => {
-            document.getElementById("{{ class.name }}class").innerHTML =
-                  "<form action='/edit/class/{{ class.name }}' method='GET'>" +
-                      "<input type='text' class= 'form-control' id='cname' name='cname' value='{{ class.name }}'>" +
-                      "<input type='submit' class='buttonnn' value='Edit Class'>"
-                  "</form>";
+        {% if view.object == "class" %}
+        {% for class in classes %}
+            {% if class.name == view.name %}
+                element = document.getElementById('{{ class.name }}classedit');
+                element.addEventListener("click", () => {
+                    document.getElementById("{{ class.name }}class").innerHTML =
+                        "<form action='/edit/class/{{ class.name }}' method='GET'>" +
+                            "<input type='text' class= 'form-control' id='cname' name='cname' value='{{ class.name }}'>" +
+                            "<input type='submit' class='buttonnn' value='Edit Class'>"
+                        "</form>";
+                });
+                {% for method in class.methods %}
+                element = document.getElementById('{{class.name}}{{ method.index }}edit');
+                element.addEventListener("click", () => {
+                    document.getElementById("{{class.name}}{{ method.index }}").innerHTML =
+                        "<form action='/edit/attribute/{{ class.name }}/{{ method.index }}' method='GET'>" +
+                            "<input type='text'   class= 'form-control' id='type' name='type' placeholder='return type' value='{{ method.return_type }}'>" +
+                            "<input type='text'   class= 'form-control'  id='name' name='name' placeholder='name' value='{{ method.name }}'>" +
+                            "<input type='submit' class='buttonnn' value='Edit Method'>" +
+                        "</form>";
+                });
+                    {% for param in method.params %}
+                        element = document.getElementById('{{class.name}}{{method.index}}{{ param.name }}paramedit');
+                        element.addEventListener("click", () => {
+                        document.getElementById("{{class.name}}{{method.index}}{{ param.name }}param").innerHTML =
+                            "<form action='/edit/parameter/{{ class.name }}/{{ method.index }}/{{ param.name }}' method='GET'>" +
+                                "<input type='text'  class= 'form-control' id='ptype' name='ptype' placeholder='type' value='{{ param.type }}'>" +
+                                "<input type='text'  class= 'form-control' id='pname' name='pname' placeholder='name' value='{{ param.name }}'>" +
+                                "<input type='submit' value='edit parameter'>" +
+                            "</form>";
+                    });
+                    {% endfor %}
+                {% endfor %}
+                {% for field in class.fields %}
+                element = document.getElementById('{{class.name}}{{ field.name }}fieldedit');
+                element.addEventListener("click", () => {
+                    document.getElementById("{{class.name}}{{ field.name }}field").innerHTML =
+                        "<form  action='/edit/attribute/{{ class.name }}/{{ field.index }}' method='GET'>" +
+                            "<input   class= 'form-control' type='text' id='type' name='type' placeholder='type' value='{{ field.type }}'>" +
+                            "<input  class= 'form-control' type='text' id='name' name='name' placeholder='name' value='{{ field.name }}'>" +
+                            "<input  class='buttonnn' type='submit'  value='Edit Field'>" +
+                        "</form>";
+                });
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+        {% endif %}
+    {% for relationship in relationships %}
+      {% if relationship.source == view.name%}
+                {% if relationship.destination == view.name2 %}
+                    element = document.getElementById('{{ relationship.destination}}{{ relationship.source }}edit');
+                        element.addEventListener("click", () => {
+                            document.getElementById("{{ relationship.destination}}{{ relationship.source }}").innerHTML =
+                                "<form action='/edit/relationship/{{ relationship.source }}/{{ relationship.destination }}'  method='GET'>" +
+                                "<select  class= 'buttonnn' name='reltype' id='reltype'>" +
+                                    " <option value='0'>aggregation</option>" +
+                                    "<option value='1'>composition</option>" +
+                                    "<option value='2'>generalization</option>" +
+                                    "<option value='3'>realization</option></select>" +
+                                    "<input type='submit' class= 'buttonnn' value='Edit Relationship'>" +
+                                "</form>";
           });
-          {% for method in class.methods %}
-          element = document.getElementById('{{class.name}}{{ method.index }}edit');
-          element.addEventListener("click", () => {
-              document.getElementById("{{class.name}}{{ method.index }}").innerHTML =
-                  "<form action='/edit/attribute/{{ class.name }}/{{ method.index }}' method='GET'>" +
-                      "<input type='text'   class= 'form-control' id='type' name='type' placeholder='return type' value='{{ method.return_type }}'>" +
-                      "<input type='text'   class= 'form-control'  id='name' name='name' placeholder='name' value='{{ method.name }}'>" +
-                      "<input type='submit' class='buttonnn' value='Edit Method'>" +
-                  "</form>";
-          });
-              {% for param in method.params %}
-                  element = document.getElementById('{{class.name}}{{method.index}}{{ param.name }}paramedit');
-                  element.addEventListener("click", () => {
-                  document.getElementById("{{class.name}}{{method.index}}{{ param.name }}param").innerHTML =
-                      "<form action='/edit/parameter/{{ class.name }}/{{ method.index }}/{{ param.name }}' method='GET'>" +
-                          "<input type='text'  class= 'form-control' id='ptype' name='ptype' placeholder='type' value='{{ param.type }}'>" +
-                          "<input type='text'  class= 'form-control' id='pname' name='pname' placeholder='name' value='{{ param.name }}'>" +
-                          "<input type='submit' value='edit parameter'>" +
-                      "</form>";
-              });
-              {% endfor %}
-          {% endfor %}
-          {% for field in class.fields %}
-          element = document.getElementById('{{class.name}}{{ field.name }}fieldedit');
-          element.addEventListener("click", () => {
-              document.getElementById("{{class.name}}{{ field.name }}field").innerHTML =
-                  "<form  action='/edit/attribute/{{ class.name }}/{{ field.index }}' method='GET'>" +
-                      "<input   class= 'form-control' type='text' id='type' name='type' placeholder='type' value='{{ field.type }}'>" +
-                      "<input  class= 'form-control' type='text' id='name' name='name' placeholder='name' value='{{ field.name }}'>" +
-                      "<input  class='buttonnn' type='submit'  value='Edit Field'>" +
-                  "</form>";
-          });
-          {% endfor %}
-      {% endfor %}
-      {% for relationship in relationships %}
-      element = document.getElementById('{{ relationship.destination}}{{ relationship.source }}edit');
-          element.addEventListener("click", () => {
-              document.getElementById("{{ relationship.destination}}{{ relationship.source }}").innerHTML =
-                  "<form action='/edit/relationship/{{ relationship.source }}/{{ relationship.destination }}'  method='GET'>" +
-                   "<select  class= 'buttonnn' name='reltype' id='reltype'>" +
-                      " <option value='0'>aggregation</option>" +
-                      "<option value='1'>composition</option>" +
-                      "<option value='2'>generalization</option>" +
-                      "<option value='3'>realization</option></select>" +
-                      "<input type='submit' class= 'buttonnn' value='Edit Relationship'>" +
-                  "</form>";
-          });
+          {% endif %}
+        {% endif %}
       {% endfor %}
   </script>
 

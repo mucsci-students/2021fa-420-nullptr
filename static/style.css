@@ -25,6 +25,16 @@ svg {
   color:white;
 }
 
+.sidebar-links a 
+{
+  padding:3px;
+}
+
+.sidebar-right
+{
+  margin-left:10px;
+}
+
 .class-table
 {
   margin-top: 15px;
@@ -66,6 +76,7 @@ body form
 .buttonnn{
   background-color: #555; 
   color: white; 
+  padding:5px;
   border-radius: 5px;
   border-style: solid; 
 }

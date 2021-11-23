@@ -227,7 +227,9 @@ json UMLData::getJson()
     jsonObj["classes"] += { {"name", uclass.getName()}, {"position_x", uclass.getX()}, {"position_y", uclass.getY()}, {"fields", jsonattr["fields"]}, {"methods", jsonattr["methods"]} };
   }
 
+  std::cout << "finsihed classes" << std::endl;
   jsonObj["relationships"] = json::array();
+  std::cout << "rel size" << relationships.size() << std::endl;
   for (UMLRelationship urelationship : relationships)
   {
     jsonObj["relationships"] += { 
@@ -236,7 +238,7 @@ json UMLData::getJson()
       {"type", getRelationshipType(urelationship.getSource().getName(), urelationship.getDestination().getName())}
     };
   }
-
+  std::cout << "finished relationships" << std::endl;
   return jsonObj;
 }
 
