@@ -82,18 +82,6 @@ Cli UMLCLI::cli_menu()
     },
     "Enter the name of your UML diagram (no file extension) as an argument to save a json representation of it within your build directory.");
 
-  // Turn On Color
-  rootMenu -> Insert(
-      "color",
-      [](std::ostream& out){ out << "Colors ON\n"; SetColor(); },
-      "Enable colors in the CLI.");
-
-  // Turn Off Color
-  rootMenu -> Insert(
-      "nocolor",
-      [](std::ostream& out){ out << "Colors OFF\n"; SetNoColor(); },
-      "Disable colors in the CLI.");
-
   // Undo
   rootMenu -> Insert(
     "undo",
@@ -506,7 +494,8 @@ Cli UMLCLI::cli_menu()
 
   // Initialize CLI that starts at root menu.
   Cli cli(std::move(rootMenu));
-
+  SetColor();
+  
   return cli;
 }
 
