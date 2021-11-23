@@ -1164,7 +1164,27 @@ TEST (UndoRedoTest, RedoAfterClassDeletedUndo)
 // Functions for tests for CLI (from test_cli.cpp)
 // **************************
 
-TEST (CLITest, AddClassWithCLI)
+// Test if help command prints help
+TEST (CLITest, HelpCommand)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "help");
+
+  // See if help was displayed 
+  ASSERT_NE(test.extract_content(oss).find("Commands available:"), string::npos); 
+}
+
+// Functions for CLI class add
+// **************************
+
+// Add a class
+TEST (CLITest, AddClass)
 {
   // Create interface and grab its menu and a stringstream
   UMLCLI interface;
@@ -1179,7 +1199,62 @@ TEST (CLITest, AddClassWithCLI)
   ASSERT_EQ("bob", interface.return_model().getClassCopy("bob").getName());
 }
 
-TEST (CLITest, DeleteClassWithCLI)
+// Add a class with invalid names should fail
+TEST (CLITest, AddInvalidClassName)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+
+  // Adding different invalid class names
+  // start with valid _ character
+  test.user_input(cli, oss, "class add _");
+  ERR_CHECK (interface.return_model().getClassCopy("_"), "Class not found");
+
+  // start with num
+  test.user_input(cli, oss, "class add 1"); 
+  ERR_CHECK (interface.return_model().getClassCopy("1"), "Class not found");
+
+  // start with invalid character
+  test.user_input(cli, oss, "class add !"); 
+  ERR_CHECK (interface.return_model().getClassCopy("!"), "Class not found");
+
+  // contain invalid character
+  test.user_input(cli, oss, "class add a!"); 
+  ERR_CHECK (interface.return_model().getClassCopy("a!"), "Class not found");
+  
+}
+
+// Adding a class with existing name should fail
+TEST (CLITest, AddDuplicateClass)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  // You can use multiple user_inputs for testing commands.
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "class add bob");
+
+  // Shouldn't be able to add duplicate class, so test for only one bob
+  test.user_input(cli, oss, "class delete bob");
+
+  // Shouldn't be able to find bob
+  ERR_CHECK (interface.return_model().getClassCopy("bob"), "Class not found");
+}
+
+// Functions for CLI class delete
+// **************************
+
+// Delete a class
+TEST (CLITest, DeleteClass)
 {
   // Create interface and grab its menu and a stringstream
   UMLCLI interface;
@@ -1194,4 +1269,1066 @@ TEST (CLITest, DeleteClassWithCLI)
 
   // Shouldn't be able to find bob
   ERR_CHECK (interface.return_model().getClassCopy("bob"), "Class not found");
+}
+
+// Deleting a nonexistant class should fail but not crash
+TEST (CLITest, DeleteNonexistentClass)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  
+  test.user_input(cli, oss, "class delete bob");
+
+  // Shouldn't be able to delete class, so if you're still here it didn't crash
+  ASSERT_TRUE(true);
+}
+
+// Functions for CLI class rename
+// **************************
+
+// Rename a class
+TEST (CLITest, ClassRename)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "class rename bob test");
+
+  // See if bob was renamed.
+  ASSERT_EQ("test", interface.return_model().getClassCopy("test").getName());
+  // Shouldn't be able to find bob
+  ERR_CHECK (interface.return_model().getClassCopy("bob"), "Class not found");
+}
+
+// Renaming an existing class to an invalid name should follow same name rules
+TEST (CLITest, ClassRenameToInvalidName)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  
+  test.user_input(cli, oss, "class add bob");
+
+  // Test renaming to invalid names
+  // Start with valid _ character
+  test.user_input(cli, oss, "class rename bob _");   
+  ASSERT_EQ("bob", interface.return_model().getClassCopy("bob").getName());
+  ERR_CHECK (interface.return_model().getClassCopy("_"), "Class not found");
+
+  // Start with num
+  test.user_input(cli, oss, "class rename bob 1"); 
+  ASSERT_EQ("bob", interface.return_model().getClassCopy("bob").getName());
+  ERR_CHECK (interface.return_model().getClassCopy("1"), "Class not found");
+
+  // Start with invalid character
+  test.user_input(cli, oss, "class rename bob ~"); 
+  ASSERT_EQ("bob", interface.return_model().getClassCopy("bob").getName());
+  ERR_CHECK (interface.return_model().getClassCopy("~"), "Class not found");
+
+  // Contain invalid character
+  test.user_input(cli, oss, "class rename bob a!"); 
+  ASSERT_EQ("bob", interface.return_model().getClassCopy("bob").getName());
+  ERR_CHECK (interface.return_model().getClassCopy("a!"), "Class not found");
+
+  // Rename to duplicate class
+  test.user_input(cli, oss, "class add bob2");
+  test.user_input(cli, oss, "class rename bob bob2"); 
+  ASSERT_EQ("bob", interface.return_model().getClassCopy("bob").getName());
+  ASSERT_EQ("bob2", interface.return_model().getClassCopy("bob2").getName());
+}
+
+// Functions for CLI Field
+// **************************
+
+// Add field to a class
+TEST (CLITest, FieldAdd)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  
+  test.user_input(cli, oss, "class add bob");
+  // Add field to class
+  test.user_input(cli, oss, "field add bob int field");
+  ASSERT_EQ(0, interface.return_model().getClassCopy("bob").findAttribute("field"));
+  ASSERT_EQ("field", interface.return_model().getClassCopy("bob").getAttributes()[0]->identifier());
+  ASSERT_EQ("field", interface.return_model().getClassCopy("bob").getAttributes()[0]->getAttributeName());
+  ASSERT_EQ("int", interface.return_model().getClassCopy("bob").getAttributes()[0]->getType());
+}
+
+// Add field to a nonexistant class should fail
+TEST (CLITest, FieldAddToNonexistantClass)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  
+  test.user_input(cli, oss, "class add bob");
+
+  // Add to nonexistant class should fail
+  test.user_input(cli, oss, "field add bob2 int field");
+  ERR_CHECK (interface.return_model().getClassCopy("bob2"), "Class not found");
+}
+
+// Add field to a class with same name but different type should succede
+TEST (CLITest, FieldAddSameType)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "field add bob int field");
+
+  // Add same type field to class should succede
+  test.user_input(cli, oss, "field add bob int field2");
+  ASSERT_EQ(1, interface.return_model().getClassCopy("bob").findAttribute("field2"));
+  ASSERT_EQ("field", interface.return_model().getClassCopy("bob").getAttributes()[1]->identifier());
+  ASSERT_EQ("field2", interface.return_model().getClassCopy("bob").getAttributes()[1]->getAttributeName());
+  ASSERT_EQ("int", interface.return_model().getClassCopy("bob").getAttributes()[1]->getType());
+}
+
+// Add field to a class with invalid name should fail
+TEST (CLITest, FieldAddInvalidName)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  
+  test.user_input(cli, oss, "class add bob");
+
+  // Add invalid named field to class should fail
+  // Start with valid special character
+  test.user_input(cli, oss, "field add bob int _");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("_"));
+  // Start with numbber
+  test.user_input(cli, oss, "field add bob int 1");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("1"));
+  // Start with invalid character
+  test.user_input(cli, oss, "field add bob int !");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("!"));
+  // Contain invalid character
+  test.user_input(cli, oss, "field add bob int a!");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("a!"));
+}
+
+// Add field to a class with invalid type should fail
+TEST (CLITest, FieldAddInvalidType)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  
+  test.user_input(cli, oss, "class add bob");
+
+  // Add invalid type field to class should fail
+  // Start with number
+  test.user_input(cli, oss, "field add bob 1 a");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("a"));
+  // Contain invalid character
+  test.user_input(cli, oss, "field add bob ! a");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("a"));
+  test.user_input(cli, oss, "field add bob int! a");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("a"));
+}
+
+// Renaming a field
+TEST (CLITest, FieldRename)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "field add bob int field2");
+
+  // Rename field
+  test.user_input(cli, oss, "field rename bob field2 field");
+
+  ASSERT_EQ(0, interface.return_model().getClassCopy("bob").findAttribute("field"));
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("field2"));
+}
+
+// Renaming a field to an existing field should fail
+TEST (CLITest, FieldRenameToExistingField)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "field add bob int field");
+  test.user_input(cli, oss, "field add bob int field2");
+
+  // Rename to existing field should fail
+  test.user_input(cli, oss, "field rename bob field field2");
+  ASSERT_EQ(0, interface.return_model().getClassCopy("bob").findAttribute("field"));
+  ASSERT_EQ(1, interface.return_model().getClassCopy("bob").findAttribute("field2"));
+}
+
+// Renaming a field to an invalid name should follow the same name rules
+TEST (CLITest, FieldRenameToInvalidName)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "field add bob int field");
+  
+  // Rename to invalid named should fail
+  // Start with valid special character
+  test.user_input(cli, oss, "field rename bob field _");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("_"));
+  // Start with numbber
+  test.user_input(cli, oss, "field rename bob field 1");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("1"));
+  // Start with invalid character
+  test.user_input(cli, oss, "field rename bob field !");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("!"));
+  // Contain invalid character
+  test.user_input(cli, oss, "field rename bob field a!");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("a!"));
+}
+
+// Change the type of a field
+TEST (CLITest, FieldChange)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "field add bob int field");
+  
+  // Change type of field
+  test.user_input(cli, oss, "field change bob field string");
+
+  ASSERT_EQ(0, interface.return_model().getClassCopy("bob").findAttribute("field"));
+  ASSERT_EQ("field", interface.return_model().getClassCopy("bob").getAttributes()[0]->identifier());
+  ASSERT_EQ("field", interface.return_model().getClassCopy("bob").getAttributes()[0]->getAttributeName());
+  ASSERT_EQ("string", interface.return_model().getClassCopy("bob").getAttributes()[0]->getType());
+}
+
+// Changing the type of a field to an invalid type should fail
+TEST (CLITest, FieldChangeToInvalid)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "field add bob int field");
+  
+  // Change field to invalid type field should fail
+  // Start with number
+  test.user_input(cli, oss, "field change bob field 1");
+  ASSERT_EQ("int", interface.return_model().getClassCopy("bob").getAttributes()[0]->getType());
+  // Contain invalid character
+  test.user_input(cli, oss, "field change bob field !");
+  ASSERT_EQ("int", interface.return_model().getClassCopy("bob").getAttributes()[0]->getType());
+  test.user_input(cli, oss, "field change bob field int!");
+  ASSERT_EQ("int", interface.return_model().getClassCopy("bob").getAttributes()[0]->getType());
+}
+
+// Deleting a field
+TEST (CLITest, FieldDelete)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "field add bob int field");
+  
+  // Delete field
+  test.user_input(cli, oss, "field delete bob field");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("field"));
+}
+
+
+// Functions for CLI Method
+// **************************
+
+// Adding a method should be found in UMLData
+TEST (CLITest, MethodAdd)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  
+  test.user_input(cli, oss, "class add bob");
+  // Add method to class
+  test.user_input(cli, oss, "method add bob int method");
+  ASSERT_EQ(0, interface.return_model().getClassCopy("bob").findAttribute("method"));
+  ASSERT_EQ("method", interface.return_model().getClassCopy("bob").getAttributes()[0]->identifier());
+  ASSERT_EQ("method", interface.return_model().getClassCopy("bob").getAttributes()[0]->getAttributeName());
+  ASSERT_EQ("int", interface.return_model().getClassCopy("bob").getAttributes()[0]->getType());
+}
+
+// Adding a method to a nonexistant class should fail
+TEST (CLITest, MethodAddToNonexistantClass)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  
+  test.user_input(cli, oss, "class add bob");
+
+  // Add to nonexistant class should fail
+  test.user_input(cli, oss, "method add bob2 int method");
+  ERR_CHECK (interface.return_model().getClassCopy("bob2"), "Class not found");
+}
+
+// Adding the same type method with different name should succede
+TEST (CLITest, MethodAddSameType)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "method add bob int method");
+
+  // Add same type method with different name to class should succede
+  test.user_input(cli, oss, "method add bob int method2");
+  ASSERT_EQ(1, interface.return_model().getClassCopy("bob").findAttribute("method2"));
+  ASSERT_EQ("method", interface.return_model().getClassCopy("bob").getAttributes()[1]->identifier());
+  ASSERT_EQ("method2", interface.return_model().getClassCopy("bob").getAttributes()[1]->getAttributeName());
+  ASSERT_EQ("int", interface.return_model().getClassCopy("bob").getAttributes()[1]->getType());
+}
+
+// Adding a method with an invalid name should fail
+TEST (CLITest, MethodAddInvalidName)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  
+  test.user_input(cli, oss, "class add bob");
+
+  // Add invalid named method to class should fail
+  // Start with valid special character
+  test.user_input(cli, oss, "method add bob int _");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("_"));
+  // Start with numbber
+  test.user_input(cli, oss, "method add bob int 1");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("1"));
+  // Start with invalid character
+  test.user_input(cli, oss, "method add bob int !");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("!"));
+  // Contain invalid character
+  test.user_input(cli, oss, "method add bob int a!");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("a!"));
+}
+
+// Adding a method with an invalid type should fail
+TEST (CLITest, MethodAddInvalidType)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  
+  test.user_input(cli, oss, "class add bob");
+
+  // Add invalid type method to class should fail
+  // Start with number
+  test.user_input(cli, oss, "method add bob 1 a");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("a"));
+  // Contain invalid character
+  test.user_input(cli, oss, "method add bob ! a");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("a"));
+  test.user_input(cli, oss, "method add bob int! a");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("a"));
+}
+
+// Renaming a method
+TEST (CLITest, MethodRename)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "method add bob int method2");
+
+  // Rename method
+  test.user_input(cli, oss, "method select bob method2 1");
+  test.user_input(cli, oss, "method rename method");
+
+  ASSERT_EQ(0, interface.return_model().getClassCopy("bob").findAttribute("method"));
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("method2"));
+}
+
+// Renaming a method to an existing method should fail
+TEST (CLITest, MethodRenameToExistingmethod)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "method add bob int method");
+  test.user_input(cli, oss, "method add bob int method2");
+
+  // Rename to existing method should fail
+  test.user_input(cli, oss, "method rename bob method method2");
+  ASSERT_EQ(0, interface.return_model().getClassCopy("bob").findAttribute("method"));
+  ASSERT_EQ(1, interface.return_model().getClassCopy("bob").findAttribute("method2"));
+}
+
+// Renaming a method to an invalid name should follow the same name rules
+TEST (CLITest, MethodRenameToInvalidName)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "method add bob int method");
+  test.user_input(cli, oss, "method select bob method 1");
+  
+  // Rename to invalid named should fail
+  // Start with valid special character
+  test.user_input(cli, oss, "method rename _");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("_"));
+  // Start with numbber
+  test.user_input(cli, oss, "method rename 1");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("1"));
+  // Start with invalid character
+  test.user_input(cli, oss, "method rename !");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("!"));
+  // Contain invalid character
+  test.user_input(cli, oss, "method rename a!");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("a!"));
+}
+
+// Changing the type of a method
+TEST (CLITest, MethodChange)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "method add bob int method");
+  test.user_input(cli, oss, "method select bob method 1");
+  
+  // Change type of method
+  test.user_input(cli, oss, "method change string");
+
+  ASSERT_EQ(0, interface.return_model().getClassCopy("bob").findAttribute("method"));
+  ASSERT_EQ("method", interface.return_model().getClassCopy("bob").getAttributes()[0]->identifier());
+  ASSERT_EQ("method", interface.return_model().getClassCopy("bob").getAttributes()[0]->getAttributeName());
+  ASSERT_EQ("string", interface.return_model().getClassCopy("bob").getAttributes()[0]->getType());
+}
+
+// Changing the type of a method to an invalid type should fail
+TEST (CLITest, MethodChangeToInvalid)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "method add bob int method");
+  test.user_input(cli, oss, "method select bob method 1");
+  
+  // Change method to invalid type method should fail
+  // Start with number
+  test.user_input(cli, oss, "method change 1");
+  ASSERT_EQ("int", interface.return_model().getClassCopy("bob").getAttributes()[0]->getType());
+  // Contain invalid character
+  test.user_input(cli, oss, "method change !");
+  ASSERT_EQ("int", interface.return_model().getClassCopy("bob").getAttributes()[0]->getType());
+  test.user_input(cli, oss, "method change int!");
+  ASSERT_EQ("int", interface.return_model().getClassCopy("bob").getAttributes()[0]->getType());
+}
+
+// Deleting a method
+TEST (CLITest, MethodDelete)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "method add bob int method");
+  test.user_input(cli, oss, "method select bob method 1");
+  
+  // Delete method
+  test.user_input(cli, oss, "method delete");
+  ASSERT_EQ(-1, interface.return_model().getClassCopy("bob").findAttribute("method"));
+}
+
+// Functions for CLI Parameter
+// **************************
+
+// Adding a parameter
+TEST (CLITest, ParameterAdd)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "method add bob int method");
+
+  // Not having a selected parameter should fail so if you're still here it didn't crash
+  test.user_input(cli, oss, "method parameter add int param");
+  ASSERT_TRUE(true);
+
+  test.user_input(cli, oss, "method select bob method 1");
+  
+  // Add parameter
+  test.user_input(cli, oss, "method parameter add int param");
+
+  // Check parameter list of class bob for paramter
+  std::shared_ptr<UMLAttribute> attr = interface.return_model().getClassCopy("bob").getAttribute("method");
+  auto paramList = std::dynamic_pointer_cast<UMLMethod>(attr)->getParam();
+  bool tester = false;
+  auto param = paramList.begin();
+  if(param->getName() == "param" && param->getType() == "int")
+    tester = true;
+
+  ASSERT_TRUE(tester);
+}
+
+// Adding a duplicate parameter should fail
+TEST (CLITest, ParameterAddDuplicate)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "method add bob int method");
+  test.user_input(cli, oss, "method select bob method 1");
+  test.user_input(cli, oss, "method parameter add int param");
+
+  // Add duplicate parameter
+  test.user_input(cli, oss, "method parameter add int param");
+
+  // Check parameter list of class bob for multiple paramter
+  std::shared_ptr<UMLAttribute> attr = interface.return_model().getClassCopy("bob").getAttribute("method");
+  auto paramList = std::dynamic_pointer_cast<UMLMethod>(attr)->getParam();
+  ASSERT_EQ(1, paramList.size());
+
+  // Add duplicate parameter with different type
+  test.user_input(cli, oss, "method parameter add string param");
+  attr = interface.return_model().getClassCopy("bob").getAttribute("method");
+  paramList = std::dynamic_pointer_cast<UMLMethod>(attr)->getParam();
+  ASSERT_EQ(1, paramList.size());
+}
+
+// Adding a parameter of the same type but different name should succede
+TEST (CLITest, ParameterAddSameType)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "method add bob int method");
+  test.user_input(cli, oss, "method select bob method 1");
+  test.user_input(cli, oss, "method parameter add int param");
+
+  // Add same type parameter with different name
+  test.user_input(cli, oss, "method parameter add int param2");
+
+  // Check parameter list of class bob for multiple paramter
+  std::shared_ptr<UMLAttribute> attr = interface.return_model().getClassCopy("bob").getAttribute("method");
+  auto paramList = std::dynamic_pointer_cast<UMLMethod>(attr)->getParam();
+  ASSERT_EQ(2, paramList.size());
+}
+
+// Deleting a parameter
+TEST (CLITest, ParameterDelete)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "method add bob int method");
+  test.user_input(cli, oss, "method select bob method 1");
+  test.user_input(cli, oss, "method parameter add int param");
+
+  // Delete Parameter
+  test.user_input(cli, oss, "method parameter delete param");
+
+  // Check parameter list of class bob for multiple paramter
+  std::shared_ptr<UMLAttribute> attr = interface.return_model().getClassCopy("bob").getAttribute("method");
+  auto paramList = std::dynamic_pointer_cast<UMLMethod>(attr)->getParam();
+  ASSERT_EQ(0, paramList.size());
+}
+
+// Renaming a parameter
+TEST (CLITest, ParameterRename)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "method add bob int method");
+  test.user_input(cli, oss, "method select bob method 1");
+  test.user_input(cli, oss, "method parameter add int param");
+
+  // Rename Parameter
+  test.user_input(cli, oss, "method parameter rename param param2");
+
+  // Check parameter list to see if it has new name
+  std::shared_ptr<UMLAttribute> attr = interface.return_model().getClassCopy("bob").getAttribute("method");
+  auto paramList = std::dynamic_pointer_cast<UMLMethod>(attr)->getParam();
+
+  ASSERT_EQ("param2", paramList.begin()->getName());
+}
+
+// Renaming a parameter to a duplicate name should fail
+TEST (CLITest, ParameterRenameToDuplicate)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "method add bob int method");
+  test.user_input(cli, oss, "method select bob method 1");
+  test.user_input(cli, oss, "method parameter add int param");
+  test.user_input(cli, oss, "method parameter add int param2");
+
+  // Rename Parameter
+  test.user_input(cli, oss, "method parameter rename param param2");
+
+  // Check parameter list to see if it has old name
+  std::shared_ptr<UMLAttribute> attr = interface.return_model().getClassCopy("bob").getAttribute("method");
+  auto paramList = std::dynamic_pointer_cast<UMLMethod>(attr)->getParam();
+
+  ASSERT_EQ("param", paramList.begin()->getName());
+}
+
+// Changing the type of a parameter
+TEST (CLITest, ParameterChangeType)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "method add bob int method");
+  test.user_input(cli, oss, "method select bob method 1");
+  test.user_input(cli, oss, "method parameter add int param");
+
+  // Change carameter type
+  test.user_input(cli, oss, "method parameter change param string");
+
+  // Check parameter list to see if it has new type
+  std::shared_ptr<UMLAttribute> attr = interface.return_model().getClassCopy("bob").getAttribute("method");
+  auto paramList = std::dynamic_pointer_cast<UMLMethod>(attr)->getParam();
+
+  ASSERT_EQ("string", paramList.begin()->getType());
+}
+
+// Changing the type of a parameter to an invalid type should fail
+TEST (CLITest, ParameterChangeToInvalidType)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "class add bob");
+  test.user_input(cli, oss, "method add bob int method");
+  test.user_input(cli, oss, "method select bob method 1");
+  test.user_input(cli, oss, "method parameter add int param");
+
+  // Change to invalid type start with valid special character and check parameter list to see if it has old type
+  test.user_input(cli, oss, "method parameter change param _");
+  std::shared_ptr<UMLAttribute> attr = interface.return_model().getClassCopy("bob").getAttribute("method");
+  auto paramList = std::dynamic_pointer_cast<UMLMethod>(attr)->getParam();
+  ASSERT_EQ("int", paramList.begin()->getType());
+
+  // Change to invalid type start with number
+  test.user_input(cli, oss, "method parameter change param 1");
+  attr = interface.return_model().getClassCopy("bob").getAttribute("method");
+  paramList = std::dynamic_pointer_cast<UMLMethod>(attr)->getParam();
+  ASSERT_EQ("int", paramList.begin()->getType());
+
+  // Change to invalid type start with invalid character
+  test.user_input(cli, oss, "method parameter change param !");
+  attr = interface.return_model().getClassCopy("bob").getAttribute("method");
+  paramList = std::dynamic_pointer_cast<UMLMethod>(attr)->getParam();
+  ASSERT_EQ("int", paramList.begin()->getType());
+
+  // Change to invalid type contain invalid character
+  test.user_input(cli, oss, "method parameter change param a!");
+  attr = interface.return_model().getClassCopy("bob").getAttribute("method");
+  paramList = std::dynamic_pointer_cast<UMLMethod>(attr)->getParam();
+  ASSERT_EQ("int", paramList.begin()->getType());
+}
+
+// Adding a method of the same name and type but different parameters should succede
+TEST (CLITest, ParameterOverload)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  
+  test.user_input(cli, oss, "class add bob");
+
+  // Make method with one paramter
+  test.user_input(cli, oss, "method add bob int method");
+  test.user_input(cli, oss, "method select bob method 1");
+  test.user_input(cli, oss, "method parameter add int param");
+
+  // Make method with zero parameters
+  test.user_input(cli, oss, "method add bob int method");
+
+  auto attrList = interface.return_model().getClassCopy("bob").getAttributes();
+  ASSERT_EQ(2, attrList.size());
+}
+
+// Functions for CLI Relationship
+// **************************
+
+// Basic check to see if adding a relationship to the data model works.
+// It should appear in the vector and have the same source, destination, and type.
+TEST (CLITest, AddingRelationshipTest)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  bool haveRelationship = false;
+  test.user_input(cli, oss, "class add test");
+  test.user_input(cli, oss, "class add test1");
+
+  // Relationship type doesn't matter for this test
+  test.user_input(cli, oss, "relationships add test test1 aggregation");
+
+  UMLData data = interface.return_model();
+  vector<UMLRelationship> rel = data.getRelationships();
+  // Loop through vector to find proper relationship
+  for (auto i = rel.begin(); i != rel.end(); ++i)
+  {
+    // Check and see if the valid relationship was added
+    if (i->getSource().getName() == "test" &&
+        i->getDestination().getName() == "test1" &&
+        i->getType() == aggregation)
+    {
+      haveRelationship = true;
+    }
+  }
+
+  // Relationship should exist
+  ASSERT_EQ (haveRelationship, true);
+  // Only one relationship should have been added
+  ASSERT_EQ (rel.size(), std::size_t (1));
+}
+
+// Error check to see if adding self inheritance causes an error.
+TEST (CLITest, AddingSelfInheritance)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "class add test");
+  test.user_input(cli, oss, "class add test1");
+  
+  // Relationship type doesn't matter for this test
+  test.user_input(cli, oss, "relationships add test test generalization");
+  test.user_input(cli, oss, "relationships add test1 test1 realization");
+
+  UMLData data = interface.return_model();
+  vector<UMLRelationship> rel = data.getRelationships();
+
+  ASSERT_EQ(0, rel.size());
+}
+
+// Error check to see if adding multiple compositions causes an error.
+TEST (CLITest, AddingMultipleCompositions)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "class add test");
+  test.user_input(cli, oss, "class add test1");
+  test.user_input(cli, oss, "class add test2");
+
+  // Should work
+  test.user_input(cli, oss, "relationships add test test1 composition");
+
+  UMLData data = interface.return_model();
+  vector<UMLRelationship> rel = data.getRelationships();
+
+  ASSERT_EQ(1, rel.size());
+
+  // Should fail so check if there are same number and type of relationships previously
+  test.user_input(cli, oss, "relationships add test2 test1 composition");
+
+  data = interface.return_model();
+  rel = data.getRelationships();
+
+  ASSERT_EQ(1, rel.size());
+
+  ASSERT_EQ("test", rel[0].getSource().getName());
+  ASSERT_EQ("test1", rel[0].getDestination().getName());
+}
+
+// Sees if deleting a relationship works.
+// When a relationship is deleted, it shouldn't be in UMLData's vector.
+TEST (CLITest, DeletingRelationshipTest)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "class add test");
+  test.user_input(cli, oss, "class add test1");
+
+  // Relationship type doesn't matter for this test
+  test.user_input(cli, oss, "relationships add test test1 aggregation");
+  test.user_input(cli, oss, "relationships delete test test1");
+
+  // Loop through vector to find proper relationship
+  bool haveRelationship = false;
+  UMLData data = interface.return_model();
+  vector<UMLRelationship> rel = data.getRelationships();
+  for (auto i = rel.begin(); i != rel.end(); ++i)
+  {
+    // Check and see if the valid relationship still exists
+    if (i->getSource().getName() == "test" &&
+        i->getDestination().getName() == "test1" &&
+        i->getType() == aggregation)
+    {
+      haveRelationship = true;
+    }
+  }
+
+  // Relationship should be deleted
+  ASSERT_EQ (haveRelationship, false);
+
+  // Vector should now be empty
+  ASSERT_EQ (rel.size(), std::size_t (0));
+}
+
+// Sees if getting the proper relationship type works after adding a relationship.
+TEST (CLITest, GetRelationshipTypeTest)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "class add test");
+  test.user_input(cli, oss, "class add test1");
+  UMLData data;
+
+  // Check for aggregation
+  test.user_input(cli, oss, "relationships add test test1 aggregation");
+  data = interface.return_model();
+  ASSERT_EQ (data.getRelationshipType ("test", "test1"), "aggregation");
+  test.user_input(cli, oss, "relationships delete test test1");
+
+  // Check for composition
+  test.user_input(cli, oss, "relationships add test test1 composition");
+  data = interface.return_model();
+  ASSERT_EQ (data.getRelationshipType ("test", "test1"), "composition");
+  test.user_input(cli, oss, "relationships delete test test1");
+
+  // Check for generalization
+  test.user_input(cli, oss, "relationships add test test1 generalization");
+  data = interface.return_model();
+  ASSERT_EQ (data.getRelationshipType ("test", "test1"), "generalization");
+  test.user_input(cli, oss, "relationships delete test test1");
+
+  // Check for realization
+  test.user_input(cli, oss, "relationships add test test1 realization");
+  data = interface.return_model();
+  ASSERT_EQ (data.getRelationshipType ("test", "test1"), "realization");
+}
+
+// Sees if changing the relationship type works at all.
+TEST (CLITest, ChangeRelationshipTypeTest)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "class add test");
+  test.user_input(cli, oss, "class add test1");
+  
+  // Test to see if relationship was changed
+  test.user_input(cli, oss, "relationships add test test1 aggregation");
+  test.user_input(cli, oss, "relationships change test test1 composition");
+  UMLData data = interface.return_model();
+  ASSERT_EQ (data.getRelationship ("test", "test1").getType(), aggregation);
+}
+
+// Tests all errors that currently exist for changing a relationship type.
+TEST (CLITest, ChangeRelationshipTypeErrors)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  test.user_input(cli, oss, "class add test");
+  test.user_input(cli, oss, "class add test1");
+  test.user_input(cli, oss, "class add test2");
+
+  // Test for self-inheritance
+  // Should fail so check original relationship type
+  test.user_input(cli, oss, "relationships add test test aggregation");
+  test.user_input(cli, oss, "relationships change test test generalization");
+  UMLData data = interface.return_model();
+  ASSERT_EQ (data.getRelationship ("test", "test").getType(), aggregation);
+
+  test.user_input(cli, oss, "relationships change test test realization");
+  data = interface.return_model();
+  ASSERT_EQ (data.getRelationship ("test", "test").getType(), aggregation);
 }

@@ -110,6 +110,7 @@ void UMLClass::deleteAttribute(std::shared_ptr<UMLAttribute> attributePtr)
 }
 
 // OLD Finds attribute within pointer vector
+// USED FOR TESTING
 int UMLClass::findAttribute(string attributeName) 
 {
 	for (int i = 0; i < classAttributes.size(); ++i) {
@@ -160,6 +161,7 @@ bool UMLClass::checkAttribute(std::shared_ptr<UMLAttribute> attribute)
 }
 
 // OLD Finds attribute within pointer vector, returns smart pointer
+// USED FOR TESTING
 std::shared_ptr<UMLAttribute> UMLClass::getAttribute(string attributeName)
 {
 	int loc = findAttribute(attributeName);

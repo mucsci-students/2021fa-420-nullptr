@@ -86,7 +86,7 @@
                 <!--parameters-->
                 <h5 class="titless">Params</h5>
                 {% for param in method.params %}
-                    <p id="{{class.name}}{{method.index}}{{ param.name }}param">{{param.type}} {{param.name}} <button id="{{class.name}}{{method.index}}{{ param.name }}paramedit" style=" background-color: red;   color: white;  border-radius: 10px; border-width: 9px; ">Edit</button><a href="/delete/parameter/{{ class.name }}/{{ method.index }}/{{ param.name }}" style=" background-color: red;   color: white;  border-radius: 10px; border-width: 9px; ">Delete</a></p>
+                    <p id="{{class.name}}{{method.index}}{{ param.name }}param">{{param.type}} {{param.name}} <button class="buttonnn"  id="{{class.name}}{{method.index}}{{ param.name }}paramedit" >Edit</button><a  class="buttonnn" href="/delete/parameter/{{ class.name }}/{{ method.index }}/{{ param.name }}">Delete</a></p>
                 {% endfor %}
                 <div class="form-group">
                 <form action="/add/parameter/{{ class.name }}/{{ method.index }}" method="GET">
@@ -117,9 +117,12 @@
         </form>
         <h1 class="titless">Relationships:</h1>
         {% for relationship in relationships %}
-            <h3 id="{{ relationship.destination}}{{ relationship.source }}">{{relationship.source}} -> {{relationship.destination}} type: {{relationship.type}}
-                <button id="{{ relationship.destination}}{{ relationship.source }}edit" class="buttonnn">edit</button>
-                <a href="/delete/relationship/{{relationship.source}}/{{relationship.destination}}">delete</a></h3>
+            <h3 id="{{ relationship.destination}}{{ relationship.source }}">{{relationship.source}} -> {{relationship.destination}} type:
+                <a class="relationshipType"> {{relationship.type}} </a>
+                <button id="{{ relationship.destination}}{{ relationship.source }}edit" class="buttonnn">Edit</button>
+                <a href="/delete/relationship/{{relationship.source}}/{{relationship.destination}}" class="buttonnn">Delete</a>
+             
+            </h3>
         {% endfor %}
         <form action="/add/relationship" method="GET">
           <div class="form-group">
@@ -201,13 +204,13 @@
       element = document.getElementById('{{ relationship.destination}}{{ relationship.source }}edit');
           element.addEventListener("click", () => {
               document.getElementById("{{ relationship.destination}}{{ relationship.source }}").innerHTML =
-                  "<form action='/edit/relationship/{{ relationship.source }}/{{ relationship.destination }}' method='GET'>" +
-                   "<select name='reltype' id='reltype'>" +
+                  "<form action='/edit/relationship/{{ relationship.source }}/{{ relationship.destination }}'  method='GET'>" +
+                   "<select  class= 'buttonnn' name='reltype' id='reltype'>" +
                       " <option value='0'>aggregation</option>" +
                       "<option value='1'>composition</option>" +
                       "<option value='2'>generalization</option>" +
                       "<option value='3'>realization</option></select>" +
-                      "<input type='submit' value='edit relationship'>" +
+                      "<input type='submit' class= 'buttonnn' value='Edit Relationship'>" +
                   "</form>";
           });
       {% endfor %}
