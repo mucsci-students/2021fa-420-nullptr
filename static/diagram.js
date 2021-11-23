@@ -31,13 +31,13 @@ SVG.on(document, 'DOMContentLoaded', function() {
   drawLines(draw);
   //drawRelBox(draw);
 })
-var index = 0;
+
 //draw relationship lines
 function drawLines(draw)
 {
   clearLines();
 
-
+  var index = 0;
   for (let relKey in relationshipsJson)
   {
     
@@ -53,27 +53,44 @@ function drawLines(draw)
     var nested1 = draw.nested();
   
  
-    var rectt = nested1.rect(100,25).radius(5).css({fill: '#FFF', resize: 'both', overflow: 'auto', stroke: 'black'});
+    var rectt = nested1.rect(100,25).radius(5).css({fill: '#555', resize: 'both', overflow: 'auto', stroke: 'black'});
+   
+
+    var polyavx = (source.x() + dest.x()) / 2;
+    var polyavy = (source.y() + dest.y()) / 2;
+
+
+
+
+ 
     rectt.front();
     var text_y = averagey+155;
     var text_x = averagex;
+    var lineSlope = (dest.y() - source.y()) / (dest.x() - source.x())
     
      rectt.x(averagex);
      rectt.y(averagey+145);
     
     const relationshipTypee = document.getElementsByClassName("relationshipType").item(index).innerHTML;
-   
     nested1.text(relationshipTypee).dy(text_y).dx(text_x);
+    
     index++;
     text_y += 20;
 
     nested1.line(source.x()+100, source.y()+150, dest.x()+100, dest.y()+150).stroke({ color: 'black', width: 10, linecap: 'round' }).back();
-
+    
+    if(source.x() <= dest.x()){
+        nested1.polyline(' 60,20 100,50 60,70 ').css({fill: '#555'}).stroke({ color: '#000', width: 4, linecap: 'round', linejoin: 'round' }).x(averagex + 98).y(averagey + 132);
+    }
    
-
-
-
-
+    
+      
+     else{
+      nested1.polyline('60,70 10,50  60,20').css({fill: '#555'}).stroke({ color: '#000', width: 4, linecap: 'round', linejoin: 'round' }).x(averagex -49).y(averagey + 132);
+    }
+     
+ 
+  
 
    
     lines.push(nested1);
