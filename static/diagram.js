@@ -9,9 +9,8 @@ SVG.on(document, 'DOMContentLoaded', function() {
 
   //add panning and zooming
   svgPanZoom('#umldiagram', {
-    dblClickZoomEnabled: false
+    dblClickZoomEnabled: false,
   });
-
   background_rect = draw.rect(0, 0).attr({ fill: '#FFF', width: 3000, height: 1500}).back();
 
   background_rect.dblclick(function() {

@@ -50,19 +50,15 @@ void UMLServer::start (int port)
   svr.Get ("/", [&] (const httplib::Request& req, httplib::Response& res) {
     inja::Environment env;
     inja::Template temp = env.parse_template ("../templates/index.html");
-    std::cout << "parsed templated" << std::endl;
     json j = data.getJson();
-    std::cout << "got json" << std::endl;
     //for each for all the attributes in each class add the index number to the json object
     addAttributeIndexes (j, data);
-    std::cout << "added indexes" << std::endl;
     j["errors"] = errors;
     errors.clear();
     j["success"] = success;
     success.clear();
     j["files"] = UMLFile::listSaves();
     j["view"] = view;
-    std::cout << "added stuff" << std::endl;
     //passing in raw json string for downloading
     j["raw_json_string"] = data.getJson().dump();
     res.set_content (env.render (temp, j), "text/html");
@@ -134,11 +130,14 @@ void UMLServer::start (int port)
       std::string newParamName = req.params.find ("pname")->second;
       std::string newParamType = req.params.find ("ptype")->second;
 
-      auto attr = data.getClassCopy (className).getAttributes()[methodIndex];
-      ERR_ADD (data.deleteParameter (std::static_pointer_cast<UMLMethod> (attr),
-                                    oldParamName));
-      ERR_ADD (data.addParameter (std::static_pointer_cast<UMLMethod> (attr),
-                                  newParamName, newParamType));
+      if (oldParamName != newParamName)
+      {
+        auto attr = data.getClassCopy (className).getAttributes()[methodIndex];
+        ERR_ADD (data.deleteParameter (std::static_pointer_cast<UMLMethod> (attr),
+                                      oldParamName));
+        ERR_ADD (data.addParameter (std::static_pointer_cast<UMLMethod> (attr),
+                                    newParamName, newParamType));
+      }
       res.set_redirect ("/");
     });
 
@@ -191,7 +190,10 @@ void UMLServer::start (int port)
           [&] (const httplib::Request& req, httplib::Response& res) {
             std::string oldClassName = req.matches[1].str();
             std::string newClassName = req.params.find ("cname")->second;
-            ERR_ADD (data.changeClassName (oldClassName, newClassName));
+            if (oldClassName != newClassName)
+            {
+              ERR_ADD (data.changeClassName (oldClassName, newClassName));
+            }
             res.set_redirect ("/");
           });
 
@@ -203,8 +205,11 @@ void UMLServer::start (int port)
     std::string newName = req.params.find ("name")->second;
     std::string newType = req.params.find ("type")->second;
     auto attr = data.getClassCopy (className).getAttributes()[attrIndex];
-    ERR_ADD (data.changeAttributeType (attr, newType));
-    ERR_ADD (data.changeAttributeName (className, attr, newName));
+    if (attr->getAttributeName() != newName)
+    {
+      ERR_ADD (data.changeAttributeType (attr, newType));
+      ERR_ADD (data.changeAttributeName (className, attr, newName));
+    }
     res.set_redirect ("/");
   });
 
@@ -237,16 +242,13 @@ void UMLServer::start (int port)
   svr.Post ("/load", [&] (const httplib::Request& req, httplib::Response& res) {
     //getting load file content 
     std::string fileLoad = req.get_file_value("load").content;
-    //create new data object to store file
-    UMLData newData;
     ERR_ADD(
       //convert file to json
       json fileLoadJson = json::parse(fileLoad);
-      //update new data object
-      UMLFile::addClasses(newData, fileLoadJson);
-      UMLFile::addRelationships(newData, fileLoadJson);
-      data = newData;
+      //update data object
+      data = load_json(fileLoadJson);
     );
+    success += "File Loaded!";
     res.set_redirect ("/");
   });
 
@@ -381,4 +383,13 @@ void UMLServer::addAttributeIndexes (json& j, const UMLData& data)
       ++index;
     }
   }
+}
+
+UMLData UMLServer::load_json(json j)
+{
+  UMLData data;
+  UMLFile::addClasses(data, j);
+  UMLFile::addRelationships(data , j);
+
+  return data;
 }
