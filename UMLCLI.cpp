@@ -82,18 +82,6 @@ Cli UMLCLI::cli_menu()
     },
     "Enter the name of your UML diagram (no file extension) as an argument to save a json representation of it within your build directory.");
 
-  // Turn On Color
-  rootMenu -> Insert(
-      "color",
-      [](std::ostream& out){ out << "Colors ON\n"; SetColor(); },
-      "Enable colors in the CLI.");
-
-  // Turn Off Color
-  rootMenu -> Insert(
-      "nocolor",
-      [](std::ostream& out){ out << "Colors OFF\n"; SetNoColor(); },
-      "Disable colors in the CLI.");
-
   // Undo
   rootMenu -> Insert(
     "undo",
@@ -140,6 +128,8 @@ Cli UMLCLI::cli_menu()
     "delete", {"class_name"},
     [&](std::ostream& out, string className)
     {
+      // Make sure no more method is selected if it is owned by the deleted class
+      if (className == MethodClassName) clear_selected_method();
       delete_class(className);
     },
     "Delete a class with the name of the given argument.");
@@ -506,6 +496,7 @@ Cli UMLCLI::cli_menu()
 
   // Initialize CLI that starts at root menu.
   Cli cli(std::move(rootMenu));
+  SetColor();
 
   return cli;
 }
