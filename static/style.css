@@ -107,6 +107,15 @@ body form
 .buttonnnToggle:hover{
   color: black;
 }
+.relationshipType{
+  background-color: #555; 
+  color: white; 
+  border-radius: 5px;
+  border-style: double;
+  border-color: black; 
+  font-size: large;
+  font-style:italic;
+}
 /*
 SIDE BAR AND BANNER FORMATTING END-------------------------------------------------------------------------------------------
 */

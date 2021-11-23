@@ -1,5 +1,6 @@
 var boxes = new Map();
 var lines = new Array();
+var relBox = new Array();
 var classesJson;
 var relationshipsJson;
 SVG.on(document, 'DOMContentLoaded', function() {
@@ -28,21 +29,80 @@ SVG.on(document, 'DOMContentLoaded', function() {
   }
 
   drawLines(draw);
+  drawRelBox(draw);
 })
 
 //draw relationship lines
 function drawLines(draw)
 {
+  clearLines();
   for (let relKey in relationshipsJson)
   {
-    clearLines();
+    
     let relationship = relationshipsJson[relKey];
     let source = boxes.get(relationship["source"]);
     let dest = boxes.get(relationship["destination"]);
     let line = draw.line(source.x()+100, source.y()+150, dest.x()+100, dest.y()+150).stroke({ color: 'black', width: 10, linecap: 'round' });
+    
+   
     lines.push(line);
   }
+ 
 }
+
+function drawRelBox(draw){
+
+ // clearBox();
+  
+  for (let relKey in relationshipsJson)
+  {
+// clear function for the nested
+ 
+
+    let relationship = relationshipsJson[relKey];
+    let source = boxes.get(relationship["source"]);
+    let dest = boxes.get(relationship["destination"]);
+ 
+    
+   var averagex = (source.x() + dest.x()) / 2;
+   var averagey = (source.y() + dest.y()) / 2;
+   
+
+   var nested1 = draw.nested();
+ 
+
+ 
+   var sizex = 100;
+   var sizey = 25;
+ 
+   var rectt = nested1.rect(sizex,sizey).radius(5).css({fill: '#555', resize: 'both', overflow: 'auto', stroke: 'black'});
+
+   var text_y = averagey+155;
+   var text_x = averagex;
+   
+    rectt.x(averagex);
+    rectt.y(averagey+145);
+   
+  
+
+   const relationshipTypee = document.getElementsByClassName("relationshipType").item(0).innerHTML;
+   nested1.text(relationshipTypee).dy(text_y).dx(text_x);
+   text_y += 20;
+
+  
+ 
+  }
+  //clearBox();
+}
+
+
+function clearBox()
+{
+  nested1.forEach(function (rectt) {
+    rectt.remove();
+  })
+}
+
 
 function clearLines()
 {
@@ -131,6 +191,7 @@ function createClassBox(draw, uclass, x, y)
   //redraw lines after move
   nested.draggable().on('dragmove', e => {
     drawLines(draw);
+    drawRelBox(draw);
   });
     
 }
