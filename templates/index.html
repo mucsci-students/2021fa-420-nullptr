@@ -27,7 +27,15 @@
  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" 
  integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous">
  </script>
-    
+ 
+
+
+
+
+
+
+
+    <button type="button"  onclick="toggleSidebar()" name="button"  id ="togglebutton"  class="buttonnnToggle">Toggle Editor Panel</button>
     <div id="umlsidebar" class="container col-xs-4 sidebar">
         {% for error in errors %}
             <p style="color:red; font-size: 30px;">{{ error }}</p>
@@ -129,32 +137,18 @@
             <input type="submit"  class="buttonnn"  value="Add Relationship">
           </div>
         </form>
-        <h1 class="titless">File:</h1>
+        <h1 class="titless">Save</h1>
 
-        <a onclick="save();" class="buttonnn">Save</a>
+        <button onclick="save();" class="buttonnn">Save JSON</button>
+        <button onClick="getDiagramImage();" class="buttonnnPNG">Save PNG</button>
        
+        <h1 class="titless">Load File:</h1>
         <form action="/load" method="POST" enctype="multipart/form-data">
             <input type="file" class="form-control-file"  name="load" id="load">
             <input type="submit" class="buttonnn" value="Load">
         </form>
-        <a onClick="getDiagramImage();" class="buttonnnPNG">Save PNG</a>
-    </div>
-        <div class="top-nav">
-            <ul>
-                <div class="right-side-buttons">
-                    <li><a class="buttonnn" href="">Settings</a></li>
-                    <li><a class="buttonnn" href="">Load</a></li>
-                    <li><a class="buttonnn" href="">Save</a></li>   
-                </div>
-                <li><button type="button"  onclick="toggleSidebar()" name="button"  id ="togglebutton"  class="buttonnnToggle">Toggle Editor Panel</button></li>
-                <li> 
-                    <div class="welcomeBanner">
-                    Welcome to UML++         
-                   </div>
-                </li>
-            </ul>
-    </div>
     </body>
+    </div>
     <svg width="3000px" height="1500px" viewBox="0 0 3000 1500" id="umldiagram"></svg>
     <!--this is for generating png save-->
     <canvas id="umlcanvas"></canvas>
@@ -223,7 +217,9 @@
 
 
 
-  <!--  Welcome banner  ------------------------------------------------------------------------------------------------------------------------------ -->
-
+  <!--Welcome banner  ------------------------------------------------------------------------------------------------------------------------------ -->
+ <div class="welcomeBanner">
+  Welcome to UML++         
+ </div>
  <!-- ---------------------------------------------------------------------------------------------------------------------------------------------------- -->
 </html>

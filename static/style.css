@@ -119,10 +119,6 @@ body form
   color: white; 
   border-radius: 5px;
   border-style: solid;
-  position:absolute; 
-  right: 24%;
-  top: 3%;
-  font-size: medium;
 }
 .buttonnnToggle{
   background-color: #555; 
