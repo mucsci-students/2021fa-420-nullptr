@@ -30,4 +30,6 @@ class UMLServer
     
     // Attribute index management
     void addAttributeIndexes (json& j, const UMLData& data);
+
+    UMLData load_json(json j);
 };

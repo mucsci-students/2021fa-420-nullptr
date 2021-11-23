@@ -27,7 +27,7 @@ using json = nlohmann::json;
     fun;                                  \
     history.save (data);                  \
   }                                       \
-  catch (const std::runtime_error& error) \
+  catch (const std::exception& error) \
   {                                       \
     errors += error.what();               \
   }                                       \
@@ -39,6 +39,11 @@ void UMLServer::start (int port)
   svr.set_mount_point ("/", "../static");
   UMLData data;
   UMLDataHistory history (data);
+  //create view for focusing certain elements in sidebar
+  json view;
+  view["object"] = "all";
+  view["name"] = "";
+  view["name2"] = "";
   json errors = json::array();
   json success = json::array();
 
@@ -53,6 +58,9 @@ void UMLServer::start (int port)
     j["success"] = success;
     success.clear();
     j["files"] = UMLFile::listSaves();
+    j["view"] = view;
+    //passing in raw json string for downloading
+    j["raw_json_string"] = data.getJson().dump();
     res.set_content (env.render (temp, j), "text/html");
   });
 
@@ -122,11 +130,14 @@ void UMLServer::start (int port)
       std::string newParamName = req.params.find ("pname")->second;
       std::string newParamType = req.params.find ("ptype")->second;
 
-      auto attr = data.getClassCopy (className).getAttributes()[methodIndex];
-      ERR_ADD (data.deleteParameter (std::static_pointer_cast<UMLMethod> (attr),
-                                    oldParamName));
-      ERR_ADD (data.addParameter (std::static_pointer_cast<UMLMethod> (attr),
-                                  newParamName, newParamType));
+      if (oldParamName != newParamName)
+      {
+        auto attr = data.getClassCopy (className).getAttributes()[methodIndex];
+        ERR_ADD (data.deleteParameter (std::static_pointer_cast<UMLMethod> (attr),
+                                      oldParamName));
+        ERR_ADD (data.addParameter (std::static_pointer_cast<UMLMethod> (attr),
+                                    newParamName, newParamType));
+      }
       res.set_redirect ("/");
     });
 
@@ -179,7 +190,10 @@ void UMLServer::start (int port)
           [&] (const httplib::Request& req, httplib::Response& res) {
             std::string oldClassName = req.matches[1].str();
             std::string newClassName = req.params.find ("cname")->second;
-            ERR_ADD (data.changeClassName (oldClassName, newClassName));
+            if (oldClassName != newClassName)
+            {
+              ERR_ADD (data.changeClassName (oldClassName, newClassName));
+            }
             res.set_redirect ("/");
           });
 
@@ -191,8 +205,11 @@ void UMLServer::start (int port)
     std::string newName = req.params.find ("name")->second;
     std::string newType = req.params.find ("type")->second;
     auto attr = data.getClassCopy (className).getAttributes()[attrIndex];
-    ERR_ADD (data.changeAttributeType (attr, newType));
-    ERR_ADD (data.changeAttributeName (className, attr, newName));
+    if (attr->getAttributeName() != newName)
+    {
+      ERR_ADD (data.changeAttributeType (attr, newType));
+      ERR_ADD (data.changeAttributeName (className, attr, newName));
+    }
     res.set_redirect ("/");
   });
 
@@ -214,17 +231,23 @@ void UMLServer::start (int port)
   });
 
   svr.Get ("/save", [&] (const httplib::Request& req, httplib::Response& res) {
-    std::string fileName = req.params.find ("save")->second;
-    UMLFile file (fileName + ".json");
-    ERR_ADD (file.save (data));
     success += "File Saved!";
     res.set_redirect ("/");
   });
+  //sends json file over as text 
+   svr.Get ("/save/data", [&] (const httplib::Request& req, httplib::Response& res) {
+    res.set_content(data.getJson().dump(), "text/plain");
+  });
 
-  svr.Get ("/load", [&] (const httplib::Request& req, httplib::Response& res) {
-    std::string fileName = req.params.find ("load")->second;
-    UMLFile file (fileName + ".json");
-    ERR_ADD (data = file.load());
+  svr.Post ("/load", [&] (const httplib::Request& req, httplib::Response& res) {
+    //getting load file content 
+    std::string fileLoad = req.get_file_value("load").content;
+    ERR_ADD(
+      //convert file to json
+      json fileLoadJson = json::parse(fileLoad);
+      //update data object
+      data = load_json(fileLoadJson);
+    );
     success += "File Loaded!";
     res.set_redirect ("/");
   });
@@ -254,20 +277,34 @@ void UMLServer::start (int port)
             res.set_redirect ("/");
           });
 
-  svr.Get("/stream", [&](const httplib::Request &req, httplib::Response &res) {
-    const size_t DATA_CHUNK_SIZE = 4;
-    auto test = new std::string("abcdefg");
-    res.set_content_provider(
-      test->size(), // Content length
-      "text/plain", // Content type
-      [test, DATA_CHUNK_SIZE](size_t offset, size_t length, httplib::DataSink &sink) {
-        const auto &d = *test;
-        sink.write(&d[offset], std::min(length, DATA_CHUNK_SIZE));
-        return true; // return 'false' if you want to cancel the process.
-      },
-    [test](bool success) { delete test; });
+      //changes view to specific class
+  svr.Get(R"(/change/view/class/(\w+))", [&](const httplib::Request &req, httplib::Response &res) {
+    std::string objectName = req.matches[1].str();
+    view["object"] = "class";
+    view["name"] = objectName;
+    res.set_redirect ("/");
+  });
+  //changes view to specific relationship
+   svr.Get(R"(/change/view/relationship/(\w+)/(\w+))", [&](const httplib::Request &req, httplib::Response &res) {
+    std::string dest = req.matches[1].str();
+    std::string src = req.matches[2].str();
+    view["object"] = "relationship";
+    view["name"] = dest;
+    view["name2"] = src;
+    res.set_redirect ("/");
+  });
+        //changes view to other types
+  svr.Get(R"(/change/view/(\w+))", [&](const httplib::Request &req, httplib::Response &res) {
+    std::string object = req.matches[1].str();
+    view["object"] = object;
+    res.set_redirect ("/");
   });
 
+    //dispalays the main 'all' view
+    svr.Get(R"(/change/view/all)", [&](const httplib::Request &req, httplib::Response &res) {
+      view["object"] = "all";
+      res.set_redirect ("/");
+    });
   std::cout << "running at http:://localhost:60555/" << std::endl;
   svr.listen ("localhost", port);
 }
@@ -346,4 +383,13 @@ void UMLServer::addAttributeIndexes (json& j, const UMLData& data)
       ++index;
     }
   }
+}
+
+UMLData UMLServer::load_json(json j)
+{
+  UMLData data;
+  UMLFile::addClasses(data, j);
+  UMLFile::addRelationships(data , j);
+
+  return data;
 }

@@ -226,7 +226,7 @@ json UMLData::getJson()
     } 
     jsonObj["classes"] += { {"name", uclass.getName()}, {"position_x", uclass.getX()}, {"position_y", uclass.getY()}, {"fields", jsonattr["fields"]}, {"methods", jsonattr["methods"]} };
   }
-
+  
   jsonObj["relationships"] = json::array();
   for (UMLRelationship urelationship : relationships)
   {
@@ -236,7 +236,6 @@ json UMLData::getJson()
       {"type", getRelationshipType(urelationship.getSource().getName(), urelationship.getDestination().getName())}
     };
   }
-
   return jsonObj;
 }
 
