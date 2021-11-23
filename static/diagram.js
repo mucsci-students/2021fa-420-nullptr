@@ -53,7 +53,7 @@ function drawLines(draw)
     var nested1 = draw.nested();
   
  
-    var rectt = nested1.rect(100,25).radius(5).css({fill: '#555', resize: 'both', overflow: 'auto', stroke: 'black'});
+    var rectt = nested1.rect(105,25).radius(5).css({fill: '#555', resize: 'both', overflow: 'auto', stroke: 'black'});
    
 
     var polyavx = (source.x() + dest.x()) / 2;
@@ -65,14 +65,14 @@ function drawLines(draw)
  
     rectt.front();
     var text_y = averagey+155;
-    var text_x = averagex;
+    var text_x = averagex + 5;
     var lineSlope = (dest.y() - source.y()) / (dest.x() - source.x())
     
      rectt.x(averagex);
      rectt.y(averagey+145);
     
     const relationshipTypee = document.getElementsByClassName("relationshipType").item(index).innerHTML;
-    nested1.text(relationshipTypee).dy(text_y).dx(text_x);
+    nested1.text(relationshipTypee).dy(text_y).dx(text_x).css({  fill: '#FFF' });
     
     index++;
     text_y += 20;
@@ -82,39 +82,18 @@ function drawLines(draw)
     if(source.x() <= dest.x()){
         nested1.polyline(' 60,20 100,50 60,70 ').css({fill: '#555'}).stroke({ color: '#000', width: 4, linecap: 'round', linejoin: 'round' }).x(averagex + 98).y(averagey + 132);
     }
-   
-    
-      
      else{
-      nested1.polyline('60,70 10,50  60,20').css({fill: '#555'}).stroke({ color: '#000', width: 4, linecap: 'round', linejoin: 'round' }).x(averagex -49).y(averagey + 132);
+      nested1.polyline('60,70 10,50  60,20').css({fill: '#555'}).stroke({ color: '#000', width: 4, linecap: 'round', linejoin: 'round' }).x(averagex -47).y(averagey + 132);
     }
-     
- 
-  
-
-   
     lines.push(nested1);
-    
   }
- 
 }
-
-
-
-
-
-
-
 function clearLines()
 {
   lines.forEach(function (line) {
     line.remove();
   })
 }
-
-
-
-
 
 function createClassBox(draw, uclass, x, y)
 {
@@ -127,7 +106,7 @@ function createClassBox(draw, uclass, x, y)
 
   var text_y = 20;
   var text_x = 10;
-  nested.text(uclass["name"]).dy(text_y).dx(text_x);
+  nested.text(uclass["name"]).dy(text_y).dx(text_x).css({  fill: '#FFF' });
   text_y += 20;
 
 // const textElement = document.querySelector('text')  
