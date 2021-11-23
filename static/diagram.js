@@ -1,12 +1,15 @@
 var boxes = new Map();
 var lines = new Array();
 var classesJson;
+var json_string;
 var relationshipsJson;
 SVG.on(document, 'DOMContentLoaded', function() {
   var draw = SVG().addTo('svg');
 
   //add panning and zooming
-  svgPanZoom('#umldiagram');
+  svgPanZoom('#umldiagram', {
+    dblClickZoomEnabled: false
+  });
 
   draw.rect(0, 0).attr({ fill: '#FFF', width: 3000, height: 1500}).back();
 
@@ -120,12 +123,28 @@ function createClassBox(draw, uclass, x, y)
     else if(nested.x() > 3000){
       nested.x(2700);
     }
+    //send position to server
     request = new XMLHttpRequest();
     request.open("GET", '/position/' + uclass["name"] + '/' + Math.floor(nested.x()) + '/' + Math.floor(nested.y(), true));
     request.send();
 
-    drawLines(draw);
+    //get new json string for saving
+    var json_string_request = new XMLHttpRequest;
+    json_string_request.open('GET', '/save/data');
+    
+    // If specified, responseType must be empty string or "document"
+    json_string_request.responseType = 'text';
+    
+    json_string_request.onload = function () {
+      if (json_string_request.readyState === json_string_request.DONE && json_string_request.status === 200) {
+        json_string = json_string_request.responseText;
+      }
+    };
+    
+    json_string_request.send();
 
+    //draw the relationship lines after each drag
+    drawLines(draw);
   });
 
   //redraw lines after move
@@ -135,10 +154,11 @@ function createClassBox(draw, uclass, x, y)
     
 }
 
-function sendDiagramInfo(classes_in, relationships_in)
+function sendDiagramInfo(classes_in, relationships_in, json_string_in)
 {
   classesJson = classes_in;
   relationshipsJson = relationships_in;
+  json_string = JSON.stringify(json_string_in);
 }
 
 function getDiagramImage()
@@ -149,8 +169,18 @@ function getDiagramImage()
   const ctx = canvas.getContext("2d");
   drawInlineSVG(document.getElementById('umldiagram'), ctx, function() {
     img = canvas.toDataURL();
-    download(img);
+    download(img, "diagram");
   });
+}
+
+//for saving file
+function save()
+{
+  window.location = "/save";
+  document.addEventListener('DOMContentLoaded', function () {
+    alert("page loaded");
+  });
+  window.onload = download('data:text/plain;charset=utf-8,' + encodeURIComponent(json_string), "diagram.json");
 }
 
 function download(file, name)

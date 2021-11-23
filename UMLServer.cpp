@@ -27,7 +27,7 @@ using json = nlohmann::json;
     fun;                                  \
     history.save (data);                  \
   }                                       \
-  catch (const std::runtime_error& error) \
+  catch (const std::exception& error) \
   {                                       \
     errors += error.what();               \
   }                                       \
@@ -53,6 +53,8 @@ void UMLServer::start (int port)
     j["success"] = success;
     success.clear();
     j["files"] = UMLFile::listSaves();
+    //passing in raw json string for downloading
+    j["raw_json_string"] = data.getJson().dump();
     res.set_content (env.render (temp, j), "text/html");
   });
 
@@ -214,18 +216,27 @@ void UMLServer::start (int port)
   });
 
   svr.Get ("/save", [&] (const httplib::Request& req, httplib::Response& res) {
-    std::string fileName = req.params.find ("save")->second;
-    UMLFile file (fileName + ".json");
-    ERR_ADD (file.save (data));
     success += "File Saved!";
     res.set_redirect ("/");
   });
+  //sends json file over as text 
+   svr.Get ("/save/data", [&] (const httplib::Request& req, httplib::Response& res) {
+    res.set_content(data.getJson().dump(), "text/plain");
+  });
 
-  svr.Get ("/load", [&] (const httplib::Request& req, httplib::Response& res) {
-    std::string fileName = req.params.find ("load")->second;
-    UMLFile file (fileName + ".json");
-    ERR_ADD (data = file.load());
-    success += "File Loaded!";
+  svr.Post ("/load", [&] (const httplib::Request& req, httplib::Response& res) {
+    //getting load file content 
+    std::string fileLoad = req.get_file_value("load").content;
+    //create new data object to store file
+    UMLData newData;
+    ERR_ADD(
+      //convert file to json
+      json fileLoadJson = json::parse(fileLoad);
+      //update new data object
+      UMLFile::addClasses(newData, fileLoadJson);
+      UMLFile::addRelationships(newData, fileLoadJson);
+      data = newData;
+    );
     res.set_redirect ("/");
   });
 

@@ -28,8 +28,8 @@ class UMLClass
 		// Name of class and a vector of all of its attributes as objects
 		string className;
 		vector<std::shared_ptr<UMLAttribute>> classAttributes;
-		int x = 0;
-		int y = 0;
+		int x = 1000;
+		int y = 350;
 
 	public:
 		// Constructor for class object without attributes
