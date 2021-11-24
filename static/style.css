@@ -19,7 +19,7 @@ svg {
 .sidebar
 { 
   height:100vh;
-  width: 25vw;
+  width: 28vw;
   background-color:#555;
   overflow-x:auto;
   color:white;
@@ -65,7 +65,7 @@ body form
   align-content: center;
   border-style: double;
   border-color: #0D1117; 
-  left: 39%;
+  left: 42%;
   top: 0%;
   border-style: solid; 
   font-size: large; 
@@ -129,6 +129,8 @@ body form
   font-size: large;
   font-style:italic;
 }
+
+
 /*
 SIDE BAR AND BANNER FORMATTING END-------------------------------------------------------------------------------------------
 */

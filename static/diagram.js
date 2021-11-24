@@ -108,16 +108,30 @@ function clearLines()
 
 function createClassBox(draw, uclass, x, y)
 {
+  
+  
   var nested = draw.nested();
  // nested.rect(200,200).attr({ fill: '#f00', opacity: 0.3, width: 150, height: 150  }).front();
   var xval_rect = 150;
   var yval_rect = 150;
   var nested = draw.nested()
+
   var rect = nested.rect(xval_rect,yval_rect).radius(10).css({fill: '#555', resize: 'both', overflow: 'auto', stroke: 'black'});
 
   var text_y = 20;
   var text_x = 10;
-  nested.text(uclass["name"]).dy(text_y).dx(text_x).css({  fill: '#FFF' });
+  var maxTextLength = 140;
+  var lineCount = 8;
+  
+  var classText = nested.text(" Class: " + uclass["name"]).dy(text_y).dx(text_x).css({  fill: '#FFF' });
+
+  var classtextLength = classText.length();
+  
+  
+  if(maxTextLength < classtextLength){
+    maxTextLength = classtextLength;
+  }
+
   text_y += 20;
 
 // const textElement = document.querySelector('text')  
@@ -133,24 +147,47 @@ function createClassBox(draw, uclass, x, y)
   for (let key in uclass["fields"])
   {
     let field = uclass["fields"][key];
-    nested.text(field["type"] + " " + field["name"]).dy(text_y).dx(text_x);
+   var fieldTextname =  nested.text("Field: "  + field["type"] + " " + field["name"]).dy(text_y).dx(text_x).css({  fill: '#FFF' });
+   var fieldTextLength = fieldTextname.length();
+
+
+   if(maxTextLength < fieldTextLength){
+    maxTextLength = fieldTextLength;
+
+   }
+   lineCount++;
     text_y += 20;
   }
   //methods
   for (let key in uclass["methods"])
   {
+    
     let method = uclass["methods"][key];
     var param_list = "";
     for (let param_key in method["params"])
     {
       let param = method["params"][param_key];
-       param_list += param["type"] + ", ";
+       param_list += param["type"] + " " + param["name"] + ", ";
     }
     //get rid of last comma
     param_list = param_list.substring(0, param_list.length - 2);
-    nested.text(method["return_type"] + " " + method["name"] + "(" + param_list + ")").dy(text_y).dx(text_x);
+    
+    var methodText =  nested.text("Method: " + method["return_type"] + " " + method["name"] + "(" + param_list + ")").dy(text_y).dx(text_x).css({  fill: '#FFF' });
+   
+    var methodTextLength = methodText.length();
+
+    if(maxTextLength < methodTextLength){
+      maxTextLength = methodTextLength;
+  
+    }
     text_y += 20;
+
+    lineCount++;
   }
+  //resizing class box based on longest text length
+  rect.width(maxTextLength + 20);
+  rect.height(lineCount * 13.34173228346);
+
   nested.x(x).y(y);
   boxes.set(uclass["name"], nested);
 
