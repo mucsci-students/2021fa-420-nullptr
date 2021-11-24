@@ -28,7 +28,104 @@ With these rules, its possible to create representations of programs from differ
 
 ## GUI
 
-To be written!
+### Getting Started
+Once you've built the program, you can access the GUI by running the program with no arguments within the build folder. 
+```
+./project
+```
+The message below should appear, and the server should be running. 
+
+```
+running at http:://localhost:60555/
+```
+Now, open up a web browser and type ```http:://localhost:60555/``` into the address bar. 
+
+### The Layout
+![image](https://user-images.githubusercontent.com/89749149/143141094-e17375bc-f38c-4572-b807-b0149c9736ec.png)
+
+On the left side is the Editor Panel. This panel is used to edit and modify classes and relationships within the UML Diagram. You can show/hide this panel at any time. To this, use the "Toggle Editor Panel" button located to the right of the panel.
+
+On the right, there is a large white area. This is the Diagram View, where you'll be able to move class boxes and relationship arrows within your diagram. 
+
+### General Usage 
+
+When you create a class using the Editor Panel, it appears in the Diagram View at a set spot (Note: when you add more than one class at a time, the boxes will stack on top of each other). Then, you can drag the boxes around on the Diagram View as you wish. You can pan and zoom around the diagram view, and you can double click on a class box show the class details in the Editor Panel. 
+
+When you create a relationship in the Editor Panel, an arrow connecting the two related class boxes will appear in the Diagram View. The arrow will follow the class boxes as you move them and double clicking an arrow will show the relationship details in the Editor Panel. 
+
+### The Editor Panel
+
+#### Creating a Class
+A class can be creating using the add class form under the “Classes:” heading. 
+
+![image](https://user-images.githubusercontent.com/89749149/143143435-3dd7223a-1378-4d75-a003-551be37f715a.png)
+
+After adding the class, it will appear under the "Classes:" heading. A class box will, also, appear in the Diagram View.
+
+![image](https://user-images.githubusercontent.com/89749149/143143697-52d6a9be-b2ec-43e4-a081-60db6cb770f3.png)
+
+To delete the class, select the "Delete" button next to the class name. 
+
+To edit details about a class such as the name, fields, and methods, enter the class detail view. To do this, click the edit button next to the class name. Alternatively, you can double click the class box within the Diagram View.
+
+![image](https://user-images.githubusercontent.com/89749149/143143981-c948948a-cd36-4c1b-8b43-5b147b473684.png)
+
+While in the class detail view, the back button can be used to return to the view with all classes within the diagram. 
+
+#### Adding a Field
+A field can be added by using the add field form. After submission, the type and name will be displayed under the “Fields:” heading. 
+
+![image](https://user-images.githubusercontent.com/89749149/143144777-9b6ce157-0b5f-4403-be9f-3564146f7072.png)
+
+To edit the name or type of a field, use the edit button next to the name of the field. 
+
+To delete a field, use the delete button next to the name of the field. 
+
+#### Adding a Method
+
+A method can be added by using the add method form. 
+
+![image](https://user-images.githubusercontent.com/89749149/143145356-bed83679-8adb-4bed-b864-a5754b597c82.png)
+
+After submitting the form, you should see the type and method name displayed (note: the parens () are added onto the name automatically). 
+To edit the name/return type of the method or delete the method, use the buttons to the right of the method. 
+
+After a method is added, an add parameter form should show up under the method, use this form to add parameters to the method. 
+
+#### Creating a Relationship 
+A relationship between two classes can be created using the relationship form found on the all view within the Editor Panel. Specify the classes to be added and the type of relationship. 
+
+![image](https://user-images.githubusercontent.com/89749149/143155503-fb9eb706-6f20-48e7-90d4-b8cf45ab9cef.png)
+
+After submission, the relationship will show under the “Relationships” heading. To edit the type of the relationship, select the edit button next to the relationship. 
+To delete the relationship, select delete next to the relationship. 
+When a class is deleted that is in a relationship, all relationships with that class are also deleted.
+
+#### Undo/Redo
+![image](https://user-images.githubusercontent.com/89749149/143155794-0616c91d-c67c-4b2b-81a4-f6b31b170e56.png)
+
+You can undo/redo any actions using the undo redo buttons situated at the top of the Editor Panel. These buttons will also undo and redo dragging changes and file loads. 
+#### Saving/Loading
+The saving and loading form can be accessed at the bottom of the all-classes view or by clicking the Save/Load button at the top of the Editor Panel.
+
+![image](https://user-images.githubusercontent.com/89749149/143155977-5ecd0fca-7704-4c32-8f6c-0681be657fc3.png)
+
+Here, you can choose to save the diagram as a JSON file and a PNG file. Saving as a JSON file allows you to reload the file into the editor to edit the diagram again. You can reload the file into the editor by using the “Load File” form. 
+Click “Choose File” and select a valid JSON file with a valid format, and the diagram will be filled in according to the values in the file. 
+
+#### Accessing Help
+![image](https://user-images.githubusercontent.com/89749149/143156196-0795023c-ca87-4c46-8776-ceeb82d0c6f8.png)
+
+Additional help tips can be found by selecting the help button, which is located at the top of the editor panel.
+
+### Diagram Window 
+
+The diagram windows allow for dragging of class boxes. Elements will appear here after added via the Editor Panel. 
+The Relationship arrows will follow the shortest path to the class box, and the arrows will update when the box is moved. 
+
+![image](https://user-images.githubusercontent.com/89749149/143156624-a57469eb-bf32-4fa6-bfce-2c0afe8eda80.png)
+
+You can double click the lines and boxes, and that action will bring up the class or relationship detail view within the Editor Panel.
 
 ---
 
