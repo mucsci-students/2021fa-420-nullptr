@@ -293,6 +293,7 @@ Cli UMLCLI::cli_menu()
           out << "Cannot select method.\n";
           out << "Make sure you are selecting the correct method number.\n";
           out << "This number be found by viewing the class and observing the final number placed next to a method.\n";
+          ErrorStatus = false;
         }
       }
       else{

@@ -39,7 +39,7 @@ void UMLServer::start (int port)
   svr.set_mount_point ("/", "../static");
   UMLData data;
   UMLDataHistory history (data);
-  //create view for focusing certain elements in sidebar
+  // Create view for focusing certain elements in sidebar
   json view;
   view["object"] = "all";
   view["name"] = "";
@@ -51,7 +51,7 @@ void UMLServer::start (int port)
     inja::Environment env;
     inja::Template temp = env.parse_template ("../templates/index.html");
     json j = data.getJson();
-    //for each for all the attributes in each class add the index number to the json object
+    // for each for all the attributes in each class add the index number to the json object
     addAttributeIndexes (j, data);
     j["errors"] = errors;
     errors.clear();
@@ -59,147 +59,132 @@ void UMLServer::start (int port)
     success.clear();
     j["files"] = UMLFile::listSaves();
     j["view"] = view;
-    //passing in raw json string for downloading
+    // passing in raw json string for downloading
     j["raw_json_string"] = data.getJson().dump();
     res.set_content (env.render (temp, j), "text/html");
   });
 
-  svr.Get ("/add/class",
-          [&] (const httplib::Request& req, httplib::Response& res) {
-            std::string name = req.params.find ("cname")->second;
-            ERR_ADD (data.addClass (name));
-            res.set_redirect ("/");
-          });
+  svr.Get ("/add/class", [&] (const httplib::Request& req, httplib::Response& res) {
+      std::string name = req.params.find ("cname")->second;
+      ERR_ADD (data.addClass (name));
+      res.set_redirect ("/");
+    });
 
-  svr.Get (R"(/add/field/(\w+))",
-          [&] (const httplib::Request& req, httplib::Response& res) {
-            std::string className = req.matches[1].str();
-            std::string fieldName = req.params.find ("fname")->second;
-            std::string fieldType = req.params.find ("ftype")->second;
-            ERR_ADD (data.addClassAttribute (
-              className, std::make_shared<UMLField> (fieldName, fieldType)));
-            res.set_redirect ("/");
-          });
+  svr.Get (R"(/add/field/(\w+))", [&] (const httplib::Request& req, httplib::Response& res) {
+      std::string className = req.matches[1].str();
+      std::string fieldName = req.params.find ("fname")->second;
+      std::string fieldType = req.params.find ("ftype")->second;
+      ERR_ADD (data.addClassAttribute (
+        className, std::make_shared<UMLField> (fieldName, fieldType)));
+      res.set_redirect ("/");
+    });
 
-  svr.Get (R"(/add/method/(\w+))", [&] (const httplib::Request& req,
-                                        httplib::Response& res) {
-    std::string className = req.matches[1].str();
-    std::string methodName = req.params.find ("mname")->second;
-    std::string methodType = req.params.find ("mtype")->second;
-    ERR_ADD (data.addClassAttribute (
-      className, std::make_shared<UMLMethod> (methodName, methodType,
-                                              std::list<UMLParameter>{})));
-    res.set_redirect ("/");
-  });
+  svr.Get (R"(/add/method/(\w+))", [&] (const httplib::Request& req, httplib::Response& res) {
+      std::string className = req.matches[1].str();
+      std::string methodName = req.params.find ("mname")->second;
+      std::string methodType = req.params.find ("mtype")->second;
+      ERR_ADD (data.addClassAttribute (
+        className, std::make_shared<UMLMethod> (methodName, methodType, std::list<UMLParameter>{})));
+      res.set_redirect ("/");
+    });
 
-  svr.Get (R"(/add/parameter/(\w+)/(\d+))", [&] (const httplib::Request& req,
-                                                httplib::Response& res) {
+  svr.Get (R"(/add/parameter/(\w+)/(\d+))", [&] (const httplib::Request& req, httplib::Response& res) {
     std::string className = req.matches[1].str();
     int methodIndex = std::stoi (req.matches[2].str());
     std::string paramName = req.params.find ("pname")->second;
     std::string paramType = req.params.find ("ptype")->second;
 
     auto attr = data.getClassCopy (className).getAttributes()[methodIndex];
-    ERR_ADD (data.addParameter (std::static_pointer_cast<UMLMethod> (attr),
-                                paramName, paramType));
+    ERR_ADD (data.addParameter (className, std::static_pointer_cast<UMLMethod> (attr), paramName, paramType));
     res.set_redirect ("/");
   });
   //delete/parameter/classname/methodindex/paramname
-  svr.Get (R"(/delete/parameter/(\w+)/(\d+)/(\w+))",
-          [&] (const httplib::Request& req, httplib::Response& res) {
-            std::string className = req.matches[1].str();
-            int methodIndex = std::stoi (req.matches[2].str());
-            std::string paramName = req.matches[3].str();
+  svr.Get (R"(/delete/parameter/(\w+)/(\d+)/(\w+))", [&] (const httplib::Request& req, httplib::Response& res) {
+    std::string className = req.matches[1].str();
+    int methodIndex = std::stoi (req.matches[2].str());
+    std::string paramName = req.matches[3].str();
 
-            auto attr =
-              data.getClassCopy (className).getAttributes()[methodIndex];
-            ERR_ADD (data.deleteParameter (
-              std::static_pointer_cast<UMLMethod> (attr), paramName));
-            res.set_redirect ("/");
-          });
+    auto attr = data.getClassCopy (className).getAttributes()[methodIndex];
+    ERR_ADD (data.deleteParameter (className, std::static_pointer_cast<UMLMethod> (attr), paramName));
+    res.set_redirect ("/");
+  });
 
   //edit/parameter/classname/methodINDEX/parametername/
-  svr.Get (
-    R"(/edit/parameter/(\w+)/(\d+)/(\w+))",
-    [&] (const httplib::Request& req, httplib::Response& res) {
-      std::string className = req.matches[1].str();
+  svr.Get (R"(/edit/parameter/(\w+)/(\d+)/(\w+))", [&] (const httplib::Request& req, httplib::Response& res) {
+    std::string className = req.matches[1].str();
+    
+    int methodIndex = std::stoi (req.matches[2].str());
+    std::string oldParamName = req.matches[3].str();
+
+    std::string newParamName = req.params.find ("pname")->second;
+    std::string newParamType = req.params.find ("ptype")->second;
+
+    if (oldParamName != newParamName)
+    {
+      auto attr = data.getClassCopy (className).getAttributes()[methodIndex];
       
-      int methodIndex = std::stoi (req.matches[2].str());
-      std::string oldParamName = req.matches[3].str();
+      ERR_ADD (data.deleteParameter (className, std::static_pointer_cast<UMLMethod> (attr), oldParamName));
 
-      std::string newParamName = req.params.find ("pname")->second;
-      std::string newParamType = req.params.find ("ptype")->second;
+      ERR_ADD (data.addParameter (className, std::static_pointer_cast<UMLMethod> (attr), newParamName, newParamType));
+    }
+    res.set_redirect ("/");
+  });
 
-      if (oldParamName != newParamName)
-      {
-        auto attr = data.getClassCopy (className).getAttributes()[methodIndex];
-        ERR_ADD (data.deleteParameter (std::static_pointer_cast<UMLMethod> (attr),
-                                      oldParamName));
-        ERR_ADD (data.addParameter (std::static_pointer_cast<UMLMethod> (attr),
-                                    newParamName, newParamType));
-      }
-      res.set_redirect ("/");
-    });
+  svr.Get ("/add/relationship", [&] (const httplib::Request& req, httplib::Response& res) {
+    std::string source = req.params.find ("source")->second;
+    std::string dest = req.params.find ("dest")->second;
+    std::string type = req.params.find ("reltype")->second;
+    ERR_ADD (data.addRelationship (source, dest, std::stoi (type)));
+    res.set_redirect ("/");
+  });
 
-  svr.Get ("/add/relationship",
-          [&] (const httplib::Request& req, httplib::Response& res) {
-            std::string source = req.params.find ("source")->second;
-            std::string dest = req.params.find ("dest")->second;
-            std::string type = req.params.find ("reltype")->second;
-            ERR_ADD (data.addRelationship (source, dest, std::stoi (type)));
-            res.set_redirect ("/");
-          });
   //edit/relationship/source/dest
-  svr.Get (R"(/edit/relationship/(\w+)/(\w+))",
-          [&] (const httplib::Request& req, httplib::Response& res) {
-            std::string source = req.matches[1].str();
-            std::string dest = req.matches[2].str();
-            std::string type = req.params.find ("reltype")->second;
-            ERR_ADD (
-              data.changeRelationshipType (source, dest, std::stoi (type)));
-            res.set_redirect ("/");
-          });
+  svr.Get (R"(/edit/relationship/(\w+)/(\w+))", [&] (const httplib::Request& req, httplib::Response& res) {
+    std::string source = req.matches[1].str();
+    std::string dest = req.matches[2].str();
+    std::string type = req.params.find ("reltype")->second;
+    ERR_ADD (
+      data.changeRelationshipType (source, dest, std::stoi (type)));
+    res.set_redirect ("/");
+  });
 
   //source/dest
-  svr.Get (R"(/delete/relationship/(\w+)/(\w+))",
-          [&] (const httplib::Request& req, httplib::Response& res) {
-            std::string source = req.matches[1].str();
-            std::string dest = req.matches[2].str();
-            ERR_ADD (data.deleteRelationship (source, dest));
-            res.set_redirect ("/");
-          });
+  svr.Get (R"(/delete/relationship/(\w+)/(\w+))", [&] (const httplib::Request& req, httplib::Response& res) {
+    std::string source = req.matches[1].str();
+    std::string dest = req.matches[2].str();
+    ERR_ADD (data.deleteRelationship (source, dest));
+    res.set_redirect ("/");
+  });
 
   //class/attribute
-  svr.Get (R"(/delete/attribute/(\w+)/(\w+))",
-          [&] (const httplib::Request& req, httplib::Response& res) {
-            std::string uclass = req.matches[1].str();
-            std::string attribute = req.matches[2].str();
-            
-            ERR_ADD (data.removeClassAttribute (uclass, attribute));
-            res.set_redirect ("/");
-          });
+  svr.Get (R"(/delete/attribute/(\w+)/(\d+))", [&] (const httplib::Request& req, httplib::Response& res) {
+    std::string uclass = req.matches[1].str();  
+    int attrIndex = std::stoi (req.matches[2].str());
 
-  svr.Get (R"(/delete/class/(\w+))",
-          [&] (const httplib::Request& req, httplib::Response& res) {
-            std::string uclass = req.matches[1].str();
-            ERR_ADD (data.deleteClass (uclass));
-            res.set_redirect ("/");
-          });
+    auto attr = data.getClassCopy(uclass).getAttributes()[attrIndex];
 
-  svr.Get (R"(/edit/class/(\w+))",
-          [&] (const httplib::Request& req, httplib::Response& res) {
-            std::string oldClassName = req.matches[1].str();
-            std::string newClassName = req.params.find ("cname")->second;
-            if (oldClassName != newClassName)
-            {
-              ERR_ADD (data.changeClassName (oldClassName, newClassName));
-            }
-            res.set_redirect ("/");
-          });
+    ERR_ADD (data.removeClassAttribute(uclass, attr));
+    res.set_redirect ("/");
+  });
+
+  svr.Get (R"(/delete/class/(\w+))", [&] (const httplib::Request& req, httplib::Response& res) {
+    std::string uclass = req.matches[1].str();
+    ERR_ADD (data.deleteClass (uclass));
+    res.set_redirect ("/");
+  });
+
+  svr.Get (R"(/edit/class/(\w+))", [&] (const httplib::Request& req, httplib::Response& res) {
+    std::string oldClassName = req.matches[1].str();
+    std::string newClassName = req.params.find ("cname")->second;
+    if (oldClassName != newClassName)
+    {
+      ERR_ADD (data.changeClassName (oldClassName, newClassName));
+    }
+    res.set_redirect ("/");
+  });
 
   //edit/attribute/classname/(method/field INDEX)
-  svr.Get (R"(/edit/attribute/(\w+)/(\d+))", [&] (const httplib::Request& req,
-                                                  httplib::Response& res) {
+  svr.Get (R"(/edit/attribute/(\w+)/(\d+))", [&] (const httplib::Request& req, httplib::Response& res) {
     std::string className = req.matches[1].str();
     int attrIndex = std::stoi (req.matches[2].str());
     std::string newName = req.params.find ("name")->second;
@@ -221,6 +206,7 @@ void UMLServer::start (int port)
     errors.clear();
     res.set_content (env.render (temp, j), "text/html");
   });
+
   svr.Get ("/help", [&] (const httplib::Request& req, httplib::Response& res) {
     inja::Environment env;
     inja::Template temp = env.parse_template ("../helpGUI.html");
@@ -234,8 +220,9 @@ void UMLServer::start (int port)
     success += "File Saved!";
     res.set_redirect ("/");
   });
+
   //sends json file over as text 
-   svr.Get ("/save/data", [&] (const httplib::Request& req, httplib::Response& res) {
+  svr.Get ("/save/data", [&] (const httplib::Request& req, httplib::Response& res) {
     res.set_content(data.getJson().dump(), "text/plain");
   });
 
@@ -262,30 +249,29 @@ void UMLServer::start (int port)
     res.set_redirect ("/");
   });
 
-  ///position/className/x/y
-  svr.Get (R"(/position/(\w+)/(\d+)/(\d+))",
-          [&] (const httplib::Request& req, httplib::Response& res) {
-            std::string className = req.matches[1].str();
-           
-            int x = std::stoi (req.matches[2].str());
-            int y = std::stoi (req.matches[3].str());
-          
-          
-            data.getClass (className).setX (x);
-            data.getClass (className).setY (y);
-            history.save (data);
-            res.set_redirect ("/");
-          });
+  // position/className/x/y
+  svr.Get (R"(/position/(\w+)/(\d+)/(\d+))", [&] (const httplib::Request& req, httplib::Response& res) {
+    std::string className = req.matches[1].str();
+    
+    int x = std::stoi (req.matches[2].str());
+    int y = std::stoi (req.matches[3].str());
+  
+    data.getClass (className).setX (x);
+    data.getClass (className).setY (y);
+    history.save (data);
+    res.set_redirect ("/");
+  });
 
-      //changes view to specific class
+  // changes view to specific class
   svr.Get(R"(/change/view/class/(\w+))", [&](const httplib::Request &req, httplib::Response &res) {
     std::string objectName = req.matches[1].str();
     view["object"] = "class";
     view["name"] = objectName;
     res.set_redirect ("/");
   });
-  //changes view to specific relationship
-   svr.Get(R"(/change/view/relationship/(\w+)/(\w+))", [&](const httplib::Request &req, httplib::Response &res) {
+
+  // changes view to specific relationship
+  svr.Get(R"(/change/view/relationship/(\w+)/(\w+))", [&](const httplib::Request &req, httplib::Response &res) {
     std::string dest = req.matches[1].str();
     std::string src = req.matches[2].str();
     view["object"] = "relationship";
@@ -293,21 +279,25 @@ void UMLServer::start (int port)
     view["name2"] = src;
     res.set_redirect ("/");
   });
-        //changes view to other types
+  
+  //changes view to other types
   svr.Get(R"(/change/view/(\w+))", [&](const httplib::Request &req, httplib::Response &res) {
     std::string object = req.matches[1].str();
     view["object"] = object;
     res.set_redirect ("/");
   });
 
-    //dispalays the main 'all' view
-    svr.Get(R"(/change/view/all)", [&](const httplib::Request &req, httplib::Response &res) {
-      view["object"] = "all";
-      res.set_redirect ("/");
-    });
+  //dispalays the main 'all' view
+  svr.Get(R"(/change/view/all)", [&](const httplib::Request &req, httplib::Response &res) {
+    view["object"] = "all";
+    res.set_redirect ("/");
+  });
+
   std::cout << "running at http:://localhost:60555/" << std::endl;
   svr.listen ("localhost", port);
 }
+
+
 
 // Attribute index management
 void UMLServer::addAttributeIndexes (json& j, const UMLData& data)
@@ -323,42 +313,32 @@ void UMLServer::addAttributeIndexes (json& j, const UMLData& data)
       {
         for (int classID = 0; classID < j["classes"].size(); ++classID)
         {
-          for (int fieldID = 0;
-              fieldID < j["classes"][classID]["fields"].size(); ++fieldID)
+          for (int fieldID = 0; fieldID < j["classes"][classID]["fields"].size(); ++fieldID)
           {
-            if (j["classes"][classID]["fields"][fieldID]["name"] ==
-                attr->getAttributeName())
+            if (j["classes"][classID]["fields"][fieldID]["name"] == attr->getAttributeName())
             {
               j["classes"][classID]["fields"][fieldID]["index"] = index;
             }
           }
         }
       }
-      else if (attr->identifier() ==
-              "method") //for method, match  name and parameters
+      else if (attr->identifier() == "method") //for method, match  name and parameters
       {
 
         for (int classID = 0; classID < j["classes"].size(); ++classID)
         {
-          for (int methodID = 0;
-              methodID < j["classes"][classID]["methods"].size(); ++methodID)
+          for (int methodID = 0; methodID < j["classes"][classID]["methods"].size(); ++methodID)
           {
             //check params match as methods have same name
-            if (j["classes"][classID]["methods"][methodID]["name"] ==
-                attr->getAttributeName())
+            if (j["classes"][classID]["methods"][methodID]["name"] == attr->getAttributeName())
             {
-              std::list<UMLParameter> params =
-                std::dynamic_pointer_cast<UMLMethod> (attr)->getParam();
+              std::list<UMLParameter> params = std::dynamic_pointer_cast<UMLMethod> (attr)->getParam();
               bool containsParameter = false;
               for (auto param : params)
               {
-                for (int k = 0;
-                    k < j["classes"][classID]["methods"][methodID]["params"]
-                          .size();
-                    ++k)
+                for (int k = 0; k < j["classes"][classID]["methods"][methodID]["params"].size(); ++k)
                 {
-                  if (param.getType() == j["classes"][classID]["methods"]
-                                          [methodID]["params"][k]["type"])
+                  if (param.getType() == j["classes"][classID]["methods"][methodID]["params"][k]["type"])
                   {
                     containsParameter = true;
                   }
@@ -369,10 +349,7 @@ void UMLServer::addAttributeIndexes (json& j, const UMLData& data)
                 }
               }
 
-              if (containsParameter ||
-                  (params.size() == 0 &&
-                  j["classes"][classID]["methods"][methodID]["params"]
-                      .size() == 0))
+              if (containsParameter || (params.size() == 0 && j["classes"][classID]["methods"][methodID]["params"].size() == 0))
               {
                 j["classes"][classID]["methods"][methodID]["index"] = index;
               }
