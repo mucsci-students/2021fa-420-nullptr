@@ -186,7 +186,7 @@ function createClassBox(draw, uclass, x, y)
   }
   //resizing class box based on longest text length
   rect.width(maxTextLength + 20);
-  rect.height(lineCount * 13.34173228346);
+  rect.height(lineCount * 21);
 
   nested.x(x).y(y);
   boxes.set(uclass["name"], nested);
