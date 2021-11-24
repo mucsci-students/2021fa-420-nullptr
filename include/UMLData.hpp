@@ -199,6 +199,10 @@ class UMLData
     // checks if field exists in current class
     bool doesFieldExist(string className, string fieldName);
 
+    // Takes in 2 strings (class name and method name) and the parameter list.
+    // Checks to see if a specified method exists within the class.
+    bool doesMethodExist(string className, string methodName, list<UMLParameter> paramList);
+
     // Takes in a shared method pointer and a string, and
     // checks to see if the specified parameter exists in
     // the current class.
@@ -212,15 +216,9 @@ class UMLData
 
     /********************************/
     //To be deleted
-    
-    //DO NOT USE THIS VERSION!
-    void addParameter(method_ptr method, string paramName, string paramType);
-
-    //DO NOT USE THIS VERSION!
-    void deleteParameter(method_ptr method, string paramName);
 
     // THIS WILL BE DELETED!!!!!!
-    void removeClassAttribute(string className, string attributeName);
+    //void removeClassAttribute(string className, string attributeName);
 
 
   private:

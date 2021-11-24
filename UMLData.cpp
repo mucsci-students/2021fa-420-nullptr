@@ -560,7 +560,9 @@ void UMLData::changeAttributeName(string className, attr_ptr attribute, string n
  */
 void UMLData::changeParameterName(method_ptr methodIter, string oldParamName, string newParamName)
 {
-  if(doesParameterExist(methodIter, newParamName))
+  if (!isValidName(newParamName))
+    throw std::runtime_error("New parameter name is not valid");
+  if (doesParameterExist(methodIter, newParamName))
     throw std::runtime_error("That name is already taken.");
   methodIter->changeParameterName(oldParamName, newParamName);
 }
@@ -653,11 +655,10 @@ void UMLData::changeParameterType(string className, method_ptr methodIter, strin
   }
 
   else if (!isValidName(newParamType))
-    throw std::runtime_error("New attribute name is not valid");
+    throw std::runtime_error("New parameter type name is not valid");
 
   methodIter->changeParameterType(paramName, newParamType); 
 }
-
 
 /**************************************************************/
 //BOOLS
@@ -729,6 +730,38 @@ bool UMLData::doesFieldExist(string className, string fieldName)
 
 
 /**
+ * @brief Takes in 2 strings (class name and method name) and the parameter list.
+ * Checks to see if a specified method exists within the class.
+ * 
+ * @param className 
+ * @param methodName 
+ * @param paramList 
+ * @return true 
+ * @return false 
+ */
+bool UMLData::doesMethodExist(string className, string methodName, list<UMLParameter> paramList)
+{
+  UMLClass currentClass = getClassCopy(className);
+
+  bool found = false;
+  for(auto iter : currentClass.getAttributes())
+  {
+    if(iter->identifier() == "method" && iter->getAttributeName() == methodName)
+    {
+      string methodType = iter->getType();
+      method_ptr methodCopy = std::make_shared<UMLMethod>(methodName, methodType, paramList);
+      found = currentClass.checkAttribute(methodCopy);
+      if(found)
+        break;
+    }
+  }
+  return found; 
+}
+
+/************************************/
+
+
+/**
  * @brief Takes in a shared method pointer and a string, and
  * checks to see if the specified parameter exists in the 
  * current class.
@@ -786,43 +819,6 @@ bool UMLData::isValidName(string name)
 /**************************************************************/
 //TO BE DELETED
 
-/**
- * @brief Adds parameter to a given method.
- * 
- * @param method 
- * @param paramName 
- * @param paramType 
- */
-void UMLData::addParameter(method_ptr method, string paramName, string paramType)
-{
-  if (!isValidName(paramName))
-    throw std::runtime_error("Parameter name is not valid");
-  else if (!isValidName(paramType))
-    throw std::runtime_error("Parameter type is not valid");
-  else 
-  {
-    for (UMLParameter param : method->getParam()) { 
-      if (param.getName() == paramName) {
-        throw std::runtime_error("Parameter already exists");
-      }
-    }
-  }
-  method->addParam(UMLParameter(paramName, paramType));
-}
-
-/************************************/
-
-/**
- * @brief Deletes parameter from given method
- * 
- * @param method 
- * @param paramName 
- */
-void UMLData::deleteParameter(method_ptr method, string paramName) 
-{
-  method->deleteParameter(paramName);
-}
-
 
 /************************************/
 
@@ -832,7 +828,7 @@ void UMLData::deleteParameter(method_ptr method, string paramName)
  * 
  * @param className 
  * @param attributeName 
- */
+ *
 void UMLData::removeClassAttribute(string className, string attributeName)
 {
   for (attr_ptr attr : getClass(className).getAttributes()) {

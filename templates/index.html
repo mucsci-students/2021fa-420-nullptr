@@ -107,7 +107,7 @@
                         {% for field in class.fields %}
                             <h5 id="{{class.name}}{{ field.name }}field">{{ field.type }} {{ field.name }}
                                 <button   class="buttonnn" id="{{class.name}}{{ field.name }}fieldedit">Edit</button> 
-                                <a   class="buttonnn" href="/delete/attribute/{{ class.name }}/{{ field.name }}">Delete</a>
+                                <a   class="buttonnn" href="/delete/attribute/{{ class.name }}/{{ field.index }}">Delete</a>
                             </h5>
                         {% endfor %}
                         <div class="form-group">
@@ -125,7 +125,7 @@
                 
                             <h4 id="{{class.name}}{{ method.index }}">{{ method.return_type }} {{ method.name }}()
                                 <button id="{{class.name}}{{ method.index }}edit"  class='buttonnn'>Edit</button> 
-                                <a href="/delete/attribute/{{ class.name }}/{{ method.name }}"  class='buttonnn'>Delete</a>
+                                <a href="/delete/attribute/{{ class.name }}/{{ method.index}}"  class='buttonnn'>Delete</a>
                             </h4>
                             <!--parameters-->
                             <h5 class="titless">Params</h5>

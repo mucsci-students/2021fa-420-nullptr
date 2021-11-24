@@ -48,7 +48,7 @@ class UMLClass
 		void addAttribute(const UMLAttribute& newAttribute);
 
 		// Adds attribute to attribute vector with a smart pointer
-        void addAttribute(std::shared_ptr<UMLAttribute> newAttribute);
+    void addAttribute(std::shared_ptr<UMLAttribute> newAttribute);
 
 		// Changes name of attribute within class
 		void changeAttributeName(string oldAttributeName, string newAttributeName);

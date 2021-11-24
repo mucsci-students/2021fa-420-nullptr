@@ -71,8 +71,15 @@ Server (## WIP ##)
 
 // ****************************************************
 
-// Tests for UMLClass
-// **************************
+
+/*
+////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+|**************************************************************|
+|                      Tests for UMLClass                      |
+|**************************************************************|
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////
+*/
+
 
 // Basic getter test to see if it gets the proper name
 TEST (UMLClassTest, GetNameTest)
@@ -306,8 +313,13 @@ TEST (UMLClassTest, CheckAttributesTest)
 
 // ****************************************************
 
-// Tests for UMLAttribute
-// **************************
+/*
+////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+|**************************************************************|
+|                    Tests for UMLAttribute                    |
+|**************************************************************|
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////
+*/
 
 // TEST(UMLFieldTest, GetFieldNameTest)
 
@@ -350,8 +362,13 @@ TEST (UMLAttributeTest, ChangeAttributeTypeTest)
 
 // ****************************************************
 
-// Tests for UMLField
-// **************************
+/*
+////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+|**************************************************************|
+|                      Tests for UMLField                      |
+|**************************************************************|
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////
+*/
 
 // Basic getter test to see if it gets the proper name
 TEST (UMLFieldTest, GetFieldNameTest)
@@ -392,8 +409,14 @@ TEST (UMLFieldTest, ChangeFieldTypeTest)
 
 // ****************************************************
 
-// Tests for UMLMethod
-// **************************
+
+/*
+////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+|**************************************************************|
+|                     Tests for UMLMethod                      |
+|**************************************************************|
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////
+*/
 
 // Basic getter test to see if it gets the proper name
 TEST (UMLMethodTest, GetMethodNameTest)
@@ -494,8 +517,13 @@ TEST (UMLMethodTest, ChangeParameterTypeTest)
 
 // ****************************************************
 
-// Tests for UMLParameter
-// **************************
+/*
+////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+|**************************************************************|
+|                    Tests for UMLParameter                    |
+|**************************************************************|
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////
+*/
 
 // Tests creation of a Pprameter and getting it's name and type works
 TEST (UMLParameterTest, GetParameterValuesTest)
@@ -523,8 +551,13 @@ TEST (UMLParameterTest, ChangeParameterTypeTest)
 
 // ****************************************************
 
-// Tests for UMLRelationship
-// **************************
+/*
+////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+|**************************************************************|
+|                   Tests for UMLRelationship                  |
+|**************************************************************|
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////
+*/
 
 // Test to check if constructing a generic relationship works at all
 TEST (UMLRelationshipTest, ConstructorTest)
@@ -621,8 +654,13 @@ TEST (UMLRelationshipTest, StringToTypeTest)
 
 // ****************************************************
 
-// Tests for UMLFile
-// **************************
+/*
+////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+|**************************************************************|
+|                      Tests for UMLFile                       |
+|**************************************************************|
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////
+*/
 
 // TO BE IMPLEMENTED: File creation/deletion.
 
@@ -663,18 +701,110 @@ TEST (UMLFileTest, AddComponentsTest)
   ASSERT_TRUE(std::equal(relationship1.begin(), relationship1.end(), relationship2.begin()));
 }
 
+// Saving and loading a file should work
+TEST (UMLFileTest, SaveLoadTest)
+{
+  remove("test.json");
+  // Start with JSON string, add classes and relationships based on the JSON
+  json j =
+        "{\"classes\":[{\"fields\":[{\"name\":\"test\",\"type\":\"int\"}],\"methods\":[{\"name\":\"ff\",\"params\":[{\"name\":\"something\",\"type\":\"something\"}],\"return_type\":\"string\"}],\"name\":\"fish2\",\"position_x\":0,\"position_y\":0},{\"fields\":[],\"methods\":[],\"name\":\"test\",\"position_x\":0,\"position_y\":0}],\"relationships\":[{\"destination\":\"test\",\"source\":\"fish2\",\"type\":\"aggregation\"}]}"_json;
+  UMLData data;
+  UMLFile file_old ("test.json");
+  file_old.addClasses (data, j);
+  file_old.addRelationships (data, j);
+
+  // Save file to json
+  file_old.save(data);
+  // Load json into a new UMLFile and put the contents into UMLData and check they're the same
+  UMLFile file ("test.json");
+  data = file.load();
+
+  // Test compared to equivalent data added normally
+  UMLData data2;
+  data2.addClass ("fish2");
+  data2.addClass ("test");
+  data2.addClassAttribute ("fish2", std::make_shared<UMLField> ("test", "int"));
+  auto m =
+    std::make_shared<UMLMethod> ("ff", "string", std::list<UMLParameter>{});
+  data2.addClassAttribute ("fish2", m);
+  data2.addParameter ("fish2", m, "something", "something");
+  data2.addRelationship ("fish2", "test", 0);
+
+  // Check for identical classes
+  auto classes1 = data.getClasses();
+  auto classes2 = data2.getClasses();
+  auto class2 = classes2.begin();
+  ASSERT_TRUE(std::equal(classes1.begin(), classes1.end(), classes2.begin()));
+
+  // Check for identical relationships
+  auto relationship1 = data.getRelationships();
+  auto relationship2 = data2.getRelationships();
+  ASSERT_TRUE(std::equal(relationship1.begin(), relationship1.end(), relationship2.begin()));
+
+  remove("test.json");
+}
+
+// Adding a parameter to a method that would cause overloading rules to fail should not work
+TEST (CLITest, ParameterOverloadAdd)
+{
+  // Create interface and grab its menu and a stringstream
+  UMLCLI interface;
+  Cli cli = interface.cli_menu();
+  stringstream oss;
+
+  // Initialize test
+  CLITest test;
+  
+  test.user_input(cli, oss, "class add bob");
+
+  // Make method with one paramter
+  test.user_input(cli, oss, "method add bob int method");
+  test.user_input(cli, oss, "method select bob method 1");
+  test.user_input(cli, oss, "method parameter add int param");
+
+  // Make method with zero parameters
+  test.user_input(cli, oss, "method add bob int method");
+
+  // Try to add a parameter to the second method of the same type as the first and it should fail
+  test.user_input(cli, oss, "method select bob method 2");
+  test.user_input(cli, oss, "method parameter add int param");
+
+  auto attr = interface.return_model().getClassCopy("bob").getAttributes();
+  auto paramList = std::dynamic_pointer_cast<UMLMethod>(attr[1])->getParam();
+  ASSERT_EQ(0, paramList.size());
+
+  // Try to add a parameter to the second method of a different type but same name as the first and it should succede
+  test.user_input(cli, oss, "method parameter add string param");
+
+  attr = interface.return_model().getClassCopy("bob").getAttributes();
+  paramList = std::dynamic_pointer_cast<UMLMethod>(attr[1])->getParam();
+  ASSERT_EQ(1, paramList.size());
+}
+
 // ****************************************************
 
-// Tests for UMLData involving classes
+/*
+////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+|**************************************************************|
+|                      Tests for UMLData                       |
+|**************************************************************|
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////
+*/
+
+// Tests involving classes
 // **************************
 
 // Checks to see if getting a copy of a class has the same name
-// TODO: See if it has the same contents. Also see if this method is still necessary.
 TEST (UMLDataAddClassTest, AddClassAndGetCopy)
 {
   UMLData data;
-  data.addClassObject(UMLClass("test"));
-  ASSERT_EQ("test", data.getClassCopy ("test").getName());
+  UMLClass testClass = UMLClass("test");
+  data.addClassObject(testClass);
+
+  attr_ptr attribute = std::make_shared<UMLField>("attrTest", "type");
+  data.addClassAttribute("test", attribute);
+
+  ASSERT_EQ(testClass, data.getClassCopy ("test"));
 }
 
 // Shouldn't be able to add a class that already exists
@@ -726,13 +856,102 @@ TEST (UMLDataRenameClassTest, RenameClassIntoClassThatAlreadyExists)
 
 // ****************************************************
 
-// Tests for UMLData involving attributes (method/field)
+// Tests involving attributes (method/field)
 // **************************
 
+// Checks to see if adding a method works (no parameters).
+TEST(UMLDataAttributeTest, AddMethodTestNoParams)
+{
+  UMLData data;
+  data.addClass("test");
+  auto method = std::make_shared<UMLMethod> ("testMethod", "type", std::list<UMLParameter>{});
 
-// Checks to see if changing the name of a field in UMLData works.
-// TODO: Clean up variable names.
-/*
+  std::list<UMLParameter> paramList = method->getParam();
+
+  data.addClassAttribute("test", method);
+  bool check = data.doesMethodExist("test", "testMethod", paramList);
+  
+  ASSERT_EQ(check, true);
+}
+
+// Checks to see if adding a method works (with parameters).
+TEST(UMLDataAttributeTest, AddMethodTestWithParams)
+{
+  UMLData data;
+  data.addClass("test");
+  auto method = std::make_shared<UMLMethod> ("testMethod", "type", std::list<UMLParameter>{
+    UMLParameter("p1", "int"), UMLParameter("p2", "string")});
+
+  std::list<UMLParameter> paramList = method->getParam();
+
+  data.addClassAttribute("test", method);
+  bool check = data.doesMethodExist("test", "testMethod", paramList);
+  
+  ASSERT_EQ(check, true);
+}
+
+// Checks to see if adding a field works
+TEST(UMLDataAttributeTest, AddFieldTest)
+{
+  UMLData data;
+  data.addClass("test");
+  auto field = std::make_shared<UMLField>("testField", "type");
+  
+  data.addClassAttribute("test", field);
+  bool check = data.doesFieldExist("test", "testField");
+
+  ASSERT_EQ(check, true);
+}
+
+
+// Checks to see if deleting methods and fields works properly, along with any potential overload cases.
+TEST (UMLDataAttributeTest, DeleteMethodFieldTest)
+{
+  UMLData data;
+  data.addClass ("test");
+
+  // Create field
+  auto field = std::make_shared<UMLField> ("testField", "type"); 
+  
+  // Create first method, has params
+  auto method = std::make_shared<UMLMethod> ("testMethod", "type", std::list<UMLParameter>{});
+  auto param1 = UMLParameter("testParam", "type");
+  method->addParam(param1);
+
+  // Create second method that is an overload, no params
+  auto method2 = std::make_shared<UMLMethod> ("testMethod", "type", std::list<UMLParameter>{});
+
+  // Add field and both methods to "test"
+  data.addClassAttribute ("test", field);
+  data.addClassAttribute ("test", method);
+  data.addClassAttribute ("test", method2);
+
+  // Verify that deleting field works
+  EXPECT_NO_THROW(data.removeClassAttribute("test", field));
+  for (auto attr : data.getClassAttributes ("test")) { 
+    // Field should no longer exist
+    ASSERT_NE(attr->getAttributeName(), "testField");
+  }
+
+  // Verify that deleting an overloaded method works properly
+  EXPECT_NO_THROW(data.removeClassAttribute("test", method2));
+  for (auto attr : data.getClassAttributes ("test")) { 
+    // Only method left should be testMethod
+    ASSERT_EQ(attr->getAttributeName(), "testMethod");
+    // Check that the correct param is there
+    for (auto param : std::dynamic_pointer_cast<UMLMethod>(attr)->getParam()) {
+      ASSERT_EQ(param.getName(), "testParam");
+      ASSERT_EQ(param.getType(), "type");
+    }
+  }
+
+  // Verify deleting a method on its own works properly
+  EXPECT_NO_THROW(data.removeClassAttribute("test", method));
+  // Vector should be empty now
+  ASSERT_EQ(data.getClassAttributes("test").empty(), true);
+}
+
+// Checks to see if changing the name of a method in UMLData works.
 TEST (UMLDataAttributeTest, ChangeMethodNameTest)
 {
   bool hasTestGone;
@@ -742,9 +961,10 @@ TEST (UMLDataAttributeTest, ChangeMethodNameTest)
 
   UMLData data;
   data.addClass ("test");
-  UMLMethod attribute ("hastest", "type", std::list<UMLParameter>{});
-  data.addClassAttribute ("test", attribute);
-  data.changeAttributeName ("test", "hastest", "newHasTest");
+  auto method = std::make_shared<UMLMethod> ("hastest", "type", std::list<UMLParameter>{});
+  data.addClassAttribute ("test", method);
+  
+  data.changeAttributeName ("test", method, "newHasTest");
 
   for (auto attr : data.getClassAttributes ("test"))
   {
@@ -759,11 +979,10 @@ TEST (UMLDataAttributeTest, ChangeMethodNameTest)
   }
   ASSERT_EQ (hasTestGone, newHasTestPresent);
 }
-*/
 
 // Checks to see if changing the name of a field in UMLData works.
 // TODO: Clean up variable names.
-/*
+
 TEST (UMLDataAttributeTest, ChangeFieldNameTest)
 {
   bool hasTestGone;
@@ -773,9 +992,10 @@ TEST (UMLDataAttributeTest, ChangeFieldNameTest)
 
   UMLData data;
   data.addClass ("test");
-  UMLField attribute ("hastest", "type");
-  data.addClassAttribute ("test", attribute);
-  data.changeAttributeName ("test", "hastest", "newHasTest");
+
+  auto field = std::make_shared<UMLField> ("hastest", "type"); 
+  data.addClassAttribute ("test", field);
+  data.changeAttributeName ("test", field, "newHasTest");
 
   for (auto attr : data.getClassAttributes ("test"))
   {
@@ -789,21 +1009,449 @@ TEST (UMLDataAttributeTest, ChangeFieldNameTest)
     }
   }
   ASSERT_EQ (hasTestGone, newHasTestPresent);
-}*/
+}
+
+// Checks to see if changing the type of a method in UMLData works.
+TEST (UMLDataAttributeTest, ChangeMethodTypeTest)
+{
+  bool hasTestGone;
+  hasTestGone = true;
+  bool newHasTestPresent;
+  newHasTestPresent = false;
+
+  UMLData data;
+  data.addClass ("test");
+  auto method = std::make_shared<UMLMethod> ("hastest", "type", std::list<UMLParameter>{});
+  data.addClassAttribute ("test", method);
+  data.changeAttributeType (method, "type2");
+
+  for (auto attr : data.getClassAttributes ("test"))
+  {
+    if (attr->getType() == "type")
+    {
+      hasTestGone = false;
+    }
+    if (attr->getType() == "type2")
+    {
+      newHasTestPresent = true;
+    }
+  }
+  ASSERT_EQ (hasTestGone, newHasTestPresent);
+}
+
+// Checks to see if changing the type of a field in UMLData works.
+TEST (UMLDataAttributeTest, ChangeFieldTypeTest)
+{
+  bool hasTestGone;
+  hasTestGone = true;
+  bool newHasTestPresent;
+  newHasTestPresent = false;
+
+  UMLData data;
+  data.addClass ("test");
+  auto field = std::make_shared<UMLField> ("hastest", "type"); 
+  data.addClassAttribute ("test", field);
+  data.changeAttributeType (field, "type2");
+
+  for (auto attr : data.getClassAttributes ("test"))
+  {
+    if (attr->getType() == "type")
+    {
+      hasTestGone = false;
+    }
+    if (attr->getType() == "type2")
+    {
+      newHasTestPresent = true;
+    }
+  }
+  ASSERT_EQ (hasTestGone, newHasTestPresent);
+}
 
 // Checks if an error occurs when you attempt to remove a class attribute that isn't owned by the class.
 TEST (UMLDataAttributeTest, RemovingNonExistantAttribute)
 {
   UMLData data;
   data.addClass ("test");
-  UMLAttribute attribute ("testAttribute");
-  ERR_CHECK (data.removeClassAttribute ("test", "testAttribute"),
-             "Attribute does not exist");
+  attr_ptr attribute = std::make_shared<UMLAttribute>("testAttribute"); 
+  ERR_CHECK (data.removeClassAttribute ("test", attribute), "Attribute not found");
+}
+
+// Checks if an error occurs when you attempt to remove a class method or field that isn't owned by the class.
+TEST (UMLDataAttributeTest, RemovingNonExistantMethodOrField)
+{
+  UMLData data;
+  data.addClass ("test");
+  auto field = std::make_shared<UMLField> ("testField", "type"); 
+  auto method = std::make_shared<UMLMethod> ("testMethod", "type", std::list<UMLParameter>{});
+  // These should not be removed since they aren't found within the data model itself
+  ERR_CHECK (data.removeClassAttribute ("test", field),
+             "Attribute not found");
+  ERR_CHECK (data.removeClassAttribute ("test", method),
+             "Attribute not found");
 }
 
 // ****************************************************
 
-// Tests for UMLData involving relationships
+
+
+// Tests involving parameters
+// **************************
+
+// Tests to see if adding a parameter works, as well as overload check in the case of one parameter.
+TEST (UMLDataParameterTest, AddParameterTest1) {
+  UMLData data;
+  data.addClass ("test");
+  
+  // Create method 1, has params
+  auto method = std::make_shared<UMLMethod> ("testMethod", "type", std::list<UMLParameter>{});
+  auto param1 = UMLParameter("testParam", "type");
+  method->addParam(param1);
+
+  // Create second method that is an overload, no params
+  auto method2 = std::make_shared<UMLMethod> ("testMethod", "type", std::list<UMLParameter>{});
+
+  // Add both methods to test
+  data.addClassAttribute ("test", method);
+  data.addClassAttribute ("test", method2);
+
+  // Should throw if the type signature becomes the same when adding a parameter.
+  // Parameter name should not affect this error.
+  ERR_CHECK(data.addParameter("test", method2, "testParam2", "type"), 
+    "This parameter cannot be created, as this would create duplicate methods.");
+  ERR_CHECK(data.addParameter("test", method2, "testParam", "type"), 
+    "This parameter cannot be created, as this would create duplicate methods.");
+  
+  // Shouldn't throw if the type signature is different.
+  ASSERT_NO_THROW(data.addParameter("test", method2, "testParam", "type2"));
+  
+  // Check to see if parameter was added properly
+  UMLParameter testParamCopy("testParam", "type2");
+  for (auto attr : data.getClassAttributes ("test")) { 
+    for (auto param : std::dynamic_pointer_cast<UMLMethod>(attr)->getParam()) {
+      if (param.getType() == "type2") {
+        ASSERT_EQ(param, testParamCopy);
+      }
+    }
+  }
+}
+
+// Tests cases involving adding a parameter when there is overloads involving more than one parameter.
+TEST (UMLDataParameterTest, AddParameterTest2) {
+  UMLData data;
+  data.addClass ("test");
+  
+  // Create method 1, has 2 params
+  auto method = std::make_shared<UMLMethod> ("testMethod", "type", std::list<UMLParameter>{});
+  auto param1 = UMLParameter("testParam", "type");
+  auto param2 = UMLParameter("testParam2", "type2");
+  method->addParam(param1);
+  method->addParam(param2);
+
+  // Create second method that is an overload, 1 param
+  auto method2 = std::make_shared<UMLMethod> ("testMethod", "type", std::list<UMLParameter>{});
+  auto param1Copy = UMLParameter("testParam", "type");
+  method2->addParam(param1Copy);
+
+  // Add both methods to test
+  data.addClassAttribute ("test", method);
+  // There should not be an issue with adding this method
+  ASSERT_NO_THROW(data.addClassAttribute ("test", method2));
+
+  // Should throw if the type signature becomes the same when adding a parameter.
+  // Parameter name should not affect this error.
+  ERR_CHECK(data.addParameter("test", method2, "testParam2", "type2"), 
+    "This parameter cannot be created, as this would create duplicate methods.");
+  ERR_CHECK(data.addParameter("test", method2, "testParam3", "type2"), 
+    "This parameter cannot be created, as this would create duplicate methods.");
+
+  // Shouldn't throw if the type signature is different.
+  ASSERT_NO_THROW(data.addParameter("test", method2, "testParam3", "type3"));
+
+  // Check to see if parameter was added properly
+  UMLParameter testParamCopy("testParam3", "type3");
+  for (auto attr : data.getClassAttributes ("test")) { 
+    for (auto param : std::dynamic_pointer_cast<UMLMethod>(attr)->getParam()) {
+      if (param.getType() == "type3") {
+        ASSERT_EQ(param, testParamCopy);
+      }
+    }
+  }
+}
+
+// Tests if deleting a parameter works properly.
+TEST (UMLDataParameterTest, DeleteParameterTest1) {
+  UMLData data;
+  data.addClass ("test");
+  
+  // Create method with a param
+  auto method = std::make_shared<UMLMethod> ("testMethod", "type", std::list<UMLParameter>{});
+  auto param1 = UMLParameter("testParam", "type");
+  method->addParam(param1);
+
+  // Add method to data
+  data.addClassAttribute ("test", method);
+
+  // Delete method 
+  EXPECT_NO_THROW(data.deleteParameter("test", method, "testParam"));
+  // Method should no longer have any parameters
+  EXPECT_TRUE(method->getParam().empty());
+}
+
+// Tests if deleting a parameter works when there is multiple parameters.
+TEST (UMLDataParameterTest, DeleteParameterTest2) {
+  UMLData data;
+  data.addClass ("test");
+  
+  // Create method with a param
+  auto method = std::make_shared<UMLMethod> ("testMethod", "type", std::list<UMLParameter>{});
+  auto param1 = UMLParameter("testParam", "type");
+  auto param2 = UMLParameter("testParam2", "type2");
+  method->addParam(param1);
+  method->addParam(param2);
+
+  // Add method to data
+  data.addClassAttribute ("test", method);
+
+  // Delete method 
+  EXPECT_NO_THROW(data.deleteParameter("test", method, "testParam"));
+  // Check to see if state of parameters is what it should be
+  EXPECT_EQ(method->getParam().begin()->getName(), "testParam2");
+  EXPECT_EQ(method->getParam().begin()->getType(), "type2");
+}
+
+// Tests if deleting a parameter will show an error if it would cause an overload conflict.
+TEST (UMLDataParameterTest, DeleteParameterTest3) {
+  UMLData data;
+  data.addClass ("test");
+  
+  // Create method 1, has 2 params
+  auto method = std::make_shared<UMLMethod> ("testMethod", "type", std::list<UMLParameter>{});
+  auto param1 = UMLParameter("testParam", "type");
+  auto param2 = UMLParameter("testParam2", "type2");
+  method->addParam(param1);
+  method->addParam(param2);
+
+  // Create second method that is an overload, 1 param
+  auto method2 = std::make_shared<UMLMethod> ("testMethod", "type", std::list<UMLParameter>{});
+  auto param1Copy = UMLParameter("testParam", "type");
+  method2->addParam(param1Copy);
+
+  // Add both methods to test
+  data.addClassAttribute ("test", method);
+  data.addClassAttribute ("test", method2);
+
+  // Should not be able to delete this parameter, as it would cause overload break
+  ERR_CHECK(data.deleteParameter("test", method, "testParam2"), "This parameter cannot be deleted now, as it would cause duplicate methods to exist.")
+  // Should be able to delete this parameter, as it wouldn't cause overload break
+  ASSERT_NO_THROW(data.deleteParameter("test", method, "testParam"));
+}
+
+// Tests to see if renaming a parameter works at a basic level.
+TEST (UMLDataParameterTest, RenameParameterTest1) {
+  UMLData data;
+  data.addClass ("test");
+  
+  // Create method with a param
+  auto method = std::make_shared<UMLMethod> ("testMethod", "type", std::list<UMLParameter>{});
+  auto param1 = UMLParameter("testParam", "type");
+  method->addParam(param1);
+
+  // Add method to data
+  data.addClassAttribute ("test", method);
+
+  // Renaming this parameter should not cause problems
+  ASSERT_NO_THROW(data.changeParameterName(method, "testParam", "testParam2"));
+  for (auto attr : data.getClassAttributes ("test")) { 
+    for (auto param : std::dynamic_pointer_cast<UMLMethod>(attr)->getParam()) {
+      ASSERT_EQ(param.getName(), "testParam2");
+    }
+  }
+}
+
+// Tests to see if changing a parameter type works at a basic level.
+TEST (UMLDataParameterTest, ChangeParameterTypeTest1) {
+  UMLData data;
+  data.addClass ("test");
+  
+  // Create method with a param
+  auto method = std::make_shared<UMLMethod> ("testMethod", "type", std::list<UMLParameter>{});
+  auto param1 = UMLParameter("testParam", "type");
+  method->addParam(param1);
+
+  // Add method to data
+  data.addClassAttribute ("test", method);
+
+  // Changing this parameter type should not cause problems
+  ASSERT_NO_THROW(data.changeParameterType("test", method, "testParam", "type2"));
+  for (auto attr : data.getClassAttributes ("test")) { 
+    for (auto param : std::dynamic_pointer_cast<UMLMethod>(attr)->getParam()) {
+      ASSERT_EQ(param.getType(), "type2");
+    }
+  }
+}
+
+// Tests to see if renaming a parameter works in a method with multiple parameters.
+TEST (UMLDataParameterTest, RenameParameterTest2) 
+{
+  UMLData data;
+  data.addClass ("test");
+  
+  // Create method 1, has 2 params
+  auto method = std::make_shared<UMLMethod> ("testMethod", "type", std::list<UMLParameter>{});
+  auto param1 = UMLParameter("testParam", "type");
+  auto param2 = UMLParameter("testParam2", "type2");
+  method->addParam(param1);
+  method->addParam(param2);
+
+  // Add method to data
+  data.addClassAttribute ("test", method);
+
+  // Cannot rename to same name as another parameter
+  ERR_CHECK(data.changeParameterName(method, "testParam", "testParam2"), "That name is already taken.");
+  // Should be able to change to a different name
+  ASSERT_NO_THROW(data.changeParameterName(method, "testParam", "testParam3"));
+
+  // Check to see if the proper parameter was renamed within shared_ptr
+  for (auto param : method->getParam()) {
+    if (param.getType() == "type") {
+      ASSERT_EQ(param.getName(), "testParam3");
+    }
+  }
+}
+
+// Tests to see if overload checking with renaming parameters works properly.
+TEST (UMLDataParameterTest, RenameParameterTest3) 
+{
+  UMLData data;
+  data.addClass ("test");
+  
+  // Create method 1, has 1 param
+  auto method = std::make_shared<UMLMethod> ("testMethod", "type", std::list<UMLParameter>{});
+  auto param1 = UMLParameter("testParam", "type");
+  method->addParam(param1);
+
+  // Create second method that is an overload, 1 param
+  auto method2 = std::make_shared<UMLMethod> ("testMethod", "type", std::list<UMLParameter>{});
+  auto param1Copy = UMLParameter("testParam2", "type2");
+  method2->addParam(param1Copy);
+
+  // Renaming a parameter should never cause overload errors, even if the names are identical
+  ASSERT_NO_THROW(data.changeParameterName(method, "testParam", "testParam2"));
+
+  // Check to see if the proper parameter was renamed within shared_ptr
+  for (auto param : method->getParam()) {
+    if (param.getType() == "type") {
+      ASSERT_EQ(param.getName(), "testParam2");
+    }
+  }
+}
+
+// Tests to see if changing a parameter type works in a method with multiple parameters.
+TEST (UMLDataParameterTest, ChangeParameterTypeTest2) 
+{
+  UMLData data;
+  data.addClass ("test");
+  
+  // Create method 1, has 2 params
+  auto method = std::make_shared<UMLMethod> ("testMethod", "type", std::list<UMLParameter>{});
+  auto param1 = UMLParameter("testParam", "type");
+  auto param2 = UMLParameter("testParam2", "type2");
+  method->addParam(param1);
+  method->addParam(param2);
+
+  // Add method to data
+  data.addClassAttribute ("test", method);
+
+  // Changing to the same type as something already in the method shouldn't matter at all
+  ASSERT_NO_THROW(data.changeParameterType("test", method, "testParam", "type2"));
+
+  // Check to see if the proper parameter had its type changed within shared_ptr
+  for (auto param : method->getParam()) {
+    if (param.getName() == "testParam") {
+      ASSERT_EQ(param.getType(), "type2");
+    }
+  }
+}
+
+// Tests to see if overload checking with changing parameter types works properly.
+TEST (UMLDataParameterTest, ChangeParameterTypeTest3) 
+{
+  UMLData data;
+  data.addClass ("test");
+  
+  // Create method 1, has 1 param
+  auto method = std::make_shared<UMLMethod> ("testMethod", "type", std::list<UMLParameter>{});
+  auto param1 = UMLParameter("testParam", "type");
+  method->addParam(param1);
+
+  // Create second method that is an overload, 1 param
+  auto method2 = std::make_shared<UMLMethod> ("testMethod", "type", std::list<UMLParameter>{});
+  auto param1Copy = UMLParameter("testParam2", "type2");
+  method2->addParam(param1Copy);
+
+  // Add methods to data
+  data.addClassAttribute ("test", method);
+  data.addClassAttribute ("test", method2);
+
+  // Changing to the same type signature should cause an error
+  ERR_CHECK(data.changeParameterType("test", method, "testParam", "type2"), "Parameter type cannot be changed due to conflicts with other overloads");
+  // Changing to a different one shouldn't matter
+  ASSERT_NO_THROW(data.changeParameterType("test", method, "testParam", "type3"));
+
+  // Check to see if the proper parameter had its type changed within shared_ptr
+  for (auto param : method->getParam()) {
+    if (param.getName() == "testParam") {
+      ASSERT_EQ(param.getType(), "type3");
+    }
+  }
+}
+
+// Tests to see if invalid names are caught by each parameter function
+TEST (UMLDataParameterTest, ParameterCatchInvalidNames) {
+  string invalidName1 = "_";
+  string invalidName2 = "1";
+  string invalidName3 = "!";
+  string invalidName4 = "a!";
+
+  UMLData data;
+  data.addClass ("test");
+  
+  // Create method, has 1 param
+  auto method = std::make_shared<UMLMethod> ("testMethod", "type", std::list<UMLParameter>{});
+  auto param1 = UMLParameter("testParam", "type");
+  method->addParam(param1);
+
+  // Add methods to data
+  data.addClassAttribute ("test", method);
+
+  // Add parameter, param name check
+  ERR_CHECK(data.addParameter("test", method, invalidName1, "valid"), "Parameter name is not valid");
+  ERR_CHECK(data.addParameter("test", method, invalidName2, "valid"), "Parameter name is not valid");
+  ERR_CHECK(data.addParameter("test", method, invalidName3, "valid"), "Parameter name is not valid");
+  ERR_CHECK(data.addParameter("test", method, invalidName4, "valid"), "Parameter name is not valid");
+
+  // Add parameter, param type check
+  ERR_CHECK(data.addParameter("test", method, "valid", invalidName1), "Parameter type is not valid");
+  ERR_CHECK(data.addParameter("test", method, "valid", invalidName2), "Parameter type is not valid");
+  ERR_CHECK(data.addParameter("test", method, "valid", invalidName3), "Parameter type is not valid");
+  ERR_CHECK(data.addParameter("test", method, "valid", invalidName4), "Parameter type is not valid");
+
+  // Rename parameter check
+  ERR_CHECK(data.changeParameterName(method, "testParam", invalidName1), "New parameter name is not valid");
+  ERR_CHECK(data.changeParameterName(method, "testParam", invalidName2), "New parameter name is not valid");
+  ERR_CHECK(data.changeParameterName(method, "testParam", invalidName3), "New parameter name is not valid");
+  ERR_CHECK(data.changeParameterName(method, "testParam", invalidName4), "New parameter name is not valid");
+
+  // Change parameter type check
+  ERR_CHECK(data.changeParameterType("test", method, "testParam", invalidName1), "New parameter type name is not valid");
+  ERR_CHECK(data.changeParameterType("test", method, "testParam", invalidName2), "New parameter type name is not valid");
+  ERR_CHECK(data.changeParameterType("test", method, "testParam", invalidName3), "New parameter type name is not valid");
+  ERR_CHECK(data.changeParameterType("test", method, "testParam", invalidName4), "New parameter type name is not valid");
+}
+
+// ****************************************************
+
+// Tests involving relationships
 // **************************
 
 // Basic check to see if adding a relationship to the data model works.
@@ -1161,8 +1809,14 @@ TEST (UndoRedoTest, RedoAfterClassDeletedUndo)
 
 // ****************************************************
 
-// Functions for tests for CLI (from test_cli.cpp)
-// **************************
+
+/*
+////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+|**************************************************************|
+|       Functions for tests for CLI (from test_cli.cpp)        |
+|**************************************************************|
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////
+*/
 
 // Test if help command prints help
 TEST (CLITest, HelpCommand)
@@ -1249,6 +1903,26 @@ TEST (CLITest, AddDuplicateClass)
   // Shouldn't be able to find bob
   ERR_CHECK (interface.return_model().getClassCopy("bob"), "Class not found");
 }
+
+
+
+// Tests for CLITest
+// **************************
+
+// General test of every component of the CLI test class.
+
+TEST (CLITestTester, GeneralTest) {
+  CLITest test;
+  stringstream oss;
+
+  // Create a sample menu for testing
+  auto rootMenu = make_unique<Menu>("cli");
+  Cli cli(move(rootMenu));
+  
+  ASSERT_NO_THROW(test.user_input(cli, oss, "help"));
+}
+
+
 
 // Functions for CLI class delete
 // **************************
