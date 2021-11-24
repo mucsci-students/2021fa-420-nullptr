@@ -123,7 +123,7 @@ function createClassBox(draw, uclass, x, y)
   var maxTextLength = 140;
   var lineCount = 8;
   
-  var classText = nested.text(uclass["name"]).dy(text_y).dx(text_x).css({  fill: '#FFF' });
+  var classText = nested.text(" Class: " + uclass["name"]).dy(text_y).dx(text_x).css({  fill: '#FFF' });
 
   var classtextLength = classText.length();
   
@@ -147,7 +147,7 @@ function createClassBox(draw, uclass, x, y)
   for (let key in uclass["fields"])
   {
     let field = uclass["fields"][key];
-   var fieldTextname =  nested.text(field["type"] + " " + field["name"]).dy(text_y).dx(text_x).css({  fill: '#FFF' });
+   var fieldTextname =  nested.text("Field: "  + field["type"] + " " + field["name"]).dy(text_y).dx(text_x).css({  fill: '#FFF' });
    var fieldTextLength = fieldTextname.length();
 
 
@@ -167,11 +167,13 @@ function createClassBox(draw, uclass, x, y)
     for (let param_key in method["params"])
     {
       let param = method["params"][param_key];
-       param_list += param["type"] + ", ";
+       param_list += param["type"] + " " + param["name"] + ", ";
     }
     //get rid of last comma
     param_list = param_list.substring(0, param_list.length - 2);
-    var methodText =  nested.text(method["return_type"] + " " + method["name"] + "(" + param_list + ")").dy(text_y).dx(text_x).css({  fill: '#FFF' });
+    
+    var methodText =  nested.text("Method: " + method["return_type"] + " " + method["name"] + "(" + param_list + ")").dy(text_y).dx(text_x).css({  fill: '#FFF' });
+   
     var methodTextLength = methodText.length();
 
     if(maxTextLength < methodTextLength){
