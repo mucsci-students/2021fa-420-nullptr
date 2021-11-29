@@ -7,8 +7,6 @@ project(project CXX)
 
 # Code Coverage
 set(CMAKE_CXX_FLAGS --coverage)
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/CMake-codecov/cmake" ${CMAKE_MODULE_PATH})
-find_package(codecov)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
 set(INJA_USE_EMBEDDED_JSON On CACHE Bool "" FORCE) # Allows use of json and inja as submodule
@@ -55,7 +53,6 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(Tests Tests.cpp)
-add_coverage(Tests)
 
 target_link_libraries(Tests PUBLIC gtest_main umllib)
 
