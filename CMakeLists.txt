@@ -5,6 +5,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # set the project name
 project(project CXX)
 
+# Code Coverage
+set(CMAKE_CXX_FLAGS --coverage)
+
 # find_package (Threads REQUIRED)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
