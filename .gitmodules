@@ -7,3 +7,6 @@
 [submodule "cli"]
 	path = external/cli
 	url = https://github.com/daniele77/cli
+[submodule "external/CMake-codecov"]
+	path = external/CMake-codecov
+	url = git://github.com/RWTH-HPC/CMake-codecov.git

@@ -2,16 +2,16 @@ cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# set the project name
+# Sets the project name
 project(project CXX)
 
 # Code Coverage
 set(CMAKE_CXX_FLAGS --coverage)
-
-# find_package (Threads REQUIRED)
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/external/CMake-codecov/cmake" ${CMAKE_MODULE_PATH})
+find_package(codecov)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
-set(INJA_USE_EMBEDDED_JSON On CACHE Bool "" FORCE)
+set(INJA_USE_EMBEDDED_JSON On CACHE Bool "" FORCE) # Allows use of json and inja as submodule
 set(BUILD_BENCHMARK Off CACHE Bool "" FORCE)
 set(BUILD_TESTING Off CACHE Bool "" FORCE)
 add_subdirectory(external/inja)
@@ -55,6 +55,7 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(Tests Tests.cpp)
+add_coverage(Tests)
 
 target_link_libraries(Tests PUBLIC gtest_main umllib)
 
