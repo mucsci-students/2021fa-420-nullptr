@@ -40,10 +40,13 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C ${{env.BUILD_TYPE}}
     
-    - name: Code Coverage
-      # Attempts to implement code coverage.
+    - name: Code Coverage 1
+      # Attempts to get code coverage.
+      run: gcov ${{github.workspace}}/build/CMakeFiles/umllib.dir/*.o
+    
+    - name: Code Coverage 2
+      # Attempts to push code coverage.
       uses: codecov/codecov-action@v2.1.0
       with:
-        files: ${{github.workspace}}/build/CMakeFiles/umllib.dir
+        files: ${{github.workspace}}/build/CMakeFiles/umllib.dir/*.gcov
         fail_ci_if_error: true
-
