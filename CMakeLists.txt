@@ -14,9 +14,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
 set(INJA_USE_EMBEDDED_JSON On CACHE Bool "" FORCE)
 set(BUILD_BENCHMARK Off CACHE Bool "" FORCE)
 set(BUILD_TESTING Off CACHE Bool "" FORCE)
-add_subdirectory(inja)
-add_subdirectory(cpp-httplib)
-add_subdirectory(cli)
+add_subdirectory(external/inja)
+add_subdirectory(external/cpp-httplib)
+add_subdirectory(external/cli)
 
 add_library(umllib
   UMLAttribute.cpp
