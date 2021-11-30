@@ -39,4 +39,16 @@ jobs:
       # Execute tests defined by the CMake configuration.  
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C ${{env.BUILD_TYPE}}
-      
+    
+    - name: Code Coverage 1
+      # Attempts to get code coverage.
+      run: gcov ${{github.workspace}}/build/CMakeFiles/umllib.dir/*.o
+    
+    - name: Code Coverage 2
+      # Attempts to push code coverage.
+      uses: codecov/codecov-action@v2.1.0
+      with:
+        # List all important model files tested with gcov. Do not add spaces between commas.
+        files: ./UMLClass.cpp.gcov,./UMLRelationship.cpp.gcov,./UMLAttribute.cpp.gcov,./UMLField.cpp.gcov,./UMLMethod.cpp.gcov,./UMLParameter.cpp.gcov,./UMLData.cpp.gcov,./UMLDataHistory.cpp.gcov,./UMLFile.cpp.gcov
+        fail_ci_if_error: true
+        verbose: true
