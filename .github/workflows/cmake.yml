@@ -49,14 +49,14 @@ jobs:
       uses: codecov/codecov-action@v2.1.0
       with:
         # List all important model files tested with gcov
-        files: ${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLClass.gcov,
-               ${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLRelationship.gcov,
-               ${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLAttribute.gcov,
-               ${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLField.gcov,
-               ${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLMethod.gcov,
-               ${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLParameter.gcov,
-               ${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLData.gcov,
-               ${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLDataHistory.gcov,
-               ${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLFile.gcov,
-               ${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLCLI.gcov
+        files: ${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLClass.cpp.gcov,
+               ${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLRelationship.cpp.gcov,
+               ${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLAttribute.cpp.gcov,
+               ${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLField.cpp.gcov,
+               ${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLMethod.cpp.gcov,
+               ${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLParameter.cpp.gcov,
+               ${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLData.cpp.gcov,
+               ${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLDataHistory.cpp.gcov,
+               ${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLFile.cpp.gcov,
+               ${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLCLI.cpp.gcov
         fail_ci_if_error: true
