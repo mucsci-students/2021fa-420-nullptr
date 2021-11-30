@@ -49,6 +49,15 @@ jobs:
       uses: codecov/codecov-action@v2.1.0
       with:
         # List all important model files tested with gcov
-        files: ${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLClass.cpp.gcov,${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLRelationship.cpp.gcov,${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLAttribute.cpp.gcov,${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLField.cpp.gcov,${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLMethod.cpp.gcov,${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLParameter.cpp.gcov,${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLData.cpp.gcov,${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLDataHistory.cpp.gcov,${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLFile.cpp.gcov,${{github.workspace}}/build/CMakeFiles/umllib.dir/UMLCLI.cpp.gcov
+        files: ./UMLClass.cpp.gcov,
+               ./UMLRelationship.cpp.gcov,
+               ./UMLAttribute.cpp.gcov,
+               ./UMLField.cpp.gcov,
+               ./UMLMethod.cpp.gcov,
+               ./UMLParameter.cpp.gcov,
+               ./UMLData.cpp.gcov,
+               ./UMLDataHistory.cpp.gcov,
+               ./UMLFile.cpp.gcov,
+               ./UMLCLI.cpp.gcov
         fail_ci_if_error: true
         verbose: true
