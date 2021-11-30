@@ -1,4 +1,4 @@
-# UML++ ![workflow](https://github.com/mucsci-students/2021fa-420-nullptr/actions/workflows/cmake.yml/badge.svg) [![codecov](https://codecov.io/gh/mucsci-students/2021fa-420-nullptr/branch/master/graph/badge.svg?token=gjrjXBxxEO)](https://codecov.io/gh/mucsci-students/2021fa-420-nullptr)
+# UML++ ![workflow](https://github.com/mucsci-students/2021fa-420-nullptr/actions/workflows/cmake.yml/badge.svg) [![codecov](https://codecov.io/gh/mucsci-students/2021fa-420-nullptr/branch/develop/graph/badge.svg?token=gjrjXBxxEO)](https://codecov.io/gh/mucsci-students/2021fa-420-nullptr)
 
 UML++ is a C++ & Javascript editor and generator of UML class diagrams.
 
