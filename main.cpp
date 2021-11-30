@@ -6,14 +6,14 @@
 
 //--------------------------------------------------------------------
 // System includes
-#include "include/UMLCLI.hpp"
-#include "include/UMLAttribute.hpp"
-#include "include/UMLClass.hpp"
-#include "include/UMLData.hpp"
-#include "include/UMLDataHistory.hpp"
-#include "include/UMLMethod.hpp"
-#include "include/UMLParameter.hpp"
-#include "include/UMLServer.hpp"
+#include "umllib/include/UMLCLI.hpp"
+#include "umllib/include/UMLAttribute.hpp"
+#include "umllib/include/UMLClass.hpp"
+#include "umllib/include/UMLData.hpp"
+#include "umllib/include/UMLDataHistory.hpp"
+#include "umllib/include/UMLMethod.hpp"
+#include "umllib/include/UMLParameter.hpp"
+#include "umllib/include/UMLServer.hpp"
 #include <memory>
 //--------------------------------------------------------------------
 
