@@ -795,11 +795,6 @@ TEST (UMLFileTest, SaveLoadTest)
   UMLFile file ("test.json");
   data = file.load();
 
-  // Check that json listed is sent properly
-  json list = file_old.listSaves();
-  string listString = list.dump();
-  ASSERT_EQ(listString, "[\"test\",\"umldiagram\"]");
-
   // Test compared to equivalent data added normally
   UMLData data2;
   data2.addClass ("fish2");
