@@ -60,13 +60,11 @@ UMLField
 UMLMethod
 UMLParameter
 UMLRelationship
-UMLFile (## WIP ##)
-UMLData - Classes
-UMLData - Methods/Fields
-UMLData - Relationships
+UMLFile
+UMLData
 UMLDataHistory
-CLI (## WIP ##)
-Server (## WIP ##)
+UMLCLI
+UMLServer (## WIP ##)
 */
 
 // ****************************************************
@@ -99,9 +97,9 @@ TEST (UMLClassTest, ChangeNameTest)
 // Test to see if the proper attribute with the right name is added
 TEST (UMLClassTest, AddAttributeTest)
 {
-  UMLClass class1 ("test");
-  UMLAttribute attribute ("testattribute");
-  class1.addAttribute (attribute);
+  UMLClass class1("test");
+  UMLAttribute attribute("testattribute");
+  class1.addAttribute(attribute);
   bool attrFound = false;
 
   for (auto attr : class1.getAttributes())
@@ -112,7 +110,13 @@ TEST (UMLClassTest, AddAttributeTest)
     }
   }
 
-  ASSERT_EQ (attrFound, true);
+  ASSERT_TRUE (attrFound);
+
+  // Adding methods and fields shouldn't work with this function. It is solely for raw attributes
+  UMLField field("testField", "type");
+  UMLMethod method("testMethod", "type", std::list<UMLParameter>{});
+  ERR_CHECK(class1.addAttribute(field), "Cannot directly add field without smart_ptr");
+  ERR_CHECK(class1.addAttribute(method), "Cannot directly add method without smart_ptr");
 }
 
 // Tests to see if an attribute inside of a class properly gets modified based on name.
@@ -191,7 +195,10 @@ TEST (UMLClassTest, DeleteAttributeTest)
     }
   }
 
-  ASSERT_EQ (attrFound, false);
+  ASSERT_FALSE (attrFound);
+
+  // Cannot delete something that does not exist
+  ERR_CHECK(class1.deleteAttribute("test"), "Attribute not found");
 }
 
 // Checks if deleting attribute based on its reference works.
@@ -218,7 +225,6 @@ TEST (UMLClassTest, DeleteAttributeReferenceTest)
 }
 
 // Check if finding attribute based on name works.
-// This test is outdated and must be replaced entirely alongside modifications to UMLClass.cpp.
 TEST (UMLClassTest, FindAttributeTest)
 {
   UMLClass class1 ("test");
@@ -227,6 +233,7 @@ TEST (UMLClassTest, FindAttributeTest)
 
   ASSERT_EQ (class1.getAttribute ("testattribute")->getAttributeName(),
              attribute.getAttributeName());
+  ERR_CHECK(class1.getAttribute("nonexistent"), "Attribute not found");
 }
 
 // Test that sees that adding a test attribute works as intended.
@@ -455,16 +462,41 @@ TEST (UMLMethodTest, AddParameterTest)
   // If you call addParam directly, it won't be tested!
   UMLMethod method ("test", "type", std::list<UMLParameter>{});
   UMLParameter param ("param", "type");
+
   method.addParam (param);
   auto paramList = method.getParam();
   bool paramExists = false;
+
   // Loop to see if param was added
   for (auto param : paramList)
   {
     if (param.getName() == "param")
       paramExists = true;
   }
-  ASSERT_TRUE (paramExists) << "Parameter was not added into the method";
+  ASSERT_TRUE(paramExists) << "Parameter was not added into the method";
+}
+
+// Test to see if deleting a parameter works properly
+TEST (UMLMethodTest, DeleteParameterTest)
+{
+  UMLMethod method ("test", "type", std::list<UMLParameter>{});
+  UMLParameter param ("param", "type");
+
+  // Shouldn't be able to delete a nonexistent param
+  ERR_CHECK(method.deleteParameter("param"), "Parameter not found.");
+
+  method.addParam(param);
+  method.deleteParameter("param");
+  auto paramList = method.getParam();
+  bool paramExists = false;
+
+  // Loop to see if param was added
+  for (auto param : paramList)
+  {
+    if (param.getName() == "param")
+      paramExists = true;
+  }
+  ASSERT_FALSE(paramExists) << "Parameter was not deleted from the method";
 }
 
 // Checks to see if changing a parameter name in a method works properly
@@ -472,10 +504,16 @@ TEST (UMLMethodTest, RenameParameterTest)
 {
   UMLMethod method ("test", "type", std::list<UMLParameter>{});
   UMLParameter param ("param", "type");
-  method.addParam (param);
-  method.changeParameterName ("param", "newParam");
+
+  // Shouldn't be able to rename a nonexistent param
+  ERR_CHECK(method.changeParameterName("param", "newParam"), "Parameter not found.");
+  
+  method.addParam(param);
+  method.changeParameterName("param", "newParam");
+  
   auto paramList = method.getParam();
   bool test = false;
+  
   // test if new name is there
   for (auto param : paramList)
   {
@@ -487,8 +525,9 @@ TEST (UMLMethodTest, RenameParameterTest)
   {
     if (param.getName() == "param")
       test = false;
+  
   }
-  ASSERT_TRUE (test) << "Parameter was not renamed correctly";
+  ASSERT_TRUE(test) << "Parameter was not renamed correctly";
 }
 
 // Checks to see if changing a parameter type in a method works properly
@@ -496,10 +535,16 @@ TEST (UMLMethodTest, ChangeParameterTypeTest)
 {
   UMLMethod method ("test", "type", std::list<UMLParameter>{});
   UMLParameter param ("param", "type");
+
+  // Shouldn't be able to change parameter type of nonexistent param
+  ERR_CHECK(method.changeParameterType("param", "newType"), "Parameter not found.");
+
   method.addParam (param);
   method.changeParameterType ("param", "newType");
+
   auto paramList = method.getParam();
   bool test = false;
+
   // test if new type is there
   for (auto param : paramList)
   {
@@ -512,7 +557,29 @@ TEST (UMLMethodTest, ChangeParameterTypeTest)
     if (param.getType() == "type")
       test = false;
   }
-  ASSERT_TRUE (test) << "Parameter was not changed correctly";
+  ASSERT_TRUE(test) << "Parameter was not changed correctly";
+}
+
+// Checks to see if setting a new list of parameters works properly.
+// We do not use this, but its functionality may be useful for someone else.
+// NOTE: setParam DOES NOT error check the list it is given to it!
+TEST (UMLMethodTest, SetParamTest) {
+  // Generate method with sample parameters
+  UMLParameter param1 ("param1", "type1");
+  UMLParameter param2 ("param2", "type2");
+  UMLMethod method ("test", "type", std::list<UMLParameter>{param1, param2});
+  
+  // Get old list of parameters
+  std::list<UMLParameter> oldList = method.getParam();
+
+  // Create new list of parameters
+  UMLParameter param3 ("param3", "type3");
+  std::list<UMLParameter> newList = {param3};
+
+  // Set method, and compare with lists
+  method.setParam(newList);
+  ASSERT_EQ(method.getParam(), newList);
+  ASSERT_NE(method.getParam(), oldList);
 }
 
 // ****************************************************
@@ -613,8 +680,12 @@ TEST (UMLRelationshipTest, SetTypeTest)
   UMLClass class1 ("class1");
   UMLClass class2 ("class2");
   UMLRelationship relate (class1, class2, 0);
+  // relationship type should work
   relate.setType (composition);
-  ASSERT_EQ (relate.getType() == composition, true);
+  ASSERT_TRUE (relate.getType() == composition);
+  // changing it back should work too
+  relate.setType (aggregation);
+  ASSERT_TRUE (relate.getType() == aggregation);
 }
 
 // Make and set relationships of each type and see if they hold the correct type
@@ -630,6 +701,9 @@ TEST (UMLRelationshipTest, GetAllTypeTest)
   ASSERT_EQ (relate.getType() == generalization, true);
   relate.setType (realization);
   ASSERT_EQ (relate.getType() == realization, true);
+  // You shouldn't be able to set to an invalid type or the "none" error type
+  ERR_CHECK(relate.setType(4), "Invalid type");
+  ERR_CHECK(relate.setType(none), "Invalid type");
 }
 
 // Test that sees if all strings are converting to the correct types
@@ -650,6 +724,8 @@ TEST (UMLRelationshipTest, StringToTypeTest)
     << "Generalization has incorrect string to type";
   ASSERT_EQ (relate.string_to_type ("realization"), realization)
     << "Realization has incorrect string to type";
+  ASSERT_EQ (relate.string_to_type ("invalid"), none)
+    << "Sending an invalid type doesn't give the invalid type";
 }
 
 // ****************************************************
@@ -794,8 +870,23 @@ TEST (CLITest, ParameterOverloadAdd)
 // Tests involving classes
 // **************************
 
+// Test vector constructor.
+// This isn't used in our program, but it might be used by someone else.
+TEST (UMLDataClassTest, ClassVectorConstructor) {
+  UMLClass testClass = UMLClass("test");
+  UMLClass testClass2 = UMLClass("test2");
+  UMLClass testClass3 = UMLClass("test3");
+  vector<UMLClass> testVector = {testClass, testClass2, testClass3};
+
+  UMLData data(testVector);
+  auto dataList = data.getClasses();
+  std::vector<UMLClass> dataVector(dataList.begin(), dataList.end());
+  // These should have the same classes
+  ASSERT_EQ(dataVector, testVector);
+}
+
 // Checks to see if getting a copy of a class has the same name
-TEST (UMLDataAddClassTest, AddClassAndGetCopy)
+TEST (UMLDataClassTest, AddClassAndGetCopy)
 {
   UMLData data;
   UMLClass testClass = UMLClass("test");
@@ -808,7 +899,7 @@ TEST (UMLDataAddClassTest, AddClassAndGetCopy)
 }
 
 // Shouldn't be able to add a class that already exists
-TEST (UMLDataAddClassTest, AddClassThatAlreadyExists)
+TEST (UMLDataClassTest, AddClassThatAlreadyExists)
 {
   UMLData data;
   data.addClassObject(UMLClass ("test"));
@@ -816,7 +907,7 @@ TEST (UMLDataAddClassTest, AddClassThatAlreadyExists)
 }
 
 // Should be able to delete a class and then check with delete that it doesn't exist
-TEST (UMLRemoveClassTest, RemoveClass) 
+TEST (UMLDataClassTest, RemoveClass) 
 {
   UMLData data;
   data.addClassObject(UMLClass("test"));
@@ -825,14 +916,26 @@ TEST (UMLRemoveClassTest, RemoveClass)
 }
 
 // Shouldn't be able to remove a class that doesn't exist
-TEST (UMLDataRemoveClassTest, RemoveClassThatDoesntExist)
+TEST (UMLDataClassTest, RemoveClassThatDoesntExist)
 {
   UMLData data;
   ERR_CHECK (data.deleteClass ("test"), "Class not found");
 }
 
+// Removing a class should also remove its relationship
+TEST (UMLDataClassTest, RemoveClassWithRelationships)
+{
+  UMLData data;
+  data.addClassObject(UMLClass("test"));
+  data.addClassObject(UMLClass("test2"));
+  ERR_CHECK (data.getRelationship("test", "test2"), "Relationship not found");
+  data.addRelationship("test", "test2", 0);
+  data.deleteClass("test");
+  ERR_CHECK (data.deleteClass("test"), "Class not found");
+}
+
 // Renaming the class in the data model should = the operation in UMLClass
-TEST (UMLDataRenameClassTest, RenameAClassTest)
+TEST (UMLDataClassTest, RenameAClassTest)
 {
   UMLData data;
   string oldName;
@@ -845,7 +948,7 @@ TEST (UMLDataRenameClassTest, RenameAClassTest)
 }
 
 // Shouldn't be allowed to rename a class to one that already exists in the data model
-TEST (UMLDataRenameClassTest, RenameClassIntoClassThatAlreadyExists)
+TEST (UMLDataClassTest, RenameClassIntoClassThatAlreadyExists)
 {
   UMLData data;
   data.addClass ("test");
@@ -903,6 +1006,55 @@ TEST(UMLDataAttributeTest, AddFieldTest)
   ASSERT_EQ(check, true);
 }
 
+// Tests to see if overloads are being handled correctly in UMLData
+TEST(UMLDataAttributeTest, AddOverloadTest) {
+  // All tests from UMLClass's checkAttribute test should apply here too
+  UMLData data;
+  UMLClass class1("test");
+  data.addClassObject(class1);
+
+  // Starting method to test basic situations
+  shared_ptr<UMLMethod> method1 =
+    std::make_shared<UMLMethod> ("test", "int", std::list<UMLParameter>{});
+  data.addClassAttribute ("test", method1);
+
+  // method2 should be identical to method1
+  shared_ptr<UMLMethod> method2 =
+    std::make_shared<UMLMethod> ("test", "int", std::list<UMLParameter>{});
+  // Identical to method2 in name and type, but is a field
+  shared_ptr<UMLField> field1 = std::make_shared<UMLField> ("test", "int");
+  ERR_CHECK (data.addClassAttribute ("test", method2), "Method cannot be added, conflicts with other attributes");
+  ERR_CHECK (data.addClassAttribute ("test", field1), "Field cannot be added, conflicts with other attributes");
+
+  // Create set of methods for the sake of testing with different sets of parameters
+  UMLParameter param1 ("param", "type1");
+  UMLParameter param2 ("param", "type2");
+  UMLParameter param3 ("param2", "type1");
+  UMLParameter param4 ("param2", "type2");
+
+  // Default method to be compared with
+  shared_ptr<UMLMethod> method3 = std::make_shared<UMLMethod> (
+    "paramTest", "type", std::list<UMLParameter>{param1, param4});
+  data.addClassAttribute ("test", method3);
+
+  // Same as method3, but second parameter has different type
+  shared_ptr<UMLMethod> method4 = std::make_shared<UMLMethod> (
+    "paramTest", "type", std::list<UMLParameter>{param1, param3});
+  // Same as method3, but both parameters have different types
+  shared_ptr<UMLMethod> method5 = std::make_shared<UMLMethod> (
+    "paramTest", "type", std::list<UMLParameter>{param2, param3});
+  // Same as method3, but the method itself has a different name
+  shared_ptr<UMLMethod> method6 = std::make_shared<UMLMethod> (
+    "testParam", "type", std::list<UMLParameter>{param1, param4});
+  // Same as method3, btu the method itself has a different type
+  shared_ptr<UMLMethod> method7 = std::make_shared<UMLMethod> (
+    "paramTest", "type2", std::list<UMLParameter>{param1, param4});
+
+  ASSERT_NO_THROW (data.addClassAttribute ("test", method4));
+  ASSERT_NO_THROW (data.addClassAttribute ("test", method5));
+  ASSERT_NO_THROW (data.addClassAttribute ("test", method6));
+  ERR_CHECK (data.addClassAttribute ("test", method7), "Method cannot be added, conflicts with other attributes");
+}
 
 // Checks to see if deleting methods and fields works properly, along with any potential overload cases.
 TEST (UMLDataAttributeTest, DeleteMethodFieldTest)
@@ -981,8 +1133,6 @@ TEST (UMLDataAttributeTest, ChangeMethodNameTest)
 }
 
 // Checks to see if changing the name of a field in UMLData works.
-// TODO: Clean up variable names.
-
 TEST (UMLDataAttributeTest, ChangeFieldNameTest)
 {
   bool hasTestGone;
@@ -1009,6 +1159,74 @@ TEST (UMLDataAttributeTest, ChangeFieldNameTest)
     }
   }
   ASSERT_EQ (hasTestGone, newHasTestPresent);
+}
+
+// Checks if overloads for attribute name changes works properly within UMLData.
+TEST (UMLDataAttributeTest, ChangeAttributeNameOverloadTest)
+{
+  UMLData data;
+  data.addClass ("test");
+
+  // ----------------------------------------------
+
+  // Scenario 1: Field
+  // Our base field that we will test against
+  auto field1 = std::make_shared<UMLField> ("test", "type"); 
+  data.addClassAttribute ("test", field1);
+
+  // A field and method with different names
+  auto field2 = std::make_shared<UMLField> ("test2", "type"); 
+  auto method1 = std::make_shared<UMLMethod> ("test3", "type", std::list<UMLParameter>{});
+  data.addClassAttribute ("test", field2);
+  data.addClassAttribute ("test", method1);
+
+  // Cannot change name to "test", as this will conflict with the field named test
+  ERR_CHECK(data.changeAttributeName("test", field2, "test"), "Field name cannot be changed due to conflicts with other attributes");
+  ERR_CHECK(data.changeAttributeName("test", method1, "test"), "Method name cannot be changed due to conflicts with other attributes");
+  // Similarly, the base field cannot change its name to the other attributes
+  ERR_CHECK(data.changeAttributeName("test", field1, "test2"), "Field name cannot be changed due to conflicts with other attributes");
+  ERR_CHECK(data.changeAttributeName("test", field1, "test3"), "Field name cannot be changed due to conflicts with other attributes");
+
+  // ----------------------------------------------
+
+  // Scenario 2: Method
+  // Our base method that we will test against
+  UMLParameter param1 ("param", "type1");
+  UMLParameter param2 ("param2", "type2");
+  auto method2 = std::make_shared<UMLMethod> ("test4", "type", std::list<UMLParameter>{param1, param2});
+
+  // A method with a different name, but the same parameter type signature as method2
+  UMLParameter param3 ("param3", "type1");
+  UMLParameter param4 ("param4", "type2");
+  auto method3 = std::make_shared<UMLMethod> ("test5", "type", std::list<UMLParameter>{param3, param4});
+
+  // A method with a different name and a different type signature compared to method2
+  UMLParameter param5 ("param5", "type2");
+  UMLParameter param6 ("param6", "type2");
+  auto method4 = std::make_shared<UMLMethod> ("test6", "type", std::list<UMLParameter>{param5, param6});
+
+  // A random field to compare against the 3 methods
+  auto field3 = std::make_shared<UMLField> ("test7", "type");
+
+  // Add methods and fields
+  data.addClassAttribute ("test", method2);
+  data.addClassAttribute ("test", method3); 
+  data.addClassAttribute ("test", method4); 
+  data.addClassAttribute ("test", field3); 
+
+  // method2 and method3 cannot be renamed to one another.
+  ERR_CHECK(data.changeAttributeName("test", method2, "test5"), "Method name cannot be changed due to conflicts with other attributes");
+  ERR_CHECK(data.changeAttributeName("test", method3, "test4"), "Method name cannot be changed due to conflicts with other attributes");
+  
+  // method4 can be renamed to method2 and method3's name, and then back to its old name.
+  ASSERT_NO_THROW(data.changeAttributeName("test", method4, "test4"));
+  ASSERT_NO_THROW(data.changeAttributeName("test", method4, "test5"));
+  ASSERT_NO_THROW(data.changeAttributeName("test", method4, "test6"));
+  
+  // field3 cannot be named to method2, method3, or method4.
+  ERR_CHECK(data.changeAttributeName("test", field3, "test4"), "Field name cannot be changed due to conflicts with other attributes");
+  ERR_CHECK(data.changeAttributeName("test", field3, "test5"), "Field name cannot be changed due to conflicts with other attributes");
+  ERR_CHECK(data.changeAttributeName("test", field3, "test6"), "Field name cannot be changed due to conflicts with other attributes");
 }
 
 // Checks to see if changing the type of a method in UMLData works.
@@ -1638,6 +1856,26 @@ TEST (UMLDataRelationshipTest, GetRelationshipByClassTest)
   }
 }
 
+// Tests getRelationship (not plural).
+TEST (UMLDataRelationshipTest, GetRelationshipRefTest) {
+  UMLData data;
+
+  data.addClass ("test");
+  data.addClass ("test1");
+
+  // Shouldn't be able to get relationship that doesn't exist
+  ERR_CHECK(data.getRelationship("test", "test1"), "Relationship not found");
+
+  // Add relationship and get reference to relationship
+  data.addRelationship ("test", "test1", 0);
+  UMLRelationship relationship = data.getRelationship("test", "test1");
+
+  // Check reference data
+  ASSERT_EQ(relationship.getSource().getName(), "test");
+  ASSERT_EQ(relationship.getDestination().getName(), "test1");
+  ASSERT_EQ(relationship.getType(), aggregation);
+}
+
 // Sees if changing the relationship type works at all.
 TEST (UMLDataRelationshipTest, ChangeRelationshipTypeTest)
 {
@@ -1708,6 +1946,9 @@ TEST (UndoRedoTest, UndoAfterAddOneClassTest)
   UMLData data;
   UMLDataHistory history (data);
 
+  // Undo and redo should be empty right now
+  ASSERT_TRUE (history.is_redo_empty());
+
   //collect json object beforre undo for comparison
   json beforeClassAddUndo = data.getJson();
 
@@ -1735,7 +1976,6 @@ TEST (UndoRedoTest, UndoAfterAddTwoClassesTest)
 
   // Collect json object beforre undo for comparison1
   json beforeClassAddUndo = data.getJson();
-
  
   data.addClass ("TestClass2");
   history.save(data);
@@ -1805,6 +2045,70 @@ TEST (UndoRedoTest, RedoAfterClassDeletedUndo)
   json afterClassAddUndo = data.getJson();
 
   ASSERT_EQ (beforeClassAddUndo, afterClassAddUndo);
+}
+
+// Checking of sizes when operations are performed
+// Our implementation uses a queue of jsons, so what operation occurs shouldn't matter
+TEST (UndoRedoTest, UndoRedoSizeCheck)
+{
+  // Set up data model and undo/redo model
+  UMLData data;
+  UMLDataHistory history (data);
+
+  // Both of these should be true, as neither undo or redo should have any contents
+  ASSERT_EQ(history.is_undo_empty(), history.is_redo_empty()) << "Undo and redo do not instantiate as empty queues";
+
+  // Add class
+  data.addClass ("TestClass");
+  history.save(data);
+
+  // Undo should have one element. Redo should still have no elements.
+  ASSERT_EQ(history.undo_size(), 1) << "Undo should have one element after one class add";
+  ASSERT_TRUE(history.is_redo_empty()) << "Redo should have no elements after one class add";
+
+  // Add second class
+  data.addClass ("TestClass2");
+  history.save(data);
+
+  // Undo should have two element. Redo should still have no elements.
+  ASSERT_EQ(history.undo_size(), 2) << "Undo should have two elements after two class adds";
+  ASSERT_TRUE(history.is_redo_empty()) << "Redo should have no elements after two class adds";
+
+  // Check if redo does anything when redo is empty
+  data = history.redo();
+
+  // Both undo and redo should be the same
+  ASSERT_EQ(history.undo_size(), 2) << "Undo queue shouldn't be affected by redo when redo queue is empty";
+  ASSERT_TRUE(history.is_redo_empty()) << "Redo queue shouldn't be affected by redo when redo queue is empty";
+
+  // Undo an operation (general undo check)
+  data = history.undo();
+
+  // Undo and redo should both have one element
+  ASSERT_EQ(history.undo_size(), 1) << "Undo should have one element after undoing on a set of two class adds";
+  ASSERT_EQ(history.redo_size(), 1) << "Redo should have one element after undoing on a set of two class adds";
+
+  // Undo another operation (check when undo is done with one element left)
+  data = history.undo();
+
+  // Undo should have no more elements. Redo should have two
+  ASSERT_TRUE(history.is_undo_empty()) << "Undo should be empty after clearing all elements";
+  ASSERT_EQ(history.redo_size(), 2) << "Redo should have two elements after undoing all two class adds";
+
+  // Check if redo works as expected
+  data = history.redo();
+
+  // Undo and redo should both have one element
+  ASSERT_EQ(history.undo_size(), 1) << "Undo should have one element after redoing one of the class adds";
+  ASSERT_EQ(history.redo_size(), 1) << "Redo should have one element after redoing one of the class adds";
+
+  // Add yet another class (redo clear check)
+  data.addClass ("TestClass3");
+  history.save(data);
+
+  // Confirm that redos have been cleared
+  ASSERT_EQ(history.undo_size(), 2) << "Undo should have two elements after adding with one undo and one redo";
+  ASSERT_TRUE(history.is_redo_empty()) << "Redos should be cleared when a new operation occurs";
 }
 
 // ****************************************************

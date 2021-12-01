@@ -23,13 +23,12 @@ class UMLServer
     // No private methods
 
   public:
-    //holds screen position for gui
-
     // Controller management for the GUI
     void start (int port);
     
     // Attribute index management
     void addAttributeIndexes (json& j, const UMLData& data);
 
+    // Loads json into UMLData
     UMLData load_json(json j);
 };

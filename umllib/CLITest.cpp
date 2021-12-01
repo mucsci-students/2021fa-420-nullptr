@@ -7,25 +7,7 @@
 // System includes
 #include "include/CLITest.hpp"
 //--------------------------------------------------------------------
-
-// Extracts first prompt of the CLI
-string CLITest::extract_first_prompt(const stringstream& o)
-{
-    auto content = o.str();
-    std::size_t pos = content.find_first_of('>');
-    return content.substr(0, pos);
-}
-
-// Extracts last prompt of the CLI
-string CLITest::extract_last_prompt(const stringstream& o)
-{
-    auto content = o.str();
-    std::size_t pos = content.find_last_of('\n');
-    content = content.substr(pos+1);
-    pos = content.find_last_of('>');
-    return content.substr(0, pos);
-}
-
+ 
 /* Takes
 
 cli> sub> foo

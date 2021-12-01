@@ -35,9 +35,6 @@ class UMLClass
 		// Constructor for class object without attributes
 		UMLClass(string newClass);
 
-		// Constructor for class object with attributes
-		UMLClass(string newClass, const std::vector<UMLAttribute>& attributes);
-
 		// Grab name from given class object
 		string getName() const;
 
@@ -48,7 +45,7 @@ class UMLClass
 		void addAttribute(const UMLAttribute& newAttribute);
 
 		// Adds attribute to attribute vector with a smart pointer
-    void addAttribute(std::shared_ptr<UMLAttribute> newAttribute);
+    	void addAttribute(std::shared_ptr<UMLAttribute> newAttribute);
 
 		// Changes name of attribute within class
 		void changeAttributeName(string oldAttributeName, string newAttributeName);
