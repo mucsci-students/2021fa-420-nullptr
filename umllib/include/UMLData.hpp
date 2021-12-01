@@ -69,7 +69,6 @@ class UMLData
     /********************************/
     // Constructors
 
-
     // Empty constructor
     UMLData();
 
@@ -78,8 +77,7 @@ class UMLData
 
 
     /********************************/
-    //Get Collections
-
+    // Get Collections
 
     // Returns vector of all classes
     list<UMLClass> getClasses() const;
@@ -95,8 +93,7 @@ class UMLData
 
 
     /********************************/
-    //Get Data
-
+    // Get Data
 
     // Return a single class
     UMLClass getClassCopy(string name);
@@ -110,19 +107,9 @@ class UMLData
     // Returns string representation of relationship type
     string getRelationshipType(const string& srcName, const string& destName);
 
-    //---------------------------------------------------
-    // Memento pattern
-    // Returns const snapshot of UMLData object
-    //const UMLDataSnapshot make_snapshot();
-
-    // Restores UMLData object from a snapshot
-    //void restore(const UMLDataSnapshot& snapshot);
-    //---------------------------------------------------
-
 
     /********************************/
-    //Adding
-
+    // Adding
 
     // Takes in class and adds it to vector
     void addClassObject(const UMLClass& classIn);
@@ -141,8 +128,7 @@ class UMLData
 
 
     /********************************/
-    //Deleting
-
+    // Deleting
 
     // Deletes a class by string in the classes vector
     void deleteClass(string name);
@@ -158,9 +144,8 @@ class UMLData
 
 
     /********************************/
-    //Renaming
+    // Renaming
     
-
     // Changes class name from old name to new name
     void changeClassName(string oldName, string newName);
 
@@ -173,7 +158,7 @@ class UMLData
     
 
     /********************************/
-    //Type Changing
+    // Type Changing
 
     // Modifies relationship type given a new relationship type 
     void changeRelationshipType(const string& srcName, const string& destName, int newType);
@@ -187,7 +172,7 @@ class UMLData
 
 
     /********************************/
-    //Bools
+    // Bools
 
     // Checks if class exists within classses list (string argument) 
     bool doesClassExist(const string& name);
@@ -213,12 +198,6 @@ class UMLData
 
     // Checks if identifier name is valid
     bool isValidName(string name);
-
-    /********************************/
-    //To be deleted
-
-    // THIS WILL BE DELETED!!!!!!
-    //void removeClassAttribute(string className, string attributeName);
 
 
   private:

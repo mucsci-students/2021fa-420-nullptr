@@ -22,16 +22,6 @@ UMLClass::UMLClass(string newClass)
 {
 }
 
-// Constructor for class object with attributes
-UMLClass::UMLClass(string newClass, const std::vector<UMLAttribute>& attributes) 
-:className(newClass)
-{
-	for (UMLAttribute attr : attributes)
-	{
-		addAttribute(attr);
-	}
-}
-
 // Grab name from given class object
 string UMLClass::getName() const
 {
@@ -62,11 +52,6 @@ void UMLClass::addAttribute(const UMLAttribute& newAttribute)
 // Adds attribute to attribute vector with a smart pointer
 void UMLClass::addAttribute(std::shared_ptr<UMLAttribute> newAttribute) 
 {
-	// for(auto attribute : classAttributes)
-	// {
-	// 	if(attribute->getAttributeName() == newAttribute->getAttributeName())
-	// 		throw std::runtime_error("No duplicate attributes");
-	// }
 	classAttributes.push_back(newAttribute); // NEW POINTER VECTOR
 }
 

@@ -26,12 +26,6 @@ class CLITest
     // No private methods 
   
   public:
-    // Extracts first prompt of the CLI
-    string extract_first_prompt(const stringstream& o);
-
-    // Extracts last prompt of the CLI
-    string extract_last_prompt(const stringstream& o);
-
     /* Takes
 
     cli> sub> foo

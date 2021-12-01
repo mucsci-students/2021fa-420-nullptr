@@ -27,7 +27,7 @@ using json = nlohmann::json;
     fun;                                  \
     history.save (data);                  \
   }                                       \
-  catch (const std::exception& error) \
+  catch (const std::exception& error)     \
   {                                       \
     errors += error.what();               \
   }                                       \

@@ -816,32 +816,6 @@ bool UMLData::isValidName(string name)
 }
 
 
-/**************************************************************/
-//TO BE DELETED
-
-
-/************************************/
-
-
-/**
- * @brief THIS WILL BE DELETED!!!!!!!!!!!!!!
- * 
- * @param className 
- * @param attributeName 
- *
-void UMLData::removeClassAttribute(string className, string attributeName)
-{
-  for (attr_ptr attr : getClass(className).getAttributes()) {
-    if (attr->getAttributeName() == attributeName) {
-      getClass(className).deleteAttribute(attributeName);
-      return;
-    }
-  }
-  throw std::runtime_error("Attribute does not exist");
-}
-
-
-
 /*
 ////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 |**************************************************************|
