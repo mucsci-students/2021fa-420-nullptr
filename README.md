@@ -73,3 +73,5 @@ For help, type 'help' in the command line or see USER_GUIDE.md.
 [NicatFire](https://github.com/NicatFire) -  Nick Wells
 
 [lgnzg](https://github.com/lgnzg) - Logan Zug
+
+[DragonArchon](https://github.com/DragonArchon) - Matt Giacoponello
