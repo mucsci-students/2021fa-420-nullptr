@@ -22,14 +22,14 @@
 #include "cli/cli.h"
 #include "cli/clifilesession.h"
 
-#include "include/UMLCLI.hpp"
-#include "include/UMLClass.hpp"
-#include "include/UMLData.hpp"
-#include "include/UMLDataHistory.hpp"
-#include "include/UMLMethod.hpp"
-#include "include/UMLParameter.hpp"
-#include "include/UMLRelationship.hpp"
-#include "include/CLITest.hpp"
+#include "umllib/include/UMLCLI.hpp"
+#include "umllib/include/UMLClass.hpp"
+#include "umllib/include/UMLData.hpp"
+#include "umllib/include/UMLDataHistory.hpp"
+#include "umllib/include/UMLMethod.hpp"
+#include "umllib/include/UMLParameter.hpp"
+#include "umllib/include/UMLRelationship.hpp"
+#include "umllib/include/CLITest.hpp"
 
 #include <iostream>
 #include <memory>

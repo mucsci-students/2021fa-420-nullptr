@@ -17,20 +17,20 @@ add_subdirectory(external/cpp-httplib)
 add_subdirectory(external/cli)
 
 add_library(umllib
-  UMLAttribute.cpp
-  UMLClass.cpp
-  UMLData.cpp
-  UMLDataHistory.cpp
-  UMLField.cpp
-  UMLFile.cpp
-  UMLMethod.cpp
-  UMLParameter.cpp
-  UMLRelationship.cpp
-  UMLServer.cpp
-  UMLCLI.cpp
-  CLITest.cpp)
+  umllib/UMLAttribute.cpp
+  umllib/UMLClass.cpp
+  umllib/UMLData.cpp
+  umllib/UMLDataHistory.cpp
+  umllib/UMLField.cpp
+  umllib/UMLFile.cpp
+  umllib/UMLMethod.cpp
+  umllib/UMLParameter.cpp
+  umllib/UMLRelationship.cpp
+  umllib/UMLServer.cpp
+  umllib/UMLCLI.cpp
+  umllib/CLITest.cpp)
 
-target_include_directories(umllib PUBLIC "${PROJECT_SOURCE_DIR}/include")
+target_include_directories(umllib PUBLIC "${PROJECT_SOURCE_DIR}/umllib/include")
 
 target_link_libraries(umllib PUBLIC 
   inja

@@ -42,7 +42,7 @@ jobs:
     
     - name: Code Coverage 1
       # Attempts to get code coverage.
-      run: gcov ${{github.workspace}}/build/CMakeFiles/umllib.dir/*.o
+      run: gcov ${{github.workspace}}/build/CMakeFiles/umllib.dir/umllib/*.o
     
     - name: Code Coverage 2
       # Attempts to push code coverage.
