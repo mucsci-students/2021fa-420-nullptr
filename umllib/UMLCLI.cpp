@@ -565,12 +565,16 @@ void UMLCLI::list_relationships()
 
   for(auto iter = allRelationships.begin(); iter != allRelationships.end(); iter++)
   {
+    if(iter != allRelationships.begin())
+      cout << "------------------------------------------------------\n\n"; 
+
     UMLRelationship currentRel = *iter;
-    string source = currentRel.getSource().getName();
-    string destination = currentRel.getDestination().getName();
+    
+    UMLClass source = currentRel.getSource();
+    UMLClass destination = currentRel.getDestination();
     
     
-    string rType = Model.getRelationshipType(source, destination);
+    string rType = Model.getRelationshipType(source.getName(), destination.getName());
 
     display_relationship(source, destination, rType);
   }
@@ -1158,48 +1162,125 @@ void UMLCLI::change_parameter(string paramName, string newParamType)
 
 /**
  * @brief Takes in a UMLClass object, and displays it in
- * a format like this:
+ * a format like this: (Angle brackets not included)
  * 
- * CLASS: c1 {
- *   Fields:
- *      int f1
- *      int f2
- *      string f3
- *   Methods:
- *      void m1(int p1, string p2, bool p3)
- *      int m2()
- *      bool m3(int p1)
- * }
+ *  +----------------------------------------------------------------+
+ *  | <class name>                                                   |
+ *  +----------------------------------------------------------------+
+ *  | <field name> : <type>                                          |
+ *  +----------------------------------------------------------------+
+ *  | <method name>() : <type>                                       |
+ *  | <method name>(<param name> : <type>) : <type>                  |
+ *  | <method name>(<p1 name> : <type>, <p2 name> : <type>) : <type> |
+ *  +----------------------------------------------------------------+
  * 
  * @param currentClass 
  */
 void UMLCLI::display_class(UMLClass currentClass)
 { 
   string className = currentClass.getName();
+  size_t maxSize = className.size() + 2;
+  vector<attr_ptr> attributes = currentClass.getAttributes();
+  vector<string> fieldStrings;
+  vector<string> methodStrings;
 
-
-  cout << "CLASS: " << className << "{\n";
-  cout << "  Fields:\n";
-  
-  //Fields
-  for(auto fieldIter : currentClass.getAttributes())
+  // STEP 1: Store the data of each attribute in a string with the correct format.
+  for(auto attIter : attributes)
   {
-    if(fieldIter->identifier() == "field")
-      cout << "     " << fieldIter->getType() << " " << fieldIter->getAttributeName() << "\n";
+    if(attIter->identifier() == "field")
+    {
+      string fieldData = " " + attIter->getAttributeName() + " : " + attIter->getType() + " ";
+      fieldStrings.push_back(fieldData);
+    }
+
+    else
+    {
+      method_ptr methodIter = std::dynamic_pointer_cast<UMLMethod>(attIter);
+      
+      string methodData = " " + methodIter->getAttributeName() + "(";
+      list<UMLParameter> paramList = methodIter->getParam();
+      
+      int i = 0;
+      for(auto param : paramList)
+      {
+        if(i > 0)
+          methodData.append(", ");
+          
+        methodData.append(param.getName() + " : " + param.getType());
+        i++;
+      }
+
+      methodData.append(")");  
+      methodData.append(" : ");
+      methodData.append(methodIter->getType());
+      methodData.append(" ");
+      methodStrings.push_back(methodData);
+    }
   }
 
-  cout << "  Methods:\n";
-  
-  //Methods
-  for(auto methodIter : currentClass.getAttributes())
+  // STEP 2: Check all internal strings and update maxSize if necessary.
+  for(auto i : fieldStrings)
   {
-    if(methodIter->identifier() == "method") {
-      shared_ptr<UMLMethod> castMethodIter = std::dynamic_pointer_cast<UMLMethod>(methodIter);
-      display_method(currentClass.getName(), castMethodIter);
-    }
-  } 
+    if(maxSize < i.size())
+      maxSize = i.size();
+  }
+
+  for(auto i : methodStrings)
+  {
+    if(maxSize < i.size())
+      maxSize = i.size();
+  }
+
+  //STEP 3: Create each slice of the class box and store them in a vector.
   
-  cout << "}\n";
+  string edge = "+";
+  for(size_t i = 0; i < maxSize; i++)
+  {
+    edge.append("-");
+  }
+  edge.append("+");
+
+  cout << edge << "\n";
+
+  string classNameSlice = "| " + className;
+  for(size_t i = className.size() + 2; i < maxSize; i++)
+  {
+    classNameSlice.append(" ");
+  }
+  classNameSlice.append(" |");
+
+  cout << classNameSlice << "\n";
+  cout << edge << "\n";
+
+  for(auto fieldData : fieldStrings)
+  {
+    string slice = "|" + fieldData;
+    for(size_t i = fieldData.size(); i < maxSize; i++)
+    {
+      slice.append(" ");
+    }
+    slice.append("|");
+    cout << slice << "\n";
+  }
+  
+  if(fieldStrings.size() != 0)
+    cout << edge << "\n";
+
+  for(auto methodData : methodStrings)
+  {
+    string slice = "|" + methodData;
+    for(size_t i = methodData.size(); i < maxSize; i++)
+    {
+      slice.append(" ");
+    }
+    slice.append("|");
+    cout << slice << "\n";
+  }
+
+  if(methodStrings.size() != 0)
+    cout << edge << "\n";
+  
+  cout << "\n";
 }
 
 
@@ -1217,21 +1298,24 @@ void UMLCLI::display_class(UMLClass currentClass)
  * @param methodIter 
  */
 void UMLCLI::display_method(string className, method_ptr methodIter)
-{
-  cout << "     ";
-  cout << methodIter->getType() << " " << methodIter->getAttributeName() << "(";
+{     
+  string methodData = methodIter->getAttributeName() + "(";
+  list<UMLParameter> paramList = methodIter->getParam();
   
-  //Parameters
-  size_t paramCount = 0;
-  for (auto param : (std::dynamic_pointer_cast<UMLMethod>(methodIter))->getParam())
+  int i = 0;
+  for(auto param : paramList)
   {
-    paramCount++;
-    if (paramCount > 1)
-      cout << ", ";
-    
-    cout << param.getType() << " " << param.getName();
+    if(i > 0)
+      methodData.append(", ");
+      
+    methodData.append(param.getName() + " : " + param.getType());
+    i++;
   }
-  cout << ") (" << method_number(className, std::dynamic_pointer_cast<UMLMethod>(methodIter)) << ")\n";
+
+  methodData.append(")"); 
+  methodData.append(" : "); 
+  methodData.append(methodIter->getType() + " ");
+  cout << methodData << "\n";
 }
 
 /*************************/
@@ -1239,19 +1323,47 @@ void UMLCLI::display_method(string className, method_ptr methodIter)
 /**
  * @brief Prints out relationships in the following format:
  * 
- * TYPE        : Aggregation
- * SOURCE      : C1
- * DESTINATION : C2
+ * TYPE: Aggregation
+ * 
+ * SOURCE:
+ * +---------------------------+
+ * | Box                       |
+ * +---------------------------+
+ * | width : int               |
+ * | height : int              |
+ * +---------------------------+
+ * | empty() : void            |
+ * | area() : int              |
+ * | setWidth(w : int) : void  |
+ * | setHeight(h : int) : void |
+ * | draw(g : Graphics) : void |
+ * +---------------------------+
+ * 
+ * DESTINATION:
+ * +---------------------------+
+ * | Box2                      |
+ * +---------------------------+
+ * | width : int               |
+ * | height : int              |
+ * +---------------------------+
+ * | empty() : void            |
+ * | area() : int              |
+ * | setWidth(w : int) : void  |
+ * | setHeight(h : int) : void |
+ * | draw(g : Graphics) : void |
+ * +---------------------------+
  * 
  * @param source 
  * @param destination 
  * @param rType 
  */
-void UMLCLI::display_relationship(string source, string destination, string rType)
+void UMLCLI::display_relationship(UMLClass source, UMLClass destination, string rType)
 {
-  cout << "TYPE        : " << rType << "\n";
-  cout << "SOURCE      : " << source << "\n";
-  cout << "DESTINATION : " << destination << "\n";
+  cout << "TYPE: " << rType << "\n\n";
+  cout << "SOURCE:\n";
+  display_class(source);
+  cout << "DESTINATION:\n";
+  display_class(destination);
 }
 
 /**************************************************************/
