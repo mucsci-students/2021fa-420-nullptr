@@ -9,6 +9,10 @@
 // System includes
 #include <cli/cli.h>
 #include <string>
+#include <vector>
+#include <queue>
+#include <iostream>
+#include <fstream>
 #include "UMLClass.hpp"
 #include "UMLAttribute.hpp"
 #include "UMLRelationship.hpp"
@@ -18,9 +22,7 @@
 #include "UMLMethod.hpp"
 #include "UMLField.hpp"
 #include "UMLParameter.hpp"
-#include <vector>
-#include <iostream>
-#include <fstream>
+
 //--------------------------------------------------------------------
 
 //--------------------------------------------------------------------
@@ -32,8 +34,9 @@
  using std::vector;
  using std::invalid_argument;
  using std::list;
+ using std::queue;
  using std::shared_ptr;
- using std::map;
+ //using std::map;
  using namespace cli;
 //--------------------------------------------------------------------
 
@@ -102,7 +105,7 @@ class UMLCLI
 
     void display_class(UMLClass currentClass);
     void display_method(string className, method_ptr methodIter); 
-    void display_relationship(string source, string destination, string rType);
+    void display_relationship(UMLClass source, UMLClass destination, string rType);
 
     /********************/
     //Undo/Redo
