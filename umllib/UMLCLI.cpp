@@ -901,6 +901,7 @@ bool UMLCLI::add_method(string className, string methodName, string methodType)
 
   cout << "Overview:\n";
   display_method(className, newMethod);
+  store_selected_method(className, newMethod);
   return true;
 }
 
@@ -1164,15 +1165,15 @@ void UMLCLI::change_parameter(string paramName, string newParamType)
  * @brief Takes in a UMLClass object, and displays it in
  * a format like this: (Angle brackets not included)
  * 
- *  +----------------------------------------------------------------+
- *  | <class name>                                                   |
- *  +----------------------------------------------------------------+
- *  | <field name> : <type>                                          |
- *  +----------------------------------------------------------------+
- *  | <method name>() : <type>                                       |
- *  | <method name>(<param name> : <type>) : <type>                  |
- *  | <method name>(<p1 name> : <type>, <p2 name> : <type>) : <type> |
- *  +----------------------------------------------------------------+
+ *  +--------------------------------------------------------------------------------+
+ *  | <class name>                                                                   |
+ *  +--------------------------------------------------------------------------------+
+ *  | <field name> : <type>                                                          |
+ *  +--------------------------------------------------------------------------------+
+ *  | <method name>() : <type> (method number)                                       |
+ *  | <method name>(<param name> : <type>) : <type> (method number)                  |
+ *  | <method name>(<p1 name> : <type>, <p2 name> : <type>) : <type> (method number) |
+ *  +--------------------------------------------------------------------------------+
  * 
  * @param currentClass 
  */
@@ -1210,10 +1211,11 @@ void UMLCLI::display_class(UMLClass currentClass)
         i++;
       }
 
-      methodData.append(")");  
-      methodData.append(" : ");
+      methodData.append(") : ");  
       methodData.append(methodIter->getType());
-      methodData.append(" ");
+      methodData.append(" (");
+      methodData.append(std::to_string(method_number(className, methodIter)));
+      methodData.append(") ");
       methodStrings.push_back(methodData);
     }
   }
@@ -1314,7 +1316,10 @@ void UMLCLI::display_method(string className, method_ptr methodIter)
 
   methodData.append(")"); 
   methodData.append(" : "); 
-  methodData.append(methodIter->getType() + " ");
+  methodData.append(methodIter->getType());
+  methodData.append(" (");
+  methodData.append(std::to_string(method_number(className, methodIter)));
+  methodData.append(") ");
   cout << methodData << "\n";
 }
 
