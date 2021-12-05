@@ -59,7 +59,7 @@ function drawLines(draw)
     var nested1 = draw.nested();
   
  
-    var rectt = nested1.rect(105,25).radius(5).css({fill: '#555', resize: 'both', overflow: 'auto', stroke: 'black'});
+    //var rectt = nested1.rect(105,25).radius(5).css({fill: '#555', resize: 'both', overflow: 'auto', stroke: 'black'});
    
 
     var polyavx = (source.x() + dest.x()) / 2;
@@ -69,26 +69,64 @@ function drawLines(draw)
 
 
  
-    rectt.front();
+    //rectt.front();
     var text_y = averagey+155;
     var text_x = averagex + 5;
     var lineSlope = (dest.y() - source.y()) / (dest.x() - source.x())
+      
+    console.log((relationship["type"]))
+      
+  
     
-     rectt.x(averagex);
-     rectt.y(averagey+145);
+    //rectt.x(averagex);
+     //rectt.y(averagey+145);
     
-    nested1.text(relationship["type"]).dy(text_y).dx(text_x).css({  fill: '#FFF' });
+    //nested1.text(relationship["type"]).dy(text_y).dx(text_x).css({  fill: '#FFF' });
     
     index++;
     text_y += 20;
 
-    nested1.line(source.x()+100, source.y()+150, dest.x()+100, dest.y()+150).stroke({ color: 'black', width: 10, linecap: 'round' }).back();
+    
     
     if(source.x() <= dest.x()){
-        nested1.polyline(' 60,20 100,50 60,70 ').css({fill: '#555'}).stroke({ color: '#000', width: 4, linecap: 'round', linejoin: 'round' }).x(averagex + 98).y(averagey + 132);
+     
+        if(relationship["type"] == "aggregation"){
+           nested1.polyline('45,50 60,40 75,50 60,60 45,50 ').css({fill: '#FFF'}).stroke({ color: '#000', width: 4, linecap: 'round', linejoin: 'round' }).x(dest.x()-15).y(dest.y()+150)
+           nested1.line(source.x()+160, source.y()+160, dest.x(), dest.y()+160).stroke({ color: 'black', width: 10, linecap: 'round'}).back(); 
+          }
+        if(relationship["type"] == "composition"){
+          nested1.polyline('45,50 60,40 75,50 60,60 45,50 ').css({fill: '#000'}).stroke({ color: '#000', width: 4, linecap: 'round', linejoin: 'round' }).x(dest.x()-15).y(dest.y()+150)
+          nested1.line(source.x()+160, source.y()+160, dest.x(), dest.y()+160).stroke({ color: 'black', width: 10, linecap: 'round'}).back(); 
+        }
+        if(relationship["type"] == "generalization"){
+        nested1.polyline('85,50 60,40  60,60 85,50 ').css({fill: '#FFF'}).stroke({ color: '#000', width: 4, linecap: 'round', linejoin: 'round' }).x(dest.x()-15).y(dest.y()+150)
+        nested1.line(source.x()+160, source.y()+160, dest.x(), dest.y()+160).stroke({ color: 'black', width: 10, linecap: 'round'}).back(); 
+      }
+        if(relationship["type"] == "realization"){
+          nested1.polyline('85,50 60,40  60,60 85,50 ').css({fill: '#FFF'}).stroke({ color: '#000', width: 4, linecap: 'round', linejoin: 'round' }).x(dest.x()-15).y(dest.y()+150)
+          nested1.line(source.x()+160, source.y()+160, dest.x(), dest.y()+160).stroke({ color: 'black', width: 10, linecap: 'round', dasharray: '15 15'}).back(); 
+        }
     }
      else{
-      nested1.polyline('60,70 10,50  60,20').css({fill: '#555'}).stroke({ color: '#000', width: 4, linecap: 'round', linejoin: 'round' }).x(averagex -47).y(averagey + 132);
+      
+        if(relationship["type"] == "aggregation"){
+          nested1.polyline('45,50 60,40 75,50 60,60 45,50 ').css({fill: '#FFF'}).stroke({ color: '#000', width: 4, linecap: 'round', linejoin: 'round' }).x(dest.x()+135).y(dest.y()+150)
+          nested1.line(source.x(), source.y()+160, dest.x() + 160, dest.y()+160).stroke({ color: 'black', width: 10, linecap: 'round'}).back(); 
+        }
+        if(relationship["type"] == "composition"){
+          nested1.polyline('45,50 60,40 75,50 60,60 45,50 ').css({fill: '#000'}).stroke({ color: '#000', width: 4, linecap: 'round', linejoin: 'round' }).x(dest.x()+135).y(dest.y()+150)
+          nested1.line(source.x(), source.y()+160, dest.x() + 160, dest.y()+160).stroke({ color: 'black', width: 10, linecap: 'round'}).back(); 
+        }
+        if(relationship["type"] == "generalization"){
+          nested1.polyline('35,50 60,40  60,60 35,50 ').css({fill: '#FFF'}).stroke({ color: '#000', width: 4, linecap: 'round', linejoin: 'round' }).x(dest.x()+135).y(dest.y()+150)
+          nested1.line(source.x(), source.y()+160, dest.x() + 160, dest.y()+160).stroke({ color: 'black', width: 10, linecap: 'round'}).back();  
+        }
+        if(relationship["type"] == "realization"){
+          nested1.polyline('35,50 60,40  60,60 35,50 ').css({fill: '#FFF'}).stroke({ color: '#000', width: 4, linecap: 'round', linejoin: 'round' }).x(dest.x()+135).y(dest.y()+150)
+          nested1.line(source.x(), source.y()+160, dest.x() + 160, dest.y()+160).stroke({ color: 'black', width: 10, linecap: 'round', dasharray:'15 15'}).back();   
+        }
+    
+    
     }
 
     //focus on relationship on sidebar
