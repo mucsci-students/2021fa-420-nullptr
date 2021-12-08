@@ -66,7 +66,8 @@ the vector of UMLRelationships "relationships" could be considered collections
 of children for the mass data structure. Client code then works with all data 
 through the composite UMLData data model structure. 
 
-- 12. Chain of Responsibility (CLI imported library, UMLCLI): The imported 
-CLI library, within Cli.h, contains a "CliHandler" that handles the chain 
-of various Command classes within the CLI library (that store the commands
-that are input by the library).
+- 12. Facade (CLI imported library, UMLCLI): The Cli object acts as a facade,
+handling the input stream, tab completion, and other features that make for
+a complex CLI system. Using the facade doesn't require you to know how the 
+tab completion implementation works--you can work with the small subsystem
+of menu implementation to make the tab completion just work.
