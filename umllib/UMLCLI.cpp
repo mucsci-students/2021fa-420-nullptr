@@ -108,8 +108,8 @@ Cli UMLCLI::cli_menu()
   // Create submenu for class operations
   auto classMenu = make_unique<Menu>("class", "Menu for operations on classes.");
 
-  // List All Classes
-  rootMenu -> Insert(
+  // List Classes
+  classMenu -> Insert(
     "list",
     [&](std::ostream& out){ list_classes(); },
     "Lists all classes the user has created, as well as their attributes.");
