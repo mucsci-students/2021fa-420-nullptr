@@ -191,11 +191,13 @@ Accessible while within the main menu (uml>).
 
 Accessible when the class submenu (class>), or by adding 'class' to the operation while in the main menu (uml> class ...).
 
-![Class commands](https://i.ibb.co/2SksJgK/Class.png)
+![Class commands](https://i.ibb.co/0VGDHVK/Code-q-Bh-E5d98f-Z.png)
 
 **list:** Displays all classes within the UML class diagram. An example is shown below.
 
-![List example](https://i.ibb.co/887SXKH/Code-cn-Zvxkj6-D3.png)
+![List example](https://i.ibb.co/qdNWJy7/Code-IRo-Ng-Tt3f-J.png)
+
+**view <class_name>:** Similar to list, but only shows a single class specified.
 
 **add <class_name>**: Adds a class, and shows an empty representation of the newly made class.
 
