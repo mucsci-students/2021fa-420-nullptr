@@ -64,6 +64,12 @@ Cli UMLCLI::cli_menu()
   // Setup CLI's initial root menu
   auto rootMenu = make_unique<Menu>("uml", "Main menu for basic UML functions.");
 
+  // List All Classes
+  rootMenu -> Insert(
+    "list",
+    [&](std::ostream& out){ list_classes(); },
+    "Lists all classes the user has created, as well as their attributes.");
+
   // Load 
   rootMenu -> Insert(
     "load", {"file_name"},
@@ -108,11 +114,14 @@ Cli UMLCLI::cli_menu()
   // Create submenu for class operations
   auto classMenu = make_unique<Menu>("class", "Menu for operations on classes.");
 
-  // List Classes
+  // List Class
   classMenu -> Insert(
-    "list",
-    [&](std::ostream& out){ list_classes(); },
-    "Lists all classes the user has created, as well as their attributes.");
+    "view", {"class_name"},
+    [&](std::ostream& out, string className)
+    {
+      display_class(className);
+    },
+    "List information about a given class.");
   
   // Add Class
   classMenu -> Insert(
