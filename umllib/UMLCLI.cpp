@@ -119,7 +119,15 @@ Cli UMLCLI::cli_menu()
     "view", {"class_name"},
     [&](std::ostream& out, string className)
     {
-      if(Model.doesClassExist(className)) display_class(className);
+      if(Model.doesClassExist(className)) // Check if class exists
+      {
+        for(auto currentClass : Model.getClasses()) // Find UMLClass from the string name
+          if(currentClass.getName() == className)
+          {
+            display_class(currentClass);
+            break;
+          }
+      }
       else out << "Class does not exist\n";
     },
     "List information about a given class.");
@@ -1180,9 +1188,9 @@ void UMLCLI::change_parameter(string paramName, string newParamType)
  *  +--------------------------------------------------------------------------------+
  *  | <field name> : <type>                                                          |
  *  +--------------------------------------------------------------------------------+
- *  | <method name>() : <type> (method number)                                       |
- *  | <method name>(<param name> : <type>) : <type> (method number)                  |
- *  | <method name>(<p1 name> : <type>, <p2 name> : <type>) : <type> (method number) |
+ *  | <method name>() : <type> [method number]                                       |
+ *  | <method name>(<param name> : <type>) : <type> [method number]                  |
+ *  | <method name>(<p1 name> : <type>, <p2 name> : <type>) : <type> [method number] |
  *  +--------------------------------------------------------------------------------+
  * 
  * @param currentClass 
@@ -1194,7 +1202,7 @@ void UMLCLI::display_class(UMLClass currentClass)
   vector<attr_ptr> attributes = currentClass.getAttributes();
   vector<string> fieldStrings;
   vector<string> methodStrings;
-
+  
   // STEP 1: Store the data of each attribute in a string with the correct format.
   for(auto attIter : attributes)
   {
@@ -1223,9 +1231,9 @@ void UMLCLI::display_class(UMLClass currentClass)
 
       methodData.append(") : ");  
       methodData.append(methodIter->getType());
-      methodData.append(" (");
+      methodData.append(" [");
       methodData.append(std::to_string(method_number(className, methodIter)));
-      methodData.append(") ");
+      methodData.append("] ");
       methodStrings.push_back(methodData);
     }
   }
@@ -1327,9 +1335,9 @@ void UMLCLI::display_method(string className, method_ptr methodIter)
   methodData.append(")"); 
   methodData.append(" : "); 
   methodData.append(methodIter->getType());
-  methodData.append(" (");
+  methodData.append(" [");
   methodData.append(std::to_string(method_number(className, methodIter)));
-  methodData.append(") ");
+  methodData.append("] ");
   cout << methodData << "\n";
 }
 
