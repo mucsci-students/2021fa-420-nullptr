@@ -113,6 +113,16 @@ Cli UMLCLI::cli_menu()
     "list",
     [&](std::ostream& out){ list_classes(); },
     "Lists all classes the user has created, as well as their attributes.");
+
+  // View Class
+  classMenu -> Insert(
+    "view", {"class_name"},
+    [&](std::ostream& out, string className)
+    {
+      if(Model.doesClassExist(className)) display_class(className);
+      else out << "Class does not exist\n";
+    },
+    "List information about a given class.");
   
   // Add Class
   classMenu -> Insert(
