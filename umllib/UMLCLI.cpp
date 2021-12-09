@@ -119,7 +119,8 @@ Cli UMLCLI::cli_menu()
     "view", {"class_name"},
     [&](std::ostream& out, string className)
     {
-      display_class(className);
+      if(Model.doesClassExist(className)) display_class(className);
+      else out << "Class does not exist\n";
     },
     "List information about a given class.");
   
